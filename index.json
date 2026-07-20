@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "updated": "2026-07-20",
+  "images": {
+    "docker.io/nearaidev/vllm-proxy-rs": [
+      "b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36"
+    ],
+    "docker.io/nearaidev/compose-manager": [
+      "b487f39160e9a53c3d98943a9c709d28e12babef75e0bb5a6cd5692abc8b2db6"
+    ],
+    "docker.io/nearaidev/compose-manager-launcher": [
+      "78afb82330137c2fd90a9c8c6e452f8f178c15d863f87c079a11c13e92216e00"
+    ],
+    "docker.io/lmsysorg/sglang": [
+      "aac6b242680daeb74d2ab1d85f70575357552d7d165d2e5d30eb362797db54a1"
+    ],
+    "docker.io/datadog/agent": [
+      "5556fb80b952832719a76b016f905616c76ee0989a239c4680c6220148e865d6"
+    ],
+    "docker.io/otel/opentelemetry-collector-contrib": [
+      "85ac41c2db88d0df9bd6145e608a3cb023f5d8443868adbfbbf66efb51087917"
+    ]
+  },
+  "manifests": {
+    "nearai/cvm-compose-files/prod/GLM-5.1-SGL-AWQ-TP4.yaml": [
+      "eb00b404e3218e2e8c8ab8da5845af10ce79929fd232fe8ac3d2f688582817be"
+    ]
+  },
+  "measured": [
+    "2c650eae81601afade86d1aa5ad898473b992081998026bb42ee1524ce99ee38"
+  ],
+  "os": []
+}
