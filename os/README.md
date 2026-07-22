@@ -15,31 +15,30 @@ quote and surfaced in the [teemoon](https://teemoon.ai) app as a tier-1
 
 ## Builds
 
-| `os_image_hash` | node | status |
-|---|---|---|
-| `9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677` | model (GLM-5.1 fleet, live 2026-07-20) | **observed — identity verified, not yet source-audited** |
+| `os_image_hash` | node | verdict | review |
+|---|---|---|---|
+| [`9b69bb1698ba...`](sha256-9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677.md) | model (GLM-5.1 + shared fleet, live 2026-07-22) | PRIVATE at measured configuration | 2026-07-22 |
 
-**Identity verified (reproduce-and-match, 2026-07-20).** This hash is, byte for
-byte, the `digest.txt` published in private-ml-sdk **v0.5.5** (commit
+**Identity verified (reproduce-and-match).** This hash is, byte for byte, the
+`digest.txt` published in private-ml-sdk **v0.5.5** (commit
 `25c25025c556ab2f797eeda3bab433f38a8ffb7a`) — so the deployed guest OS is
-near.ai's own published release, not an unrecognized build. All five public
-releases were pulled and compared; only v0.5.5 matches. The gateway node runs a
-*different* image (`da9a3d5c…`), off the plaintext path. Method + full walk:
-teemoon `docs/privacy-audit/guest-os.md`.
+near.ai's own published release, not an unrecognized build. The measurement rule
+(`os_image_hash = sha256(sha256sum.txt)` over `ovmf.fd bzImage
+initramfs.cpio.gz metadata.json`) was re-derived from the shipped bytes and
+matches live attestation. The gateway node runs a *different* image, off the
+plaintext path.
 
-**Not yet done** — which is why there is no `sha256-<hash>.md` review page and no
-`index.json` entry, so the app shows **no** guest-OS audit link (fail-closed):
+**Source-audited (2026-07-22).** The review page confirms the production image
+ships **no plaintext sink**: no login/serial-shell/ssh/capture tooling (dev-only,
+different hash), no telemetry or log-shipping agent, journald RAM-capped and
+local, container stdout confined to a KMS-keyed LUKS2 disk, dm-verity read-only
+rootfs with panic-on-failure. The one content-capable route (guest-agent
+`/logs`) is compiled in but **disabled by the measured manifest** (`public_logs:
+false`), and every operator-flippable switch found lands inside the measurement.
+Verdict **PRIVATE at measured configuration**.
 
-- a **source-level review** of the guest OS's own plaintext handling —
-  disk-encryption + KMS key-release posture, kernel/rootfs configuration; and
-- the full **source→binary rebuild** (`reproduce.sh` from `25c25025…`) proving
-  the published image derives from the pinned source, not merely matches its
-  binary.
-
-The **NVIDIA CC driver** is a proprietary blob: it does not block reproducibility
-(pinned, publicly downloadable bytes) but it blocks full source review of the
-driver itself.
-
-A build gets an indexed `sha256-<os_image_hash>.md` review page — and thus an
-in-app audit link — only once that review publishes. Until then this note stands
-as *observed, identity-verified, not audited*.
+**Residuals (see the page):** reproducibility is verified-by-design but the
+multi-hour Yocto rebuild was not exercised here; the Linux kernel + upstream
+Yocto layer *source* were not line-audited (config fragments + recipes only); the
+**NVIDIA CC driver** is a proprietary, sha256-pinned but unauditable blob; and
+the host serial console is a standing (content-free today) host-readable channel.
