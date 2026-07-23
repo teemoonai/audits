@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-07-22",
+  "updated": "2026-07-23",
   "images": {
     "docker.io/nearaidev/vllm-proxy-rs": [
       "b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36"
@@ -47,6 +47,28 @@
         "commit": "e3e3cd54589cee689b785aab5bda81b3e4203191"
       }
     }
+  },
+  "projects": {
+    "docker.io/otel/opentelemetry-collector-contrib": {
+      "name": "OpenTelemetry Collector Contrib",
+      "repo": "open-telemetry/opentelemetry-collector-contrib",
+      "status": "open source · shipped build not source-audited"
+    },
+    "docker.io/datadog/agent": {
+      "name": "Datadog Agent",
+      "repo": "DataDog/datadog-agent",
+      "status": "proprietary · shipped build not source-audited"
+    },
+    "nvcr.io/nvidia/k8s/dcgm-exporter": {
+      "name": "NVIDIA DCGM Exporter",
+      "repo": "NVIDIA/dcgm-exporter",
+      "status": "pinned by tag · can drift · not source-audited"
+    }
+  },
+  "tagAudits": {
+    "nvcr.io/nvidia/k8s/dcgm-exporter": [
+      "4.5.2-4.8.1-distroless"
+    ]
   },
   "manifests": {
     "nearai/cvm-compose-files/prod/GLM-5.1-SGL-AWQ-TP4.yaml": [

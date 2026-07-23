@@ -5,10 +5,13 @@ confidential inference stack: **can anything exfiltrate your plaintext?**
 Keyed to exact attested identities, so a review only ever claims to cover the
 bytes it covered.
 
-**The model: one page per audited build, named by its hash.**
-`sha256-<digest>.md` *is* the review — verdict first, full analysis beneath.
-A build with no page has not been audited, and the [teemoon](https://teemoon.ai)
-app shows no audit link for it. Fail-closed, never overclaim.
+**The model: one page per audited build, named by its attested identity.**
+`sha256-<digest>.md` *is* the review — verdict first, full analysis beneath —
+for the digest-pinned images that are the norm; a tag-pinned image (which the
+attestation pins by tag, not bytes) gets a `tag-<tag>.md` page instead (see the
+path spec below). A build with no page has not been audited, and the
+[teemoon](https://teemoon.ai) app shows no audit link for it. Fail-closed,
+never overclaim.
 
 ## Scope rule
 
@@ -22,7 +25,11 @@ the attested manifests, it can access that plaintext**:
 - **by capability** — privileged mounts give it process-memory or log-stream
   access (`pid: host` + `SYS_PTRACE`, `docker.sock`, container-log mounts):
   `compose-manager`, `compose-manager-launcher`, `datadog/agent`,
-  `otel/opentelemetry-collector-contrib`.
+  `otel/opentelemetry-collector-contrib` — or GPU privilege (`SYS_ADMIN` +
+  nvidia runtime over all GPUs): `nvidia/k8s/dcgm-exporter`. At the audited
+  config dcgm exports telemetry counters, not content — but it is privileged
+  *and* pinned only by tag (its bytes can drift under the attestation), so it
+  is kept in scope for its privilege, not assumed benign for its function.
 - **as the substrate** — the confidential-VM **guest OS** (kernel + rootfs) all
   of the above run on. The kernel manages every container's memory, so plaintext
   is unavoidably visible to it — the most complete view of anything in the
@@ -52,22 +59,37 @@ contract:
 
 ```
 images/<registry>/<namespace>/<name>/sha256-<64 hex>.md      ← the review of that build
+images/<registry>/<namespace>/<name>/tag-<tag>.md            ← tag-addressed review (tag-pinned images only)
 manifests/<owner>/<repo>/<path minus .yaml>/sha256-<file_sha256>.md
 manifests/measured/sha256-<compose_hash>.md
 os/sha256-<os_image_hash>.md                                 ← the guest-OS review
 index.json
 ```
 
-`index.json` gates every link: `images` (ref → digests), `manifests` (path →
-`file_sha256`), `measured` (`compose_hash`), and `os` (`os_image_hash`). A
-missing/empty key means nothing published in that layer → no link.
+`index.json` gates every link: `images` (ref → digests), `tagAudits` (ref →
+tags), `manifests` (path → `file_sha256`), `measured` (`compose_hash`), and
+`os` (`os_image_hash`). A missing/empty key means nothing published in that
+layer → no link.
+
+**Tag-addressed pages (additive):** some attested manifests pin an image only
+by tag — no digest exists anywhere in the attestation chain, so a
+`sha256-*.md` page would claim a byte-identity the attestation doesn't
+provide. Those images get `tag-<tag>.md` pages instead, gated by the
+`tagAudits` index key. A tag-addressed page covers the tag string and its
+deployed configuration, **never bytes** — the registry can serve different
+bytes under the same tag with no attestation-visible trace, and each page
+says so. This is an additive sibling to the digest pattern, not a
+replacement; digest-pinned images keep digest pages.
 
 Normalization rules (implemented identically in the app; never changed):
 
 1. Bare Docker Hub refs gain `docker.io/`; official single-name images gain
    `library/`.
-2. Tags are stripped; the digest is the identity.
-3. Digest filenames are `sha256-` + 64 lowercase hex + `.md`.
+2. Tags are stripped; the digest is the identity. Exception: tag-addressed
+   pages, where the attestation provides no digest — there the verbatim tag
+   is the (weaker) identity.
+3. Digest filenames are `sha256-` + 64 lowercase hex + `.md`; tag filenames
+   are `tag-` + verbatim tag + `.md`.
 4. Manifest paths come verbatim from the signed action log, minus `.yaml`.
 5. Coordinates — org `teemoonai`, repo `audits`, branch `main` — are
    permanent. Content is append-only: pages are added or corrected in place;
