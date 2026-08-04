@@ -7,29 +7,11 @@ Written so the work does not depend on a chat session surviving.
 
 | where | at | contains |
 |---|---|---|
-| `teemoonai/audits` **origin/main** | `a659360` | the audit content only — 26 pages, `index.json`, corrections |
-| **`tooling-wip`** (local, unpushed) | `49e3c4f` | everything below plus the `tools/` restructure |
+| `teemoonai/audits` **origin/main** | `b3c67e8` | **everything pushed 2026-08-04**: audit content, the `tools/` layer, the link repairs, and the machine-readable index (`verdictClass` + `findings`) |
+| local `main` = `tooling-wip` | `b3c67e8` | in sync with origin/main |
 | `teemoonai/teemoon-ios` **PR #1** | OPEN | the app change that surfaces verdicts |
 | teemoon-ios local `main` | `59855c2` | 45 ahead / 34 behind origin — **unresolved divergence, not mine** |
-
-`tooling-wip` holds, and public main does not:
-
-```
-tools/fleet_drift.py        daily drift detector
-tools/resolve_identity.py   evidence-ladder identity resolution
-tools/index_page.py         gate a page + refresh verdicts + validate
-tools/README.md             the runbook (misnamed — see open items)
-acknowledged.json           knowingly-unaudited identities (root, deliberately)
-.github/workflows/fleet-drift.yml
-.claude/skills/audit-drift/ SKILL.md + example-brief.md
-notes/audit-surface.md      the reviewer's checklist
-```
-
-Plus **fixes to live public content that are still unpushed**: `notes/method.md`
-pointed at `PRIVACY_AUDIT_RESULTS.md`, which does not exist, and it is linked from
-all 38 pages; 7 pages had link text naming a renamed file; `notes/ARCHITECTURE.md`
-linked two pages that were never published. Those are repairs to broken links in the
-published artifact and are independent of the tooling question.
+| teemoon-ios `feat/audit-findings-surfacing` | `51ffb7a` (local, unpushed) | the full audit-surfacing UI: classes, findings rollup, everyday node, hero demotion — 36/36 tests |
 
 ## Open items, ranked (from the 2026-08-04 organization review)
 
