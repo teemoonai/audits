@@ -48,7 +48,7 @@ jobs:
         id: check
         run: |
           set +e
-          python3 checks/fleet_drift.py \
+          python3 tools/fleet_drift.py \
             --samples "${{ github.event.inputs.samples || '3' }}" \
             --json drift.json | tee report.txt
           echo "exit=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
@@ -93,26 +93,26 @@ jobs:
               echo "listed hosts see no audit link where they should."
             fi
             echo
-            echo "Detected by \`checks/fleet_drift.py\` — deterministic, no model involved."
+            echo "Detected by \`tools/fleet_drift.py\` — deterministic, no model involved."
             echo "It reports only; it does not write pages or touch \`index.json\`."
             echo
             echo '```'
             cat report.txt
             echo '```'
             echo
-            echo "**What to do:** follow [\`checks/RUNBOOK.md\`](../blob/main/checks/RUNBOOK.md)."
+            echo "**What to do:** follow [\`tools/README.md\`](../blob/main/tools/README.md)."
             echo
             echo "Short version — resolve identity first, then commission the review:"
             echo
             echo '```'
-            echo "python3 checks/resolve_identity.py --brief <image>@sha256:<digest>"
+            echo "python3 tools/resolve_identity.py --brief <image>@sha256:<digest>"
             echo "#  ... review, then verify its load-bearing citations yourself ..."
-            echo "python3 checks/index_page.py <page> --commit <repo>@<sha>"
+            echo "python3 tools/index_page.py <page> --commit <repo>@<sha>"
             echo '```'
             echo
             echo "If identity cannot be established, publish an INCONCLUSIVE page making no"
             echo "privacy claim, gate it with \`--no-gate\`, and record it in"
-            echo "\`checks/acknowledged.json\` so it stops redlining this check."
+            echo "\`acknowledged.json\` so it stops redlining this check."
             echo
             echo "<sub>run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}</sub>"
           } > body.md

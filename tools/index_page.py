@@ -26,11 +26,11 @@ Two guards worth knowing about, both learned from real mistakes:
   binding; the app renders `sources` as a VERIFIED digest->commit pin.
 
 Usage:
-  python3 checks/index_page.py images/docker.io/lmsysorg/sglang/sha256-<64hex>.md \\
+  python3 tools/index_page.py images/docker.io/lmsysorg/sglang/sha256-<64hex>.md \\
       --commit sgl-project/sglang@49e384ce9d304648e9959666ecb8ce8cd98d0deb
-  python3 checks/index_page.py manifests/measured/sha256-<64hex>.md
-  python3 checks/index_page.py <page> --no-gate       # INCONCLUSIVE: verdict only
-  python3 checks/index_page.py --validate             # refresh verdicts + check
+  python3 tools/index_page.py manifests/measured/sha256-<64hex>.md
+  python3 tools/index_page.py <page> --no-gate       # INCONCLUSIVE: verdict only
+  python3 tools/index_page.py --validate             # refresh verdicts + check
 """
 
 import argparse
@@ -156,7 +156,7 @@ def main():
             sys.exit("\nREFUSING to gate an INCONCLUSIVE page.\n"
                      "  The app renders a gated link as 'source reviewed', which is a claim this\n"
                      "  page does not make. Re-run with --no-gate, and record the identity in\n"
-                     "  checks/acknowledged.json so the drift check stops counting it.")
+                     "  acknowledged.json so the drift check stops counting it.")
 
         if a.no_gate:
             print("gate    : SKIPPED (verdict recorded only)")

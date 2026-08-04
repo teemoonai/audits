@@ -10,7 +10,7 @@ repo are published as "independent AI source review, Fable", so a page you wrote
 yourself would make that attribution false. Your job is the four steps around the
 review: establish identity, commission it, verify it, publish it.
 
-Read [`checks/RUNBOOK.md`](../../../checks/RUNBOOK.md) before starting. It has the
+Read [`tools/README.md`](../../../tools/README.md) before starting. It has the
 reasoning; this file has the mechanics.
 
 ## 1. Read the issue and triage
@@ -18,12 +18,12 @@ reasoning; this file has the mechanics.
 `gh issue list --label fleet-drift` then read it. Sort targets by blast radius —
 an engine that sees plaintext on nine hosts outranks a telemetry sidecar on one.
 Ignore the **KNOWN OPEN** section; those are recorded in
-`checks/acknowledged.json` and are backlog, not alarm.
+`acknowledged.json` and are backlog, not alarm.
 
 ## 2. Resolve identity — before commissioning anything
 
 ```bash
-python3 checks/resolve_identity.py --brief <image>@sha256:<digest>
+python3 tools/resolve_identity.py --brief <image>@sha256:<digest>
 ```
 
 A review keyed to the wrong tree is worse than no review. Never let an agent go
@@ -130,7 +130,7 @@ what actually matched before acting on it. See the runbook for worked examples.
 ## 5. Publish
 
 ```bash
-python3 checks/index_page.py <page> --commit <repo>@<full-40-hex-sha>
+python3 tools/index_page.py <page> --commit <repo>@<full-40-hex-sha>
 ```
 
 `--commit` only when identity is a real binding (signed attestation, OCI label,
@@ -143,8 +143,8 @@ Then commit and push. The next scheduled run closes the issue.
 1. Commission an INCONCLUSIVE page that makes no privacy claim, recording how
    absence was established — a **positive control in the same run** is what
    separates "genuinely absent" from "we looked in the wrong place".
-2. `python3 checks/index_page.py <page> --no-gate`
-3. Add it to `checks/acknowledged.json` with a reason and `closes_when`, so it
+2. `python3 tools/index_page.py <page> --no-gate`
+3. Add it to `acknowledged.json` with a reason and `closes_when`, so it
    stops counting as drift.
 
 ## What you must not do

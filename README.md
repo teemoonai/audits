@@ -128,10 +128,15 @@ move only with the same care as tier 1. The remaining notes are editorial and ma
 be reorganised freely.
 
 **Tier 3 — machinery. Free to change.**
-`checks/`, `.github/`, `.claude/`. The drift detector, the identity resolver, the
-indexer, the runbook and the orchestration skill. No client reads any of it.
+`tools/`, `.github/`, `.claude/`. The drift detector, the identity resolver, the
+indexer, and the orchestration skill. No client reads any of it.
 
-**The rule that matters:** *nothing in `checks/` may write a page.* The tooling
+`acknowledged.json` sits at the root beside `index.json` rather than under
+`tools/`, because it is not tooling config: one file says what *is* audited, the
+other says what is knowingly running **un**audited. Burying the second inside a
+scripts directory would hide exactly the fact a sceptical reader most wants.
+
+**The rule that matters:** *nothing in `tools/` may write a page.* The tooling
 reports, validates and gates; the claims are written by review and verified by a
 human before publication. `index_page.py` gates a link only after a page exists
 and states its own verdict, and refuses outright to gate a page whose verdict is

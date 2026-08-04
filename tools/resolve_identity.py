@@ -25,7 +25,7 @@ itself part of the finding, and it decides whether the digest may carry a
                           is NOT a pin and earns no `sources` entry.
   5. UNRESOLVED           publish an INCONCLUSIVE page making no privacy claim,
                           leave it out of index.json, and record it in
-                          checks/acknowledged.json. That is a correct outcome.
+                          acknowledged.json. That is a correct outcome.
 
 One technique is deliberately not automated: when a build `git clone`s an
 unpinned ref it leaves `.git/` in a layer, and `.git/shallow` recovers the commit.
@@ -33,9 +33,9 @@ That worked once here and is worth trying by hand at rung 4 -- it needs a layer
 download and a full-tree diff to confirm, which is too heavy to run speculatively.
 
 Usage:
-  python3 checks/resolve_identity.py lmsysorg/sglang@sha256:5027e95b...
-  python3 checks/resolve_identity.py nvcr.io/nvidia/k8s/dcgm-exporter@sha256:ed59...
-  python3 checks/resolve_identity.py --brief lmsysorg/sglang@sha256:...  # agent-ready block
+  python3 tools/resolve_identity.py lmsysorg/sglang@sha256:5027e95b...
+  python3 tools/resolve_identity.py nvcr.io/nvidia/k8s/dcgm-exporter@sha256:ed59...
+  python3 tools/resolve_identity.py --brief lmsysorg/sglang@sha256:...  # agent-ready block
 
 Stdlib only. GITHUB_TOKEN is optional and only raises the rate limit.
 """
@@ -266,7 +266,7 @@ def main():
     if not resolved:
         print("VERDICT: UNRESOLVED.")
         print("  Publish an INCONCLUSIVE page that makes NO privacy claim, leave the digest")
-        print("  out of index.json, and add it to checks/acknowledged.json.")
+        print("  out of index.json, and add it to acknowledged.json.")
         return 2
 
     print(f"VERDICT: resolved by {cls.upper()}")

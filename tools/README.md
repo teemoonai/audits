@@ -30,7 +30,7 @@ not an alarm.
 ## 1. Resolve identity — before anything else
 
 ```
-python3 checks/resolve_identity.py --brief <image>@sha256:<digest>
+python3 tools/resolve_identity.py --brief <image>@sha256:<digest>
 ```
 
 A review keyed to the wrong tree is worse than no review, and this repo has been
@@ -152,7 +152,7 @@ that looks summarisable: read the page.
 ## 4. Publish
 
 ```
-python3 checks/index_page.py <page> --commit <repo>@<full-40-hex-sha>
+python3 tools/index_page.py <page> --commit <repo>@<full-40-hex-sha>
 ```
 
 Infers the gate from the page path, refreshes every page's verdict verbatim from
@@ -170,7 +170,7 @@ Then commit and push. The next scheduled run closes the issue by itself.
 1. Publish an INCONCLUSIVE page that makes **no privacy claim**, and record how
    absence was established — a positive control in the same run is what
    distinguishes "genuinely absent" from "we looked in the wrong place".
-2. `python3 checks/index_page.py <page> --no-gate` — verdict recorded, no link.
+2. `python3 tools/index_page.py <page> --no-gate` — verdict recorded, no link.
 3. Add it to [`acknowledged.json`](acknowledged.json) with a reason and a
    `closes_when`, so it stops counting as drift.
 

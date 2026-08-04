@@ -43,9 +43,9 @@ EXIT CODES
      internally broken — nothing may be concluded about coverage
 
 Usage:
-  python3 checks/fleet_drift.py                 # human-readable report
-  python3 checks/fleet_drift.py --json out.json # machine-readable, for CI
-  python3 checks/fleet_drift.py --samples 5     # LB'd hosts serve different CVMs
+  python3 tools/fleet_drift.py                 # human-readable report
+  python3 tools/fleet_drift.py --json out.json # machine-readable, for CI
+  python3 tools/fleet_drift.py --samples 5     # LB'd hosts serve different CVMs
 """
 
 import argparse
@@ -351,7 +351,7 @@ def load_acknowledged():
     """Known-open items: reported, but not counted as drift. Without this a
     single permanent gap keeps the check red forever and the signal dies."""
     try:
-        with open(os.path.join(REPO_ROOT, "checks", "acknowledged.json")) as f:
+        with open(os.path.join(REPO_ROOT, "acknowledged.json")) as f:
             return {a["id"]: a for a in json.load(f).get("acknowledged", [])}
     except Exception:
         return {}
