@@ -16,12 +16,16 @@ one tool (including Claude Code / Fable).
 > `TEE_STACK_EXPLAINED.md` §7 (audit playbook) with concrete, versioned
 > targets.
 
-> **Findings from running this procedure:**
-> [`PRIVACY_AUDIT_RESULTS.md`](PRIVACY_AUDIT_RESULTS.md) — the completed report
-> (gateway + model node + SGLang engine source + teemoon client), generated
-> 2026-07-13 – 2026-07-15 with Claude Code (Claude Opus 4.8 / Claude Fable 5).
-> This document is the *method*; that one is the *result* — re-run this procedure
-> yourself and compare, rather than taking the result on trust.
+> **Findings from running this procedure:** the pages of this repo *are* the
+> result. [`images/`](/images/) covers each audited build, [`manifests/`](/manifests/)
+> the documents that define the plaintext environment, and [`os/`](/os/) the guest
+> OS — each keyed to the exact attested identity it reviewed, each stating its own
+> verdict. This document is the *method*; those are the *results*. Re-run the
+> procedure yourself and compare, rather than taking any of them on trust.
+>
+> (An earlier single-file report, `PRIVACY_AUDIT_RESULTS.md`, was superseded by
+> that per-identity layout. A review that covers "the stack" cannot say which
+> bytes it covered; a review named by a digest can.)
 
 ---
 

@@ -109,7 +109,40 @@ Normalization rules (implemented identically in the app; never changed):
    paths are never renamed or moved. `index.json` carries `"schema": 1`; any
    structural evolution adds a new tree/schema beside this one.
 
-`notes/` is editorial and outside the contract.
+## What is API here, and what is not
+
+This repo is two things in one tree — **the artifact the app reads**, and **the
+machinery that maintains it**. They have different guarantees, and confusing them
+matters: a reader checking a claim needs to know which files are claims.
+
+**Tier 1 — the endpoint. Frozen; this is API.**
+`index.json`, `images/`, `manifests/`, `os/`. Shipped clients construct these
+paths from attested fields, so a rename breaks released software. Content is
+append-only; corrections are made in place.
+
+**Tier 2 — referenced by published pages. Frozen in practice.**
+`notes/method.md` is linked from **every** page in this repo, and
+`notes/ARCHITECTURE.md` from many; `notes/audit-surface.md` is reached from
+`method.md`. Renaming any of them breaks live links in published reviews, so they
+move only with the same care as tier 1. The remaining notes are editorial and may
+be reorganised freely.
+
+**Tier 3 — machinery. Free to change.**
+`checks/`, `.github/`, `.claude/`. The drift detector, the identity resolver, the
+indexer, the runbook and the orchestration skill. No client reads any of it.
+
+**The rule that matters:** *nothing in `checks/` may write a page.* The tooling
+reports, validates and gates; the claims are written by review and verified by a
+human before publication. `index_page.py` gates a link only after a page exists
+and states its own verdict, and refuses outright to gate a page whose verdict is
+INCONCLUSIVE — a gated link renders in-app as "source reviewed", which is a claim
+such a page does not make.
+
+Why one repo rather than two: a page, its `index.json` gate and its verdict have
+to land in a single commit, or there is a window where the index gates a page
+that does not exist. And keeping the tooling beside the claims is the point — you
+can read exactly what produced them and re-run it, which is what
+"[don't trust any one tool](/notes/method.md)" requires.
 
 ## Layout
 

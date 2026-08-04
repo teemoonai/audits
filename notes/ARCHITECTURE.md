@@ -9,7 +9,7 @@ run where, how they are connected, and — the load-bearing question for privacy
 the teemoon app to the model and back.
 
 > Companion to the per-image audits in this folder and to the method in
-> [`../PRIVACY_AUDIT.md`](/notes/method.md). Scope (image → source commit) was
+> [`/notes/method.md`](/notes/method.md). Scope (image → source commit) was
 > re-derived from live attestation on 2026-07-15; see [`README.md`](README.md).
 
 ---
@@ -144,7 +144,7 @@ the gateway-side findings do not touch message content for teemoon.
 ### 3b. Degraded (non-E2EE) path — teemoon avoids this
 
 If a request is *not* E2EE (a different client, or teemoon during a cold-start
-window — see [`teemoon-client.md`](/notes/teemoon-client.md)), the picture changes:
+window — the client review is not published in this repo), the picture changes:
 
 ```
 [device] PLAINTEXT ──TLS──▶ cvm-ingress ──▶ cloud-api ──mesh──▶ model node ──▶ SGLang
@@ -170,9 +170,9 @@ image's file; the one-line answers:
 
 | Hop (plaintext present) | Could it leak? | Verdict | Detail |
 |---|---|---|---|
-| teemoon (device) | Logs / at-rest store / egress | Protected (in-app); Siri intent CRITICAL | At-rest store now protected + backup-excluded; no telemetry SDKs. Gaps: Siri/Shortcuts sends plaintext, and a cold-start window can send non-E2EE without confirmation | [client](/notes/teemoon-client.md) |
+| teemoon (device) | Logs / at-rest store / egress | Protected (in-app); Siri intent CRITICAL | At-rest store now protected + backup-excluded; no telemetry SDKs. Gaps: Siri/Shortcuts sends plaintext, and a cold-start window can send non-E2EE without confirmation | teemoon client — reviewed in the teemoon project, not published here |
 | cvm-ingress (degraded only) | Access logs / body spool | PRIVATE (qualified) | Logs are metadata-only; but request bodies >16 KB transiently spool to nginx temp files (`proxy_request_buffering` left on) | cvm-ingress |
-| cloud-api (degraded only) | Logs / persistence | PRIVATE (stateless) / LEAKS (stateful) | Stateless `/v1/chat/completions` stores no content; stateful `/v1/responses` persists to external Postgres and ignores `store:false` (teemoon never calls it) | [cloud-api](/endpoints/nearai-cloud-api.md) |
+| cloud-api (degraded only) | Logs / persistence | PRIVATE (stateless) / LEAKS (stateful) | Stateless `/v1/chat/completions` stores no content; stateful `/v1/responses` persists to external Postgres and ignores `store:false` (teemoon never calls it) | cloud-api — gateway-side, out of this repo's scope rule |
 | mesh (transit) | Capture / weak admission | PRIVATE (structural caveats) | WireGuard+mTLS, no content logged; caveats are peer-admission and a pre-send app_id check | dstack-vpc |
 | vllm-proxy-rs (decrypts) | Logs / cache / egress | PRIVATE (2 opt-in egress) | Content-free logs/cache by construction; Fusion + Brave widen egress only when opted in | [inference-proxy](/images/docker.io/nearaidev/vllm-proxy-rs/sha256-b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36.md) |
 | SGLang (the model) | Request logging / disk / egress | PRIVATE at deployed flags | Request logging off, KV cache RAM-only; 2 rare content-bearing log lines (watchdog stall, tool-parser warning) | [sglang](/images/docker.io/lmsysorg/sglang/sha256-aac6b242680daeb74d2ab1d85f70575357552d7d165d2e5d30eb362797db54a1.md) |
