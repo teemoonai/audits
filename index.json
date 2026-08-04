@@ -1,29 +1,44 @@
 {
   "schema": 1,
-  "updated": "2026-07-23",
+  "updated": "2026-08-03",
   "images": {
     "docker.io/nearaidev/vllm-proxy-rs": [
-      "b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36"
+      "b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36",
+      "b0c5cd0786b19dfa46144107be15e340b7a338b1c341d02ffa994c9f1ea77dfd"
     ],
     "docker.io/nearaidev/compose-manager": [
-      "b487f39160e9a53c3d98943a9c709d28e12babef75e0bb5a6cd5692abc8b2db6"
+      "b487f39160e9a53c3d98943a9c709d28e12babef75e0bb5a6cd5692abc8b2db6",
+      "5165400d9eb43ab5da36986a85de0ba55f3fb4d05211c4397ecc4bde3ef0113b",
+      "6e035c8fb99c1d31f41760d25af178683a658cca4afd73cd0d366fbb5bf884be"
     ],
     "docker.io/nearaidev/compose-manager-launcher": [
-      "78afb82330137c2fd90a9c8c6e452f8f178c15d863f87c079a11c13e92216e00"
+      "78afb82330137c2fd90a9c8c6e452f8f178c15d863f87c079a11c13e92216e00",
+      "91fdff3cfa3543d72656b2368c7d8a0a83d95a0f1087378c897aa1537acdba56"
     ],
     "docker.io/lmsysorg/sglang": [
       "aac6b242680daeb74d2ab1d85f70575357552d7d165d2e5d30eb362797db54a1",
       "9e02c8e1fe2790a1c445bd5f6814305fe43639a4adb01c8ad1e8e21e750bf581",
-      "6bb5fee34b6c4537c09a4775e2292ac40350d5ad1218fcc835b2692142f443b1"
+      "6bb5fee34b6c4537c09a4775e2292ac40350d5ad1218fcc835b2692142f443b1",
+      "5027e95bf6ec536856b1b52a91d1f35ff5c564ab83e8a94758a169ff09bb8df3",
+      "1c64fde976bdf0d56474a30bccbcfc19667e5b3ab34c826a534c9d6aaca41212",
+      "8ece90ad52faa8b56149f0117227d9009db34513213e35990da468aeb6fe0b75"
     ],
     "docker.io/vllm/vllm-openai": [
-      "960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403"
+      "960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403",
+      "6766ce0c459e24b76f3e9ba14ffc0442131ef4248c904efdcbf0d89e38be01fe",
+      "ccd6a6dbf4aba4e94c6f7052d1835d6e742082b6a5095276552e9b7a5a47c2e5"
     ],
     "docker.io/datadog/agent": [
       "5556fb80b952832719a76b016f905616c76ee0989a239c4680c6220148e865d6"
     ],
     "docker.io/otel/opentelemetry-collector-contrib": [
       "85ac41c2db88d0df9bd6145e608a3cb023f5d8443868adbfbbf66efb51087917"
+    ],
+    "docker.io/nearaidev/sglang": [
+      "1e335c485bfe064e1b9cdfdcb2765e327235a59fbb65df91be9b429d23e1db08"
+    ],
+    "nvcr.io/nvidia/k8s/dcgm-exporter": [
+      "ed594cf53fe6942e84b07b0740cdcbb249fa4b39cb21feeebf93881ae51f0b5e"
     ]
   },
   "sources": {
@@ -39,12 +54,50 @@
       "6bb5fee34b6c4537c09a4775e2292ac40350d5ad1218fcc835b2692142f443b1": {
         "repo": "sgl-project/sglang",
         "commit": "7de33ce806c12664b647604d61cf1403d2d18013"
+      },
+      "5027e95bf6ec536856b1b52a91d1f35ff5c564ab83e8a94758a169ff09bb8df3": {
+        "repo": "sgl-project/sglang",
+        "commit": "49e384ce9d304648e9959666ecb8ce8cd98d0deb"
+      },
+      "1c64fde976bdf0d56474a30bccbcfc19667e5b3ab34c826a534c9d6aaca41212": {
+        "repo": "sgl-project/sglang",
+        "commit": "85fd90072d1a9f2432842b03588f63b745e524e4"
+      },
+      "8ece90ad52faa8b56149f0117227d9009db34513213e35990da468aeb6fe0b75": {
+        "repo": "sgl-project/sglang",
+        "commit": "1e309030e309bec523513a01a68e2128963cfb4e"
       }
     },
     "docker.io/vllm/vllm-openai": {
       "960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403": {
         "repo": "vllm-project/vllm",
-        "commit": "e3e3cd54589cee689b785aab5bda81b3e4203191"
+        "commit": "b4c80ec0fd19c13a53d89623bb5957cd5cd631bb"
+      },
+      "6766ce0c459e24b76f3e9ba14ffc0442131ef4248c904efdcbf0d89e38be01fe": {
+        "repo": "vllm-project/vllm",
+        "commit": "4fd9d6a85c00ac0186aa9abbeff73fc2ac6c721e"
+      }
+    },
+    "docker.io/nearaidev/vllm-proxy-rs": {
+      "b0c5cd0786b19dfa46144107be15e340b7a338b1c341d02ffa994c9f1ea77dfd": {
+        "repo": "nearai/inference-proxy",
+        "commit": "48d7e349f6ea76d6ec5a3ca234c5c254967abf9c"
+      }
+    },
+    "docker.io/nearaidev/compose-manager": {
+      "5165400d9eb43ab5da36986a85de0ba55f3fb4d05211c4397ecc4bde3ef0113b": {
+        "repo": "nearai/compose-manager",
+        "commit": "69c363ea0f0d313a5324b207b2905072656e8c40"
+      },
+      "6e035c8fb99c1d31f41760d25af178683a658cca4afd73cd0d366fbb5bf884be": {
+        "repo": "nearai/compose-manager",
+        "commit": "f91a204549b64218a92c9bada84f8129de3c1f45"
+      }
+    },
+    "docker.io/nearaidev/compose-manager-launcher": {
+      "91fdff3cfa3543d72656b2368c7d8a0a83d95a0f1087378c897aa1537acdba56": {
+        "repo": "nearai/compose-manager",
+        "commit": "8e07c3583909c9ab9da94d883e87add1ae90832d"
       }
     }
   },
@@ -52,17 +105,17 @@
     "docker.io/otel/opentelemetry-collector-contrib": {
       "name": "OpenTelemetry Collector Contrib",
       "repo": "open-telemetry/opentelemetry-collector-contrib",
-      "status": "open source · shipped build not source-audited"
+      "status": "open source \u00b7 shipped build not source-audited"
     },
     "docker.io/datadog/agent": {
       "name": "Datadog Agent",
       "repo": "DataDog/datadog-agent",
-      "status": "proprietary · shipped build not source-audited"
+      "status": "proprietary \u00b7 shipped build not source-audited"
     },
     "nvcr.io/nvidia/k8s/dcgm-exporter": {
       "name": "NVIDIA DCGM Exporter",
       "repo": "NVIDIA/dcgm-exporter",
-      "status": "pinned by tag · can drift · not source-audited"
+      "status": "pinned by tag \u00b7 can drift \u00b7 not source-audited"
     }
   },
   "tagAudits": {
@@ -73,13 +126,77 @@
   "manifests": {
     "nearai/cvm-compose-files/prod/GLM-5.1-SGL-AWQ-TP4.yaml": [
       "eb00b404e3218e2e8c8ab8da5845af10ce79929fd232fe8ac3d2f688582817be"
+    ],
+    "nearai/cvm-compose-files/prod/small-models.yaml": [
+      "a385f19a51054767b8be49a64ebc3111e0e62f721a861e54c78984b186904599"
+    ],
+    "nearai/cvm-compose-files/prod/GLM-5.2-W4AFP8-SGL-2xTP4.yaml": [
+      "f408de5c89d7e7f8b4715b1f62409f67cadf52e232cfdce663f94482a134bba2"
+    ],
+    "nearai/cvm-compose-files/prod/GLM-5.2-W4AFP8-SGL-TP8.yaml": [
+      "db6f4e8ffd0324fcc3b2c3ef51ec2a4735b888bd9293057295d9161c9585bf38"
+    ],
+    "nearai/cvm-compose-files/prod/qwen35-dsv4-flash.yaml": [
+      "5be223d330932d118eb8ceee6414304af43c98d9a0f43b8195c8d86dfb77d000"
+    ],
+    "nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4.yaml": [
+      "cf11b98ccd81a738e051e8c743a67ded88af181648ab05d44d647409c5127d5e"
+    ],
+    "nearai/cvm-compose-files/prod/dsv4-flash-glm51.yaml": [
+      "d085dcfc4ee0fbb13b183d52cf3a140cbc075e5e3de44fc039df961a4913ca4c"
     ]
   },
   "measured": [
     "2c650eae81601afade86d1aa5ad898473b992081998026bb42ee1524ce99ee38",
-    "db6943f37a4f54bd12144ecbf9f8c780ca14c0c44600a5a9ca09a041d92ba5ca"
+    "db6943f37a4f54bd12144ecbf9f8c780ca14c0c44600a5a9ca09a041d92ba5ca",
+    "fb3d47e5ae94ddfd43721002b127ce07d3828b05687e4e5a394a7a827d0ec55c",
+    "9385918de0a73b861ae833d99fb5be6f7e1c8a50487a835df4f277497c206825",
+    "002b406e4770df733eba8f7dfce066f1c8e8d041d972cc02da8b9e3756ebca9a",
+    "66007399f064f058af68771c552bcae150c9f88622305631b5141da1aa2f7b7e",
+    "d98a2568546afce9ab53f7eb4d4b2058e5497e1efd05a8ad0934793043240ed7",
+    "0fccab4eb7ffc4c9ec1be8e2851e7b820efef0485cfd21ac027bf1408dc836b0"
   ],
   "os": [
     "9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677"
-  ]
+  ],
+  "verdicts": {
+    "images/docker.io/datadog/agent/sha256-5556fb80b952832719a76b016f905616c76ee0989a239c4680c6220148e865d6.md": "metadata-only exposure at audited config",
+    "images/docker.io/lmsysorg/sglang/sha256-1c64fde976bdf0d56474a30bccbcfc19667e5b3ab34c826a534c9d6aaca41212.md": "private at the deployed flags \u2014 with the repo's two standing live paths present and unmitigated: an unauthenticated `/configure_logging`, and an undisableable hang-time prompt dump whose blast radius is the largest in the fleet",
+    "images/docker.io/lmsysorg/sglang/sha256-5027e95bf6ec536856b1b52a91d1f35ff5c564ab83e8a94758a169ff09bb8df3.md": "private at the deployed flags \u2014 but not \"cannot happen\": one unauthenticated runtime logging switch and one unconditional hang-time prompt dump remain live",
+    "images/docker.io/lmsysorg/sglang/sha256-6bb5fee34b6c4537c09a4775e2292ac40350d5ad1218fcc835b2692142f443b1.md": "PRIVATE at deployed flags",
+    "images/docker.io/lmsysorg/sglang/sha256-8ece90ad52faa8b56149f0117227d9009db34513213e35990da468aeb6fe0b75.md": "LEAKS \u2014 the FLUX diffusion server logs every user prompt at INFO and writes every generated image to disk, both unconditionally at deployed flags",
+    "images/docker.io/lmsysorg/sglang/sha256-9e02c8e1fe2790a1c445bd5f6814305fe43639a4adb01c8ad1e8e21e750bf581.md": "PRIVATE at deployed flags",
+    "images/docker.io/lmsysorg/sglang/sha256-aac6b242680daeb74d2ab1d85f70575357552d7d165d2e5d30eb362797db54a1.md": "PRIVATE at deployed flags",
+    "images/docker.io/nearaidev/compose-manager-launcher/sha256-78afb82330137c2fd90a9c8c6e452f8f178c15d863f87c079a11c13e92216e00.md": "COMPROMISABLE by credentialed operator (shares the compose-manager verdict; watchdog role)",
+    "images/docker.io/nearaidev/compose-manager-launcher/sha256-91fdff3cfa3543d72656b2368c7d8a0a83d95a0f1087378c897aa1537acdba56.md": "COMPROMISABLE by credentialed operator \u2014 this is the post-attestation mutation engine; no plaintext reach",
+    "images/docker.io/nearaidev/compose-manager-launcher/sha256-d652f92b64f57ef8aa086bd77a4cf932c1976965b3cea2814a7ee82fe73aa993.md": "INCONCLUSIVE \u2014 no build attestation exists; the source commit is unresolvable, so no source review is possible and **this page makes no privacy claim**",
+    "images/docker.io/nearaidev/compose-manager/sha256-5165400d9eb43ab5da36986a85de0ba55f3fb4d05211c4397ecc4bde3ef0113b.md": "COMPROMISABLE by credentialed operator (control-plane; no data-plane role)",
+    "images/docker.io/nearaidev/compose-manager/sha256-6e035c8fb99c1d31f41760d25af178683a658cca4afd73cd0d366fbb5bf884be.md": "COMPROMISABLE by credentialed operator (control-plane; no data-plane role) \u2014 wider blast radius than the earlier builds",
+    "images/docker.io/nearaidev/compose-manager/sha256-b487f39160e9a53c3d98943a9c709d28e12babef75e0bb5a6cd5692abc8b2db6.md": "COMPROMISABLE by credentialed operator (control-plane; no data-plane role)",
+    "images/docker.io/nearaidev/sglang/sha256-1e335c485bfe064e1b9cdfdcb2765e327235a59fbb65df91be9b429d23e1db08.md": "private at the deployed flags \u2014 this is not a rebuild of an upstream commit, it is a one-file scheduler **patch** on top of an already-audited image; I extracted the patch from the image and it is privacy-neutral",
+    "images/docker.io/nearaidev/vllm-proxy-rs/sha256-b0c5cd0786b19dfa46144107be15e340b7a338b1c341d02ffa994c9f1ea77dfd.md": "core request path clean \u2014 no plaintext in logs, files, or telemetry; two **client-opt-in** features (web search, fusion) deliberately egress message-derived plaintext",
+    "images/docker.io/nearaidev/vllm-proxy-rs/sha256-b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36.md": "PRIVATE (2 opt-in egress caveats)",
+    "images/docker.io/otel/opentelemetry-collector-contrib/sha256-85ac41c2db88d0df9bd6145e608a3cb023f5d8443868adbfbbf66efb51087917.md": "management-logs only by configuration",
+    "images/docker.io/vllm/vllm-openai/sha256-6766ce0c459e24b76f3e9ba14ffc0442131ef4248c904efdcbf0d89e38be01fe.md": "clean at deployed flags in steady state; one crash-path token-ID leak into Datadog, plus metadata-only phone-home",
+    "images/docker.io/vllm/vllm-openai/sha256-960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403.md": "PRIVATE at deployed flags",
+    "images/docker.io/vllm/vllm-openai/sha256-ccd6a6dbf4aba4e94c6f7052d1835d6e742082b6a5095276552e9b7a5a47c2e5.md": "PRIVATE for message plaintext \u2014 but media-fetch egress is unrestricted, unlike its sibling",
+    "images/nvcr.io/nvidia/k8s/dcgm-exporter/sha256-ed594cf53fe6942e84b07b0740cdcbb249fa4b39cb21feeebf93881ae51f0b5e.md": "telemetry-not-content at deployed config \u2014 GPU-privileged, and the bytes are now pinned",
+    "images/nvcr.io/nvidia/k8s/dcgm-exporter/tag-4.5.2-4.8.1-distroless.md": "telemetry-not-content at audited config \u2014 but GPU-privileged, and the tag can drift",
+    "manifests/measured/sha256-002b406e4770df733eba8f7dfce066f1c8e8d041d972cc02da8b9e3756ebca9a.md": "qualified PASS at the manifest layer \u2014 no allowed env is a content switch \u2014 but this node measures in a **Datadog agent collecting all container stdout to a third-party US SaaS**, runs a **launcher build with no resolvable provenance**, and defines the shared network on which the engine's unauthenticated logging switch sits",
+    "manifests/measured/sha256-0fccab4eb7ffc4c9ec1be8e2851e7b820efef0485cfd21ac027bf1408dc836b0.md": "qualified PASS at the manifest layer, **weaker than its sibling on the one axis that decides who reads your prompts** \u2014 a measured `datadog-agent` collects **all** container stdout and ships it to `us3.datadoghq.com`, adding a second off-box log destination and an **open OTLP *logs* receiver on the shared network**; everything else (22 identical `allowed_envs`, fail-closed management filter, audited control-plane images) matches gpu02",
+    "manifests/measured/sha256-2c650eae81601afade86d1aa5ad898473b992081998026bb42ee1524ce99ee38.md": "management-only; zero plaintext-toucher signals",
+    "manifests/measured/sha256-66007399f064f058af68771c552bcae150c9f88622305631b5141da1aa2f7b7e.md": "qualified PASS at the manifest layer \u2014 no allowed env is a content switch and every telemetry destination is literal; but this node is on the **Datadog side of the node lottery** (a measured agent ships every container's stdout, engines included, to `us3.datadoghq.com`), it measures a root-equivalent, ptrace-capable compose-manager whose image is a *default, not a pin*, and it defines the shared network that keeps the engines' unauthenticated logging switch reachable",
+    "manifests/measured/sha256-9385918de0a73b861ae833d99fb5be6f7e1c8a50487a835df4f277497c206825.md": "qualified PASS at the manifest layer \u2014 management-only harness with **no Datadog agent**, so the measured off-box log path is near.ai's gateway alone; but this document defines the shared `dstack_default` network that makes the engine's unauthenticated logging switch reachable, and it measures a root-equivalent, ptrace-capable compose-manager whose image is a *default*, not a pin",
+    "manifests/measured/sha256-d98a2568546afce9ab53f7eb4d4b2058e5497e1efd05a8ad0934793043240ed7.md": "qualified PASS at the manifest layer \u2014 **no Datadog agent**, so the measured off-box log path is near.ai's gateway alone, and both control-plane images resolve to audited builds; but this is the one measured document published here whose **own `pre_launch_script` replays a persisted compose-manager image override at boot**, and it mounts the entire guest root filesystem into the collector",
+    "manifests/measured/sha256-db6943f37a4f54bd12144ecbf9f8c780ca14c0c44600a5a9ca09a041d92ba5ca.md": "qualified PASS at the manifest layer; management harness measured, four-model plaintext stack is log-pinned, not hardware-measured",
+    "manifests/measured/sha256-fb3d47e5ae94ddfd43721002b127ce07d3828b05687e4e5a394a7a827d0ec55c.md": "qualified PASS at the manifest layer; management harness measured, the nine-model plaintext stack is log-pinned, not hardware-measured \u2014 and the harness measures in its own image-drift persistence",
+    "manifests/nearai/cvm-compose-files/prod/GLM-5.1-SGL-AWQ-TP4/sha256-eb00b404e3218e2e8c8ab8da5845af10ce79929fd232fe8ac3d2f688582817be.md": "Qualified PASS (see caveats in the review)",
+    "manifests/nearai/cvm-compose-files/prod/GLM-5.2-W4AFP8-SGL-2xTP4/sha256-f408de5c89d7e7f8b4715b1f62409f67cadf52e232cfdce663f94482a134bba2.md": "qualified PASS on what it configures \u2014 every logging flag is literal, the two replicas are byte-identical, and nothing here captures content \u2014 but this is the document that leaves the engine's unauthenticated logging switch **reachable**: a shared `external: true` network, a bare `location /`, no `--admin-api-key`, and a fixed, unscrubbed stdout pipeline waiting downstream",
+    "manifests/nearai/cvm-compose-files/prod/GLM-5.2-W4AFP8-SGL-TP8/sha256-db6f4e8ffd0324fcc3b2c3ef51ec2a4735b888bd9293057295d9161c9585bf38.md": "qualified PASS on what it configures \u2014 every logging flag is literal and minimal \u2014 but this is the document that leaves the fleet's highest-blast-radius engine's unauthenticated logging switch **reachable**: shared `external: true` network, bare `location /`, no `--admin-api-key`, `--max-running-requests 256` at 1M context, and an unscrubbed stdout pipeline that on this node's measured harness forks to a third-party US SaaS",
+    "manifests/nearai/cvm-compose-files/prod/dsv4-flash-glm51/sha256-d085dcfc4ee0fbb13b183d52cf3a140cbc075e5e3de44fc039df961a4913ca4c.md": "qualified PASS on what it configures \u2014 two model families share one CVM with every logging flag minimal, revisions pinned on both engines, dcgm **digest**-pinned (the only recipe in this repo that does), and dcgm's port unpublished; but this is the first recipe found with a **`${VAR}` interpolation inside an engine command**, and it leaves the same three gaps as its siblings: a shared `external: true` network, six bare `location /` servers, no `--admin-api-key`, and a fixed unscrubbed stdout pipeline",
+    "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-cf11b98ccd81a738e051e8c743a67ded88af181648ab05d44d647409c5127d5e.md": "qualified PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on all four proxies, Gemma-4's media fetch fully constrained; residuals are the fleet's \u2014 an unauthenticated engine admin surface behind allowlist-free proxies, unredacted double stdout shipping, a documented `/compose/up` env-splice channel, and two Qwen3.6 engines carrying `--trust-remote-code` with **no `--revision` pin**",
+    "manifests/nearai/cvm-compose-files/prod/qwen35-dsv4-flash/sha256-5be223d330932d118eb8ceee6414304af43c98d9a0f43b8195c8d86dfb77d000.md": "qualified PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on, every model revision-pinned; the two-image DeepSeek A/B diverges by exactly one env var (`SGLANG_EAGLE_PREFILL_FAIRNESS=1`), confirmed; residuals are the fleet's \u2014 splice-reachable env, an unauthenticated engine admin surface behind allowlist-free proxies, unredacted double stdout shipping, and one unpinned PyPI resolve in the weight downloader",
+    "manifests/nearai/cvm-compose-files/prod/small-models/sha256-a385f19a51054767b8be49a64ebc3111e0e62f721a861e54c78984b186904599.md": "qualified PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on; but three services build from mutable sources inside the enclave, FLUX runs unpinned remote code, and Qwen3-VL's media fetch is unrestricted",
+    "os/sha256-9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677.md": "PRIVATE at measured configuration"
+  }
 }

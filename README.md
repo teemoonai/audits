@@ -71,6 +71,19 @@ tags), `manifests` (path → `file_sha256`), `measured` (`compose_hash`), and
 `os` (`os_image_hash`). A missing/empty key means nothing published in that
 layer → no link.
 
+**`verdicts` (additive, optional): page path → that page's own verdict line,
+verbatim.** A link alone cannot say what a review *found* — "a page exists"
+and "the review found nothing" are different facts, and an audit link with no
+verdict beside it reads as reassurance. This repo publishes verdicts ranging
+from "PRIVATE at deployed flags" to "COMPROMISABLE by credentialed operator"
+to "INCONCLUSIVE — no build attestation exists", and a client that renders all
+of them identically is overclaiming on behalf of the ones that found
+something. So the verdict travels with the link. The value is copied verbatim
+from the page's `## verdict:` heading — it is the reviewer's wording, never a
+summary written by the client or by the indexer. A page missing from
+`verdicts` means the client must fall back to neutral copy, **never** to
+reassuring copy.
+
 **Tag-addressed pages (additive):** some attested manifests pin an image only
 by tag — no digest exists anywhere in the attestation chain, so a
 `sha256-*.md` page would claim a byte-identity the attestation doesn't
