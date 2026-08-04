@@ -73,15 +73,73 @@ attestation lookup that read only the first of four results, a severity rated a
 level too high, a claim about a Datadog agent that was wrong on first inspection,
 and one finding that had to be refuted outright.
 
-Check, at minimum:
+You are **not re-doing the review**. A citation either resolves to the claimed
+content or it does not, and that is a cheap question — two to four commands per
+page. What you are testing is whether the evidence exists and says what the page
+says it says.
 
-- **every load-bearing citation** — fetch the file, confirm the line and content
-- **anything the reviewer asked you to check**
-- **anything that contradicts an existing page.** This is how the phantom
-  "proxy path-allowlist" survived three pages for weeks: a claim was inherited
-  between pages instead of re-derived. If a new page disagrees with a published
-  one, settle it at the source and correct the older page with a dated addendum
-  rather than a rewrite.
+### What to verify, in priority order
+
+1. **The finding the verdict rests on.** If the page says CRITICAL, verify the
+   CRITICAL. Everything else can be sampled.
+2. **Anything the reviewer flagged for you.** Good reviewers do this explicitly,
+   and it is where the sharpest catches have come from — one wrote *"`6e035c8f`
+   has 4 attestations, not 1"*, correcting the identity handed to it; another
+   refused to guess whether an S3 path was operator-reachable and said which
+   answer would change the severity.
+3. **Anything that contradicts a published page.** Settle it at the source, then
+   correct the older page with a dated addendum rather than a rewrite.
+4. **Novel findings** — anything the brief did not prime the reviewer to look
+   for. No prior means no cross-check.
+5. **Anything that changes what a user sees**: severity, whether the page gets
+   gated, whether a `sources` pin is earned.
+
+Skip: routine INFO items, and ground already verified on a sibling page.
+
+### How to verify a multi-hop finding
+
+Most real findings are chains, and a chain is only as good as its weakest link.
+Verify each hop separately rather than the conclusion. For the crash-path leak
+that was the run's best catch, that meant five checks:
+
+```
+core.py:316          dump_engine_exception(...) is called unconditionally
+dump_input.py:79     ... and logs at ERROR
+dump_input.py:40-47  anon_repr is preferred, __dict__ is the fallback
+output.py:112-123    CachedRequestData has all_token_ids and NO anon_repr
+scheduler.py:842     ... populated from req.all_token_ids.copy()
+request.py:91        ... which is prompt tokens plus generated tokens
+```
+
+Each one held, so the finding held. Had the fourth failed, the whole thing
+collapses — and that is exactly the hop a summary would have glossed.
+
+### Verifying a negative claim
+
+"No path allowlist exists", "no route is `ADMIN_FORCE`", "this dest is never
+read" — these need a **whole-tree** search, not a spot check, and they need it at
+the right commit. Prefer fetching the tree and grepping it over trusting a
+reported grep. When a negative claim contradicts a published page, check it at
+**both** commits before concluding it is a regression rather than a long-standing
+error.
+
+### When a check gives a surprising answer, check what actually matched
+
+A grep for Datadog reported it present on every node, contradicting the page.
+The pattern had matched `datadoghq.ad` — an autodiscovery *label* — not the SaaS
+endpoint. Re-running against actual service definitions showed two nodes with 11
+services and no agent, five with 13 and an agent shipping to `us3.datadoghq.com`.
+The page was right and the first check was wrong.
+
+The general form: a surprising result is more often a bad query than a bad page.
+Look at the match before you act on the count.
+
+### Do not infer what you can read
+
+An attempt to derive severity levels from verdict prose labelled the genuinely
+clean page "qualified" and the page with a live token-ID leak "clean". Severity
+is stated by the reviewer or it is not stated. The same applies to anything else
+that looks summarisable: read the page.
 
 ## 4. Publish
 
