@@ -71,18 +71,31 @@ tags), `manifests` (path → `file_sha256`), `measured` (`compose_hash`), and
 `os` (`os_image_hash`). A missing/empty key means nothing published in that
 layer → no link.
 
-**`verdicts` (additive, optional): page path → that page's own verdict line,
-verbatim.** A link alone cannot say what a review *found* — "a page exists"
-and "the review found nothing" are different facts, and an audit link with no
-verdict beside it reads as reassurance. This repo publishes verdicts ranging
-from "PRIVATE at deployed flags" to "COMPROMISABLE by credentialed operator"
-to "INCONCLUSIVE — no build attestation exists", and a client that renders all
-of them identically is overclaiming on behalf of the ones that found
-something. So the verdict travels with the link. The value is copied verbatim
-from the page's `## verdict:` heading — it is the reviewer's wording, never a
-summary written by the client or by the indexer. A page missing from
-`verdicts` means the client must fall back to neutral copy, **never** to
-reassuring copy.
+**`verdicts` (additive, optional): page path → that page's own verdict line.**
+A link alone cannot say what a review *found* — "a page exists" and "the
+review found nothing" are different facts, and an audit link with no verdict
+beside it reads as reassurance. This repo publishes verdicts ranging from
+"PRIVATE at deployed flags" to "COMPROMISABLE by credentialed operator" to
+"INCONCLUSIVE — no build attestation exists", and a client that renders all of
+them identically is overclaiming on behalf of the ones that found something.
+So the verdict travels with the link. The value is copied from the page's
+`## verdict:` heading — the reviewer's wording, which clients may truncate or
+restyle for display but must not soften: a rendering that drops the class or
+the caveats is overclaiming. A page missing from `verdicts` means the client
+must fall back to neutral copy, **never** to reassuring copy.
+
+**`verdictClass` and `findings` (additive, optional): the machine-readable
+layer.** Both are derived mechanically from each page's own text by the
+indexer — never authored there. `verdictClass` maps page path → the class the
+verdict line opens with (`private` / `leaks` / `compromisable` /
+`qualified-pass` / `inconclusive`), so a client can badge and color-code
+without parsing prose. `findings` maps page path → the page's
+`### SEVERITY (deployed: …) — title` finding headings as
+`{severity, deployed, qualifier, title, anchor}`, so a client can list a
+node's plaintext-egress findings — deployed-ON separated from latent — across
+every page its attestation keys into, each linking to its evidence via the
+anchor. Both fail soft: a page the extraction rules cannot read is omitted,
+and the client falls back to the neutral treatment above.
 
 **Tag-addressed pages (additive):** some attested manifests pin an image only
 by tag — no digest exists anywhere in the attestation chain, so a
@@ -106,8 +119,10 @@ Normalization rules (implemented identically in the app; never changed):
 4. Manifest paths come verbatim from the signed action log, minus `.yaml`.
 5. Coordinates — org `teemoonai`, repo `audits`, branch `main` — are
    permanent. Content is append-only: pages are added or corrected in place;
-   paths are never renamed or moved. `index.json` carries `"schema": 1`; any
-   structural evolution adds a new tree/schema beside this one.
+   paths are never renamed or moved. `index.json` carries `"schema": 1` and
+   evolves by **additive optional keys** within it; only a change that breaks
+   an existing reader — removing/retyping a required key, changing a path
+   rule — adds a new tree/schema beside this one.
 
 ## What is API here, and what is not
 
@@ -116,16 +131,25 @@ machinery that maintains it**. They have different guarantees, and confusing the
 matters: a reader checking a claim needs to know which files are claims.
 
 **Tier 1 — the endpoint. Frozen; this is API.**
-`index.json`, `images/`, `manifests/`, `os/`. Shipped clients construct these
-paths from attested fields, so a rename breaks released software. Content is
-append-only; corrections are made in place.
+`index.json`, `images/`, `manifests/`, `os/`. What is frozen, precisely: the
+**paths** (clients construct them from attested fields — a rename breaks
+released software), the **required index keys** (`schema`, `images`,
+`manifests`, `measured`) and the **normalization rules** above. What is not:
+page *content* evolves (corrections in place, append-only), and `index.json`
+grows by **additive optional keys** — a client that ignores them keeps
+working, which is why `verdicts`, `verdictClass` and `findings` could land
+without a schema bump. The lineage `README.md` files inside these directories
+are tier 2, not tier 1: linkable, but no client constructs their paths.
 
-**Tier 2 — referenced by published pages. Frozen in practice.**
-`notes/method.md` is linked from **every** page in this repo, and
-`notes/ARCHITECTURE.md` from many; `notes/audit-surface.md` is reached from
-`method.md`. Renaming any of them breaks live links in published reviews, so they
-move only with the same care as tier 1. The remaining notes are editorial and may
-be reorganised freely.
+**Tier 2 — reachable from a published page. Frozen in practice.**
+The honest rule is transitive: **anything a published page links to, directly
+or through another note, moves only with tier-1 care**, because renaming it
+breaks live links in published reviews. Today that closure is
+`notes/method.md` (linked from every page), `notes/ARCHITECTURE.md`,
+`notes/audit-surface.md` (reached via `method.md`), and
+`notes/reviewer-comparison-2026-08-03.md` (reached via `audit-surface.md`) —
+plus the in-tree lineage READMEs. Notes outside that closure are editorial
+and may be reorganised freely.
 
 **Tier 3 — machinery. Free to change.**
 `tools/`, `.github/`, `.claude/`. The drift detector, the identity resolver, the

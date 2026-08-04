@@ -12,6 +12,11 @@ What it does:
     function, so the path IS the identity)
   - refreshes `verdicts` for EVERY page on disk, reading each page's own
     `## verdict:` heading verbatim — never a summary written here
+  - refreshes the machine-readable layer beside it, also read from the page's
+    own text: `verdictClass` (the class token the verdict line opens with) and
+    `findings` (the page's `### SEVERITY (deployed: …) — title` headings, with
+    GitHub anchors). Pages the rules can't read are omitted and warned — the
+    fix is conforming the page's wording, never overriding it here
   - validates the whole index: every gated link has a page, every page has a
     verdict, nothing on disk is silently ungated
 
@@ -62,10 +67,91 @@ def verdict_of(path):
     return " ".join(m.group(1).split()) if m else None
 
 
+# ---------------------------------------------------------------------------
+# Machine-readable layer, derived from each page's own text — never authored
+# here. The verdict prose stays verbatim in `verdicts`; `verdictClass` and
+# `findings` are mechanical reads of it so a client can badge/filter without
+# parsing prose. A page these rules cannot read is omitted (fail-soft: the
+# app falls back to neutral copy) and warned about, so the fix is always
+# "make the page's own wording conform", not "override it here".
+
+CLASS_RULES = [
+    (r"^leaks\b", "leaks"),
+    (r"^compromisable\b", "compromisable"),
+    (r"^inconclusive\b", "inconclusive"),
+    (r"^qualified pass\b", "qualified-pass"),
+    (r"^private\b", "private"),
+    # older pages whose verdict lines open with scope wording instead of a
+    # class token; all state "no content exposure at the audited config"
+    (r"^(clean|core request path clean)\b", "private"),
+    (r"^(metadata-only|telemetry-not-content|management-logs only)\b", "private"),
+    (r"^management-only\b", "qualified-pass"),
+]
+
+
+def classify(verdict):
+    v = verdict.strip().lower()
+    for pat, cls in CLASS_RULES:
+        if re.match(pat, v):
+            return cls
+    return None
+
+
+SEVERITIES = ("CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO")
+FINDING_RE = re.compile(
+    r"^###\s+(CRITICAL|HIGH|MEDIUM|LOW|INFO)(?:-\d+)?\b(.*?)\s+—\s+(.+?)\s*$", re.M)
+DEPLOYED_MAP = {"on": "on", "active": "on", "off": "off", "armed": "armed"}
+
+
+def plain(s):
+    """Markdown emphasis/backticks stripped for display fields."""
+    return re.sub(r"[`*]", "", s).strip()
+
+
+def slug(heading, seen):
+    """GitHub's anchor for a rendered heading, with duplicate suffixing."""
+    t = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", heading)
+    t = re.sub(r"[`*_]", "", t).lower()
+    t = re.sub(r"[^\w\- ]", "", t).replace(" ", "-")
+    n = seen.get(t, 0)
+    seen[t] = n + 1
+    return t if n == 0 else f"{t}-{n}"
+
+
+def findings_of(path):
+    with open(os.path.join(REPO_ROOT, path)) as f:
+        text = f.read()
+    text = re.sub(r"^```.*?^```\s*$", "", text, flags=re.M | re.S)  # no headings in code fences
+    seen, out = {}, []
+    for m in re.finditer(r"^(#{1,6})\s+(.+?)\s*$", text, re.M):
+        anchor = slug(m.group(2), seen)  # GitHub's duplicate counter spans ALL heading levels
+        if m.group(1) != "###":
+            continue
+        fm = FINDING_RE.match(m.group(0))
+        if not fm:
+            continue
+        sev, mid, title = fm.group(1), plain(fm.group(2)).strip(), plain(fm.group(3))
+        qualifier = mid[1:-1].strip() if mid.startswith("(") and mid.endswith(")") else mid
+        dm = re.search(r"deployed:\s*([A-Za-z]+)", qualifier)
+        entry = collections.OrderedDict()
+        entry["severity"] = sev.lower()
+        entry["deployed"] = DEPLOYED_MAP.get(dm.group(1).lower()) if dm else None
+        if qualifier:
+            entry["qualifier"] = qualifier
+        entry["title"] = title
+        entry["anchor"] = anchor
+        out.append(entry)
+    return out
+
+
 def refresh_verdicts(idx):
-    """Every page's own verdict line, verbatim. Never synthesized here."""
+    """Every page's own verdict line, verbatim — plus the machine-readable
+    layer (`verdictClass`, `findings`) mechanically derived from the page's
+    own wording. Nothing synthesized here."""
     v = collections.OrderedDict()
-    missing = []
+    classes = collections.OrderedDict()
+    findings = collections.OrderedDict()
+    missing, unclassified = [], []
     for pat in ["images/**/sha256-*.md", "images/**/tag-*.md",
                 "manifests/**/sha256-*.md", "os/sha256-*.md"]:
         for f in sorted(glob.glob(os.path.join(REPO_ROOT, pat), recursive=True)):
@@ -73,9 +159,23 @@ def refresh_verdicts(idx):
             got = verdict_of(rel)
             if got:
                 v[rel] = got
+                cls = classify(got)
+                if cls:
+                    classes[rel] = cls
+                else:
+                    unclassified.append(rel)
             else:
                 missing.append(rel)
+            page_findings = findings_of(rel)
+            if page_findings:
+                findings[rel] = page_findings
     idx["verdicts"] = v
+    idx["verdictClass"] = classes
+    idx["findings"] = findings
+    for rel in unclassified:
+        print(f"  WARN verdict line has no readable class (page omitted from "
+              f"verdictClass; open the verdict with PRIVATE / LEAKS / COMPROMISABLE / "
+              f"QUALIFIED PASS / INCONCLUSIVE): {rel}")
     return missing
 
 

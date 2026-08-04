@@ -47,18 +47,58 @@ published artifact and are independent of the tooling question.
    verdicts about someone else's stack and states no disclosure channel. **Code
    license gap:** `LICENSE.md` is CC BY 4.0 "for documentation"; `tools/*.py` is now
    unlicensed.
-4. **The tier model contradicts itself.** README says notes beyond method/ARCHITECTURE/
-   audit-surface are "editorial and may be reorganised freely", but the chain
-   38 pages → `method.md` → `audit-surface.md` → `reviewer-comparison-2026-08-03.md`
-   makes the last frozen in practice. Honest rule: *anything transitively reachable
-   from a published page*. Also: lineage `README.md` files inside tier-1 directories
-   are unclassified — they are linkable but not code-addressed.
+4. ~~**The tier model contradicts itself.**~~ **Closed 2026-08-04**: README tier
+   section rewritten to the transitive rule (*anything reachable from a published
+   page moves with tier-1 care*), lineage READMEs classified tier 2, and tier 1 now
+   states precisely what is frozen (paths, required keys, normalization) vs what
+   evolves additively (page content, optional index keys).
 
 Explicitly judged cargo cult for this repo, do not add: `CONTRIBUTING`, `CODEOWNERS`,
 issue templates, `CHANGELOG`, a `docs/` split.
 
 Judged correct, leave alone: `tools/` as a name, `acknowledged.json` at the root, the
 identity-named page filenames, the frozen path spec.
+
+## Generated-output shape review — 2026-08-04 (restriction lifted, decisions made)
+
+The earlier organization review excluded the generated miniaudit files; that
+exclusion is lifted. Outcomes:
+
+- **Paths stay.** `images/ manifests/ os/` at root re-examined and kept: the repo
+  name is the grouping level, the three dirs enumerate the attested coordinate
+  spaces, and a container dir (`reviews/`) would add a permanent redundant URL
+  segment. A move remains possible only until the app ships.
+- **The "verbatim, never a client summary" rule is relaxed** (owner decision).
+  Verdict prose still travels; clients may truncate/restyle but not soften.
+- **Machine-readable layer added** (additive, `"schema": 1` unchanged):
+  `verdictClass` (page path → private/leaks/compromisable/qualified-pass/
+  inconclusive) and `findings` (page path → parsed `### SEVERITY (deployed: …) —
+  title` headings with GitHub anchors). Extracted mechanically by
+  `index_page.py` from each page's own wording — never authored in tooling;
+  unreadable pages are omitted + warned (fail-soft to neutral in the app).
+  Currently 133 findings across 19 pages; manifest pages use `### Check N`
+  structure and contribute class+prose only, until future pages adopt the
+  finding-heading house format (now required by the SKILL.md brief).
+- **iOS scope EXECUTED** (teemoon-ios, local branch
+  `feat/audit-findings-surfacing` @ `51ffb7a`, on top of the PR #1 change;
+  unpushed): decode new keys + `updated` + validate `schema` (≠1 fails closed);
+  dead `manifestAuditURL` wired (7 recipe reviews now render on the recipe
+  card); `FableAuditBlock` badged by class + markdown + 3-line clip; per-node
+  "plaintext egress" rollup (live vs latent vs collapsed info, anchor
+  deep-links); staleness stamp; everyday-rung audit node (3 states, worst
+  class wins) with "see the proof" rung-flip; hero demoted to advisory orange
+  on `leaks` (never red, never send-gated; `incomplete` leaves hero alone).
+  36/36 tests pass (AuditIndex, EgressRollup, AuditLinkScoping). Note:
+  `modelNodeAuditState` recomputes `enclaveGroups` in the hero — acceptable at
+  sheet-render frequency, a caching candidate if the sheet ever feels slow.
+- **Everyday-rung decision (2026-08-04)**: one plain-language chain node, three
+  states derived from `verdictClass` alone (worst class among the node's
+  in-scope reviews): any `leaks` → alert ("this setup copies your prompts into
+  its operator's logs" — what small-models shows today); all touchers gated
+  private/qualified-pass → ok ("none of it is *set to* copy your words" — never
+  "can't"); any ungated/inconclusive → neutral gray ("a gap in the checking,
+  not an all-clear"). Placed after the identity node so a failed build check
+  dims it; tap flips to expert's egress section; no external links at this rung.
 
 ## Live findings that need an upstream ask to near.ai
 

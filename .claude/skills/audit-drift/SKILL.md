@@ -94,6 +94,16 @@ dump; confirm or refute at YOUR commit, do not assume they transfer>
   privacy claim. Failing closed is a correct outcome, not a failure.
 - review line: `reviewed <YYYY-MM-DD> (independent AI source review, Fable —
   method: [/notes/method.md](/notes/method.md))`
+- The `## verdict:` line must OPEN with its class token — PRIVATE / LEAKS /
+  COMPROMISABLE / QUALIFIED PASS / INCONCLUSIVE — and contain no markdown.
+  The indexer machine-reads it into `verdictClass`; a line it cannot read
+  ships to the app as an unbadged neutral verdict.
+- Each finding is a heading of the exact shape
+  `### <CRITICAL|HIGH|MEDIUM|LOW|INFO> (deployed: <ON|OFF|ARMED>[, qualifier]) — <title>`
+  with the title in plain text and naming the sink (log / disk / telemetry /
+  egress). The indexer machine-reads these into `findings`, which the app
+  renders as the node's plaintext-egress list — a finding in prose under a
+  differently-shaped heading is invisible to the app.
 - Plain ASCII in fenced code blocks; no HTML entities.
 
 ## Efficiency
