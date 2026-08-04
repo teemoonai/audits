@@ -71,6 +71,16 @@ Third-party sidecars in the manifests (`datadog/agent`,
 Highest priority, in order: **inference engine config → vllm-proxy-rs →
 cloud-api → cvm-ingress**, then the mesh, then compose-manager (supply chain).
 
+> **Before reviewing anything, walk [`/notes/audit-surface.md`](/notes/audit-surface.md).**
+> This document says *what* to look for; that one says *where*, and every item on
+> it exists because a finding actually came from it. It was written after a
+> controlled comparison ([`/notes/reviewer-comparison-2026-08-03.md`](/notes/reviewer-comparison-2026-08-03.md))
+> showed two independent reviewers converging on a headline finding while
+> diverging on coverage — one missed a live token-ID leak in an area it had
+> marked "not traced". The checklist turns "did the reviewer think to look" into
+> "did the reviewer finish the list", and it starts with **establishing image
+> identity**, because a review keyed to the wrong tree is worse than no review.
+
 ---
 
 ## 3. The portable audit prompt
