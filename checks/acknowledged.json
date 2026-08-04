@@ -1,0 +1,25 @@
+{
+  "_comment": [
+    "Identities that are known to be running unaudited, and are deliberately not",
+    "gated in index.json. fleet_drift.py lists these separately and does NOT count",
+    "them as drift, so that a permanent open item cannot redline the signal and",
+    "train everyone to ignore it. A new identity appearing is the alarm; a known",
+    "one staying open is a backlog entry.",
+    "",
+    "Adding an entry here is a decision to keep publishing without covering it, so",
+    "each one carries a reason and, where a page exists that explains the gap, a",
+    "link to it. Removing an entry is what happens when the gap closes.",
+    "",
+    "This file is NOT part of the frozen path spec and no client reads it."
+  ],
+  "acknowledged": [
+    {
+      "id": "nearaidev/compose-manager-launcher@sha256:d652f92b64f57ef8aa086bd77a4cf932c1976965b3cea2814a7ee82fe73aa993",
+      "since": "2026-08-03",
+      "reason": "No build attestation exists and the image carries no source label, so its source commit is unresolvable and no source review is possible. Absence was proven, not assumed: repo-level lookup 404s with quota healthy, a positive control on a sibling digest returns 200 in the same run, and the image itself resolves on Docker Hub. It holds container-control privilege and runs on the most hosts of any build of this image.",
+      "page": "images/docker.io/nearaidev/compose-manager-launcher/sha256-d652f92b64f57ef8aa086bd77a4cf932c1976965b3cea2814a7ee82fe73aa993.md",
+      "gated_in_index": false,
+      "closes_when": "near.ai publishes a build attestation for this digest, or replaces it with an attested build"
+    }
+  ]
+}

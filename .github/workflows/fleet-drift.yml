@@ -1,0 +1,124 @@
+name: fleet drift
+
+# Every page in this repo is a point-in-time claim about a configuration nobody
+# is watching. This closes that gap: it asks, on a schedule, whether what near.ai
+# is running is still what has been reviewed here.
+#
+# It is deliberately the CHEAP half of the job. Detecting drift is deterministic,
+# needs no API key and no model, and finishes in under a minute. WRITING a review
+# for whatever it finds is the expensive half — it needs a source review, costs
+# real tokens, and must be verified before publishing. So this workflow never
+# writes a page and never touches index.json. It files an issue and stops. A
+# human decides what gets reviewed and what gets published.
+
+on:
+  schedule:
+    # 06:20 UTC daily. Off the hour on purpose: scheduled jobs on the hour are
+    # heavily contended on shared runners and get delayed or dropped.
+    - cron: "20 6 * * *"
+  workflow_dispatch:
+    inputs:
+      samples:
+        description: "Requests per host (load-balanced hosts serve different CVMs)"
+        required: false
+        default: "3"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: fleet-drift
+  cancel-in-progress: false
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # No dependencies to install: the check is stdlib-only by design, so this
+      # workflow has no supply chain of its own.
+      - name: Check the fleet against index.json
+        id: check
+        run: |
+          set +e
+          python3 checks/fleet_drift.py \
+            --samples "${{ github.event.inputs.samples || '3' }}" \
+            --json drift.json | tee report.txt
+          echo "exit=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fleet-drift-report
+          path: |
+            report.txt
+            drift.json
+          retention-days: 90
+
+      - name: File, update, or close the drift issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXIT: ${{ steps.check.outputs.exit }}
+        run: |
+          set -euo pipefail
+          TITLE="fleet drift: live deployment has moved ahead of the audits"
+          EXISTING=$(gh issue list --state open --label fleet-drift \
+                       --json number --jq '.[0].number // empty' || true)
+
+          if [ "${EXIT}" = "0" ]; then
+            if [ -n "${EXISTING}" ]; then
+              gh issue comment "${EXISTING}" --body \
+                "Drift cleared as of \`${GITHUB_SHA:0:12}\` ($(date -u +%Y-%m-%dT%H:%MZ)). Every in-scope identity observed live has a page, and the index is intact. Closing."
+              gh issue close "${EXISTING}"
+            fi
+            echo "no drift"
+            exit 0
+          fi
+
+          {
+            if [ "${EXIT}" = "2" ]; then
+              echo "> **Inconclusive run.** An integrity check failed, the index is internally"
+              echo "> broken, or the fleet could not be reached. Nothing may be concluded about"
+              echo "> coverage from this run — read the report before acting on it."
+            else
+              echo "Something in scope is running that has no page in this repo. Users on the"
+              echo "listed hosts see no audit link where they should."
+            fi
+            echo
+            echo "Detected by \`checks/fleet_drift.py\` — deterministic, no model involved."
+            echo "It reports only; it does not write pages or touch \`index.json\`."
+            echo
+            echo '```'
+            cat report.txt
+            echo '```'
+            echo
+            echo "**What to do:** review each unaudited identity, publish a page, then gate it"
+            echo "in \`index.json\`. If an identity cannot be reviewed (no resolvable source),"
+            echo "publish an INCONCLUSIVE page that makes no privacy claim, leave it out of"
+            echo "\`index.json\`, and record it in \`checks/acknowledged.json\` so it stops"
+            echo "redlining this check."
+            echo
+            echo "<sub>run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}</sub>"
+          } > body.md
+
+          if [ -n "${EXISTING}" ]; then
+            gh issue comment "${EXISTING}" --body-file body.md
+          else
+            gh issue create --title "${TITLE}" --label fleet-drift --body-file body.md
+          fi
+
+          # Exit 1 (drift) is expected from time to time — the issue is the signal,
+          # so keep the run green. Exit 2 means the check itself could not reach a
+          # conclusion, which should be loud.
+          if [ "${EXIT}" = "2" ]; then
+            echo "::error::fleet drift check was inconclusive — see the issue"
+            exit 1
+          fi
