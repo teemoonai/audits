@@ -3,6 +3,14 @@
 The daily check found something in scope running with no page. This is how to
 close it. Steps 1 and 4 are scripted; steps 2 and 3 are where the judgement is.
 
+> **The short version: open Claude Code in this repo and run `/audit-drift`.**
+> The skill at `.claude/skills/audit-drift/` drives everything below — it reads
+> the issue, runs the identity resolver, spawns the Fable reviewers, verifies
+> their load-bearing claims and gates the pages. You are not spawning reviewers
+> by hand: a Claude session does that with the Agent tool, `model: "fable"`.
+> The rest of this file is what that skill is doing, and why, so you can drive it
+> manually or check its work.
+
 The shape to keep in mind: **detection is cheap and automated, review is expensive
 and deliberate.** Producing one page costs roughly 80–240k tokens and 10–20
 minutes of a reviewing model's time. Never put that on a timer, and never publish
