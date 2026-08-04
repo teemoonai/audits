@@ -46,6 +46,11 @@ no upstream source reading).
 
 Fill every placeholder. Do not shorten the Rules section.
 
+A real brief, exactly as sent — the one that produced the CRITICAL
+`/configure_logging` finding — is in [`example-brief.md`](example-brief.md),
+with notes on the two things about it worth copying and the two instructions
+added to the template after it.
+
 ```
 INDEPENDENT privacy source audit for the public repo `teemoonai/audits`,
 published verbatim as "independent AI source review, Fable".
