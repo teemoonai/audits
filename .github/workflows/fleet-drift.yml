@@ -100,11 +100,19 @@ jobs:
             cat report.txt
             echo '```'
             echo
-            echo "**What to do:** review each unaudited identity, publish a page, then gate it"
-            echo "in \`index.json\`. If an identity cannot be reviewed (no resolvable source),"
-            echo "publish an INCONCLUSIVE page that makes no privacy claim, leave it out of"
-            echo "\`index.json\`, and record it in \`checks/acknowledged.json\` so it stops"
-            echo "redlining this check."
+            echo "**What to do:** follow [\`checks/RUNBOOK.md\`](../blob/main/checks/RUNBOOK.md)."
+            echo
+            echo "Short version — resolve identity first, then commission the review:"
+            echo
+            echo '```'
+            echo "python3 checks/resolve_identity.py --brief <image>@sha256:<digest>"
+            echo "#  ... review, then verify its load-bearing citations yourself ..."
+            echo "python3 checks/index_page.py <page> --commit <repo>@<sha>"
+            echo '```'
+            echo
+            echo "If identity cannot be established, publish an INCONCLUSIVE page making no"
+            echo "privacy claim, gate it with \`--no-gate\`, and record it in"
+            echo "\`checks/acknowledged.json\` so it stops redlining this check."
             echo
             echo "<sub>run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}</sub>"
           } > body.md
