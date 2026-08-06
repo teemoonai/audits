@@ -470,8 +470,15 @@ def main():
             print(f"  {h}: {note}")
     print(f"\nUNAUDITED — in scope, running, no page  ({len(unaudited)})")
     for u in unaudited or [None]:
-        print("  none" if u is None else
-              f"  [{u['kind']:<8}] {u['role']:<26} {u['id'][:64]}\n{'':14}on {len(u['hosts'])} host(s): {u['hosts'][:6]}")
+        if u is None:
+            print("  none")
+            continue
+        hosts = sorted(u["hosts"])
+        # Cap the line, but say so — a bare [:6] under a count of 7 reads as a
+        # bug in the counter. The full list is always in --json.
+        more = f" (+{len(hosts) - 6} more)" if len(hosts) > 6 else ""
+        print(f"  [{u['kind']:<8}] {u['role']:<26} {u['id'][:64]}")
+        print(f"{'':14}on {len(hosts)} host(s): {', '.join(hosts[:6])}{more}")
     if known:
         print(f"\nKNOWN OPEN — acknowledged, not counted as drift  ({len(known)})")
         for k in known:
