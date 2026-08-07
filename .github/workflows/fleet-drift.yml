@@ -120,7 +120,23 @@ jobs:
           if [ -n "${EXISTING}" ]; then
             gh issue comment "${EXISTING}" --body-file body.md
           else
-            gh issue create --title "${TITLE}" --label fleet-drift --body-file body.md
+            # The label must exist before anything asks for it, and a fresh clone
+            # of this repo has only GitHub's defaults. --force makes this a no-op
+            # once it does exist.
+            gh label create fleet-drift --color d93f0b \
+              --description "Live deployment has moved ahead of the audits" \
+              --force >/dev/null 2>&1 || true
+
+            # File first, decorate second. A rejected label or an unassignable
+            # owner must never be the reason a drift report goes unfiled — that
+            # exact failure mode swallowed two days of reports in Aug 2026.
+            # Assignment is what carries the report to a phone: it notifies
+            # regardless of watch settings, unlike a bot-authored issue.
+            URL=$(gh issue create --title "${TITLE}" --body-file body.md)
+            gh issue edit "${URL}" \
+              --add-label fleet-drift \
+              --add-assignee "${GITHUB_REPOSITORY_OWNER}" || \
+              echo "::warning::issue ${URL} filed but could not be labelled or assigned"
           fi
 
           # Exit 1 (drift) is expected from time to time — the issue is the signal,
