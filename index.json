@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-08-03",
+  "updated": "2026-08-07",
   "images": {
     "docker.io/nearaidev/vllm-proxy-rs": [
       "b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36",
