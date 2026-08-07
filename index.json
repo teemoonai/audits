@@ -121,6 +121,9 @@
   "tagAudits": {
     "nvcr.io/nvidia/k8s/dcgm-exporter": [
       "4.5.2-4.8.1-distroless"
+    ],
+    "docker.io/pytorch/pytorch": [
+      "2.5.1-cuda12.4-cudnn9-runtime"
     ]
   },
   "manifests": {
@@ -181,6 +184,7 @@
     "images/docker.io/vllm/vllm-openai/sha256-960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403.md": "PRIVATE at deployed flags",
     "images/docker.io/vllm/vllm-openai/sha256-ccd6a6dbf4aba4e94c6f7052d1835d6e742082b6a5095276552e9b7a5a47c2e5.md": "PRIVATE for message plaintext \u2014 but media-fetch egress is unrestricted, unlike its sibling",
     "images/nvcr.io/nvidia/k8s/dcgm-exporter/sha256-ed594cf53fe6942e84b07b0740cdcbb249fa4b39cb21feeebf93881ae51f0b5e.md": "telemetry-not-content at deployed config \u2014 GPU-privileged, and the bytes are now pinned",
+    "images/docker.io/pytorch/pytorch/tag-2.5.1-cuda12.4-cudnn9-runtime.md": "QUALIFIED PASS at configuration and inline-source level \u2014 the measured file embeds the privacy filter's entire application source, and that source logs, stores, and transmits no message content; but the build stands on a mutable base tag plus unpinned pip installs, so nothing binds this review to the bytes actually running",
     "images/nvcr.io/nvidia/k8s/dcgm-exporter/tag-4.5.2-4.8.1-distroless.md": "telemetry-not-content at audited config \u2014 but GPU-privileged, and the tag can drift",
     "manifests/measured/sha256-002b406e4770df733eba8f7dfce066f1c8e8d041d972cc02da8b9e3756ebca9a.md": "qualified PASS at the manifest layer \u2014 no allowed env is a content switch \u2014 but this node measures in a **Datadog agent collecting all container stdout to a third-party US SaaS**, runs a **launcher build with no resolvable provenance**, and defines the shared network on which the engine's unauthenticated logging switch sits",
     "manifests/measured/sha256-0fccab4eb7ffc4c9ec1be8e2851e7b820efef0485cfd21ac027bf1408dc836b0.md": "qualified PASS at the manifest layer, **weaker than its sibling on the one axis that decides who reads your prompts** \u2014 a measured `datadog-agent` collects **all** container stdout and ships it to `us3.datadoghq.com`, adding a second off-box log destination and an **open OTLP *logs* receiver on the shared network**; everything else (22 identical `allowed_envs`, fail-closed management filter, audited control-plane images) matches gpu02",
@@ -221,6 +225,7 @@
     "images/docker.io/vllm/vllm-openai/sha256-960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403.md": "private",
     "images/docker.io/vllm/vllm-openai/sha256-ccd6a6dbf4aba4e94c6f7052d1835d6e742082b6a5095276552e9b7a5a47c2e5.md": "private",
     "images/nvcr.io/nvidia/k8s/dcgm-exporter/sha256-ed594cf53fe6942e84b07b0740cdcbb249fa4b39cb21feeebf93881ae51f0b5e.md": "private",
+    "images/docker.io/pytorch/pytorch/tag-2.5.1-cuda12.4-cudnn9-runtime.md": "qualified-pass",
     "images/nvcr.io/nvidia/k8s/dcgm-exporter/tag-4.5.2-4.8.1-distroless.md": "private",
     "manifests/measured/sha256-002b406e4770df733eba8f7dfce066f1c8e8d041d972cc02da8b9e3756ebca9a.md": "qualified-pass",
     "manifests/measured/sha256-0fccab4eb7ffc4c9ec1be8e2851e7b820efef0485cfd21ac027bf1408dc836b0.md": "qualified-pass",
@@ -1108,6 +1113,43 @@
         "deployed": null,
         "title": "image-baked NVIDIA_VISIBLE_DEVICES=all versus the per-service device reservation",
         "anchor": "info--image-baked-nvidiavisibledevicesall-versus-the-per-service-device-reservation"
+      }
+    ],
+    "images/docker.io/pytorch/pytorch/tag-2.5.1-cuda12.4-cudnn9-runtime.md": [
+      {
+        "severity": "high",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "mutable base tag: a registry re-push silently replaces every layer under the plaintext process, with no attestation trace (egress-capable code)",
+        "anchor": "high-deployed-armed--mutable-base-tag-a-registry-re-push-silently-replaces-every-layer-under-the-plaintext-process-with-no-attestation-trace-egress-capable-code"
+      },
+      {
+        "severity": "high",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "unpinned pip install resolves PyPI-latest into the plaintext process at every build (egress-capable code)",
+        "anchor": "high-deployed-armed--unpinned-pip-install-resolves-pypi-latest-into-the-plaintext-process-at-every-build-egress-capable-code"
+      },
+      {
+        "severity": "low",
+        "deployed": "on",
+        "qualifier": "deployed: ON, metadata-only at reviewed source",
+        "title": "container stdout/stderr ships unredacted to two off-node telemetry backends (telemetry)",
+        "anchor": "low-deployed-on-metadata-only-at-reviewed-source--container-stdoutstderr-ships-unredacted-to-two-off-node-telemetry-backends-telemetry"
+      },
+      {
+        "severity": "low",
+        "deployed": "on",
+        "qualifier": "deployed: ON, inert at pinned revision",
+        "title": "model and tokenizer fetched from huggingface.co at startup with trust_remote_code enabled (egress)",
+        "anchor": "low-deployed-on-inert-at-pinned-revision--model-and-tokenizer-fetched-from-huggingfaceco-at-startup-with-trustremotecode-enabled-egress"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "unauthenticated classify endpoint and host IPC namespace: lateral plaintext exposure inside the enclave, no external sink",
+        "anchor": "info-deployed-on--unauthenticated-classify-endpoint-and-host-ipc-namespace-lateral-plaintext-exposure-inside-the-enclave-no-external-sink"
       }
     ],
     "os/sha256-9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677.md": [
