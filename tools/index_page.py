@@ -41,6 +41,7 @@ Usage:
 import argparse
 import collections
 import glob
+import datetime
 import json
 import os
 import re
@@ -56,6 +57,30 @@ def load():
 
 
 def save(idx):
+    # Stamp `updated` — but only when something else actually moved.
+    #
+    # This was hand-maintained and drifted: it sat at 2026-07-27 through a
+    # publish of 16 new reviews, and a revert walked it BACKWARDS. A field
+    # named `updated` that reports a date older than the change shipping with
+    # it is the kind of small overclaim the rest of this repo refuses to make.
+    #
+    # The condition matters as much as the stamp. --validate routes through
+    # here to refresh verdicts, so an unconditional bump would make a
+    # read-only check produce a diff — a date that moves without an update is
+    # the same lie in the other direction.
+    try:
+        with open(INDEX) as f:
+            old = json.load(f, object_pairs_hook=collections.OrderedDict)
+    except (OSError, ValueError):
+        old = None
+
+    def body(d):
+        return json.dumps({k: v for k, v in d.items() if k != "updated"}, sort_keys=True)
+
+    if old is None or body(old) != body(idx):
+        # UTC, not local: the scheduled runs that touch this are UTC-clocked.
+        idx["updated"] = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+
     with open(INDEX, "w") as f:
         json.dump(idx, f, indent=2)
         f.write("\n")
