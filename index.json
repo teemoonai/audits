@@ -22,7 +22,8 @@
       "5027e95bf6ec536856b1b52a91d1f35ff5c564ab83e8a94758a169ff09bb8df3",
       "1c64fde976bdf0d56474a30bccbcfc19667e5b3ab34c826a534c9d6aaca41212",
       "8ece90ad52faa8b56149f0117227d9009db34513213e35990da468aeb6fe0b75",
-      "984699c298a95b73c469b2191403ddc85fd780506e13c39c4afff3845e27bc6c"
+      "984699c298a95b73c469b2191403ddc85fd780506e13c39c4afff3845e27bc6c",
+      "febfb971c7352570fc445c466ebd6ffc9d896024958e544a60f2137fd85856b1"
     ],
     "docker.io/vllm/vllm-openai": [
       "960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403",
@@ -72,6 +73,10 @@
       "984699c298a95b73c469b2191403ddc85fd780506e13c39c4afff3845e27bc6c": {
         "repo": "sgl-project/sglang",
         "commit": "fdebc938f7f4d16fe6b9f55dcd9a767cf0899ea1"
+      },
+      "febfb971c7352570fc445c466ebd6ffc9d896024958e544a60f2137fd85856b1": {
+        "repo": "sgl-project/sglang",
+        "commit": "c4271c3fe1262fc2adbd162c33b25de5255251c5"
       }
     },
     "docker.io/vllm/vllm-openai": {
@@ -181,6 +186,7 @@
     "images/docker.io/lmsysorg/sglang/sha256-984699c298a95b73c469b2191403ddc85fd780506e13c39c4afff3845e27bc6c.md": "PRIVATE at the deployed flags \u2014 but not \"cannot happen\": three live paths remain, one unauthenticated runtime logging switch, one undisableable hang-time prompt dump, and \u2014 new at this build \u2014 an unguarded request-driven media fetch because every model served on this image here is multimodal",
     "images/docker.io/lmsysorg/sglang/sha256-9e02c8e1fe2790a1c445bd5f6814305fe43639a4adb01c8ad1e8e21e750bf581.md": "PRIVATE at deployed flags",
     "images/docker.io/lmsysorg/sglang/sha256-aac6b242680daeb74d2ab1d85f70575357552d7d165d2e5d30eb362797db54a1.md": "PRIVATE at deployed flags",
+    "images/docker.io/lmsysorg/sglang/sha256-febfb971c7352570fc445c466ebd6ffc9d896024958e544a60f2137fd85856b1.md": "PRIVATE at the deployed flags \u2014 but not \"cannot happen\": three live paths, one unauthenticated runtime logging switch, one undisableable hang-time prompt dump now armed at the 300 s default, and a request-driven media fetch because Qwen3.8-27B is multimodal \u2014 and the identity is a self-asserted NIGHTLY dev build",
     "images/docker.io/nearaidev/compose-manager-launcher/sha256-78afb82330137c2fd90a9c8c6e452f8f178c15d863f87c079a11c13e92216e00.md": "COMPROMISABLE by credentialed operator (shares the compose-manager verdict; watchdog role)",
     "images/docker.io/nearaidev/compose-manager-launcher/sha256-91fdff3cfa3543d72656b2368c7d8a0a83d95a0f1087378c897aa1537acdba56.md": "COMPROMISABLE by credentialed operator \u2014 this is the post-attestation mutation engine; no plaintext reach",
     "images/docker.io/nearaidev/compose-manager-launcher/sha256-d652f92b64f57ef8aa086bd77a4cf932c1976965b3cea2814a7ee82fe73aa993.md": "INCONCLUSIVE \u2014 no build attestation exists; the source commit is unresolvable, so no source review is possible and **this page makes no privacy claim**",
@@ -228,6 +234,7 @@
     "images/docker.io/lmsysorg/sglang/sha256-984699c298a95b73c469b2191403ddc85fd780506e13c39c4afff3845e27bc6c.md": "private",
     "images/docker.io/lmsysorg/sglang/sha256-9e02c8e1fe2790a1c445bd5f6814305fe43639a4adb01c8ad1e8e21e750bf581.md": "private",
     "images/docker.io/lmsysorg/sglang/sha256-aac6b242680daeb74d2ab1d85f70575357552d7d165d2e5d30eb362797db54a1.md": "private",
+    "images/docker.io/lmsysorg/sglang/sha256-febfb971c7352570fc445c466ebd6ffc9d896024958e544a60f2137fd85856b1.md": "private",
     "images/docker.io/nearaidev/compose-manager-launcher/sha256-78afb82330137c2fd90a9c8c6e452f8f178c15d863f87c079a11c13e92216e00.md": "compromisable",
     "images/docker.io/nearaidev/compose-manager-launcher/sha256-91fdff3cfa3543d72656b2368c7d8a0a83d95a0f1087378c897aa1537acdba56.md": "compromisable",
     "images/docker.io/nearaidev/compose-manager-launcher/sha256-d652f92b64f57ef8aa086bd77a4cf932c1976965b3cea2814a7ee82fe73aa993.md": "inconclusive",
@@ -660,6 +667,78 @@
         "deployed": null,
         "title": "The in-enclave patch is out of the serving/plaintext path (this build = base + patch)",
         "anchor": "info--the-in-enclave-patch-is-out-of-the-servingplaintext-path-this-build--base--patch"
+      }
+    ],
+    "images/docker.io/lmsysorg/sglang/sha256-febfb971c7352570fc445c466ebd6ffc9d896024958e544a60f2137fd85856b1.md": [
+      {
+        "severity": "critical",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "/configure_logging is unauthenticated and turns on verbatim prompt+output logging plus arbitrary-path request pickling, no restart \u2014 sink: log / disk (and egress to near.ai on every host)",
+        "anchor": "critical-deployed-on--configurelogging-is-unauthenticated-and-turns-on-verbatim-promptoutput-logging-plus-arbitrary-path-request-pickling-no-restart--sink-log--disk-and-egress-to-nearai-on-every-host"
+      },
+      {
+        "severity": "high",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "watchdog hang dump writes the full prompt and output token IDs of the in-flight batch to stdout at ERROR, undisableable, armed at the 300 s default \u2014 sink: log (egress to near.ai on every host)",
+        "anchor": "high-deployed-on--watchdog-hang-dump-writes-the-full-prompt-and-output-token-ids-of-the-in-flight-batch-to-stdout-at-error-undisableable-armed-at-the-300-s-default--sink-log-egress-to-nearai-on-every-host"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "request-driven media fetch: Qwen3.8-27B is multimodal, and an image, audio, or video URL is fetched with no domain allowlist and redirects on \u2014 sink: egress (request-driven, model-external)",
+        "anchor": "medium-deployed-on--request-driven-media-fetch-qwen38-27b-is-multimodal-and-an-image-audio-or-video-url-is-fetched-with-no-domain-allowlist-and-redirects-on--sink-egress-request-driven-model-external"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "engine stdout is shipped off-box verbatim to near.ai's telemetry gateway on all 3 hosts, and additionally to a third-party SaaS where a Datadog agent is measured \u2014 sink: egress",
+        "anchor": "medium-deployed-on--engine-stdout-is-shipped-off-box-verbatim-to-nearais-telemetry-gateway-on-all-3-hosts-and-additionally-to-a-third-party-saas-where-a-datadog-agent-is-measured--sink-egress"
+      },
+      {
+        "severity": "low",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, correct",
+        "title": "request logging is off and level 0 is the safest; sglang serve genuinely consumes --log-requests-level 0 on this path",
+        "anchor": "low-deployed-off-correct--request-logging-is-off-and-level-0-is-the-safest-sglang-serve-genuinely-consumes---log-requests-level-0-on-this-path"
+      },
+      {
+        "severity": "low",
+        "deployed": "off",
+        "qualifier": "deployed: OFF",
+        "title": "--export-metrics-to-file would write full prompt text, because its field filter is silently disabled when request logging is off \u2014 sink: disk",
+        "anchor": "low-deployed-off----export-metrics-to-file-would-write-full-prompt-text-because-its-field-filter-is-silently-disabled-when-request-logging-is-off--sink-disk"
+      },
+      {
+        "severity": "low",
+        "deployed": "on",
+        "qualifier": "deployed: ON, partial",
+        "title": "crash diagnostics default to enabled; request pickle off, py-spy runs without --locals, CUDA core dump blocked only by an absent env var \u2014 sink: log / disk",
+        "anchor": "low-deployed-on-partial--crash-diagnostics-default-to-enabled-request-pickle-off-py-spy-runs-without---locals-cuda-core-dump-blocked-only-by-an-absent-env-var--sink-log--disk"
+      },
+      {
+        "severity": "low",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "request content can be echoed back in a 400 validation error body \u2014 sink: response (not logged here)",
+        "anchor": "low-deployed-on--request-content-can-be-echoed-back-in-a-400-validation-error-body--sink-response-not-logged-here"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "/server_info is unauthenticated and dumps the full server configuration \u2014 sink: response",
+        "anchor": "info-deployed-on--serverinfo-is-unauthenticated-and-dumps-the-full-server-configuration--sink-response"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "this is a nightly dev build; nothing resolves model code or weights from a mutable source at runtime, but the FlashInfer nightly is pinned only in a builder label",
+        "anchor": "info-deployed-on--this-is-a-nightly-dev-build-nothing-resolves-model-code-or-weights-from-a-mutable-source-at-runtime-but-the-flashinfer-nightly-is-pinned-only-in-a-builder-label"
       }
     ],
     "images/docker.io/nearaidev/compose-manager-launcher/sha256-78afb82330137c2fd90a9c8c6e452f8f178c15d863f87c079a11c13e92216e00.md": [
