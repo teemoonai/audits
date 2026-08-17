@@ -88,12 +88,13 @@ None of these can be fixed in this repo.
 
 | fix | effect |
 |---|---|
-| `--admin-api-key` on sglang | closes the unauthenticated `/configure_logging` CRITICAL and ~30 other open admin routes |
-| `--allowed-media-domains` + `VLLM_MEDIA_URL_ALLOW_REDIRECTS=0` on Qwen3-VL | two YAML lines already written for Gemma-4 in the same file |
-| `--revision` on Qwen3.6 27B/35B and FLUX | stops unpinned model code executing in-enclave |
-| publish a build attestation for `compose-manager-launcher@d652f92b` | the only unauditable component, on 10 of 17 hosts |
+| `--admin-api-key` on sglang | closes the unauthenticated `/configure_logging` CRITICAL and ~30 other open admin routes. Re-confirmed 2026-08-17 at `fdebc938` (v0.5.16) and `c4271c3f` (nightly): route still `ADMIN_OPTIONAL`, no route anywhere is `ADMIN_FORCE`, and upstream's own FIXME in `http_server.py` says why. HiCache endpoints *are* hard-gated in the same file, which is what makes this an omission rather than a design position |
+| `--allowed-media-domains` + `VLLM_MEDIA_URL_ALLOW_REDIRECTS=0` — **no longer just Qwen3-VL** | **widened 2026-08-17.** The v0.5.16 upgrade turned Qwen3.6-27B and Qwen3.6-35B-A3B multimodal (`Qwen3_5(Moe)ForConditionalGeneration`, both carry `vision_config`), and the nightly serves Qwen3.8-27B, also multimodal. All fetch request-supplied URLs with no allowlist and redirects on. Gemma-4 sets both controls in the same file, so the fix is two YAML lines already written next door |
+| `--revision` on Qwen3.6 27B/35B and FLUX | stops unpinned model code executing in-enclave. Still open at `795aab85` (2026-08-17): both Qwen3.6 services run `--trust-remote-code` with no `--revision` while DeepSeek and Gemma pin. Now compounded — those models are read from `main`, so the multimodal config above can also change under them |
+| ~~publish a build attestation for `compose-manager-launcher@d652f92b`~~ | **CLOSED 2026-08-17** by replacement, not by attestation. That digest is gone from the fleet; `91fdff3c` (4 nodes) and `78afb823` (2 nodes) both carry signed attestations and are audited and gated. `acknowledged.json` is now empty |
 | move `FUSION_ENABLED` / `WEB_CONTEXT_SEARCH_*` into the attested compose | turns a vendor assertion into a verifiable fact |
-| FLUX engine: prompt logging at INFO + generated images never deleted | the one *actual* leak found, not a latent one |
+| FLUX engine: prompt logging at INFO + generated images never deleted | the one *actual* leak found, not a latent one. Escalated to **CRITICAL** 2026-08-17 on `small-models.yaml@2443fde4`: the recipe's own otelcol-contrib ships that prompt log off-box to `telemetry.infra.near.ai`, so it is egress, not just a local log |
+| pass `--watchdog-timeout` explicitly on every sglang service | **new 2026-08-17.** Upstream dropped the `watchdog_timeout` default from 1800 s to **300 s** (`server_args.py:1226` at `c4271c3f`). The hang-time prompt dump is undisableable, so any service not setting the flag is now armed at a 6x shorter trigger. DeepSeek sets it; the Qwen engines do not |
 
 ## Known residue
 

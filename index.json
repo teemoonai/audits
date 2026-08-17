@@ -157,7 +157,8 @@
       "d1cdff7016b9b1fef4ad1662678404eca67c07c4e2ca8993795a0f8dbe15af1c"
     ],
     "nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4.yaml": [
-      "cf11b98ccd81a738e051e8c743a67ded88af181648ab05d44d647409c5127d5e"
+      "cf11b98ccd81a738e051e8c743a67ded88af181648ab05d44d647409c5127d5e",
+      "795aab8598653d4f74e3826d662d35d0040a71bca6e6256e5e3646bd5738d5c8"
     ],
     "nearai/cvm-compose-files/prod/dsv4-flash-glm51.yaml": [
       "d085dcfc4ee0fbb13b183d52cf3a140cbc075e5e3de44fc039df961a4913ca4c"
@@ -217,6 +218,7 @@
     "manifests/nearai/cvm-compose-files/prod/GLM-5.2-W4AFP8-SGL-2xTP4/sha256-f408de5c89d7e7f8b4715b1f62409f67cadf52e232cfdce663f94482a134bba2.md": "qualified PASS on what it configures \u2014 every logging flag is literal, the two replicas are byte-identical, and nothing here captures content \u2014 but this is the document that leaves the engine's unauthenticated logging switch **reachable**: a shared `external: true` network, a bare `location /`, no `--admin-api-key`, and a fixed, unscrubbed stdout pipeline waiting downstream",
     "manifests/nearai/cvm-compose-files/prod/GLM-5.2-W4AFP8-SGL-TP8/sha256-db6f4e8ffd0324fcc3b2c3ef51ec2a4735b888bd9293057295d9161c9585bf38.md": "qualified PASS on what it configures \u2014 every logging flag is literal and minimal \u2014 but this is the document that leaves the fleet's highest-blast-radius engine's unauthenticated logging switch **reachable**: shared `external: true` network, bare `location /`, no `--admin-api-key`, `--max-running-requests 256` at 1M context, and an unscrubbed stdout pipeline that on this node's measured harness forks to a third-party US SaaS",
     "manifests/nearai/cvm-compose-files/prod/dsv4-flash-glm51/sha256-d085dcfc4ee0fbb13b183d52cf3a140cbc075e5e3de44fc039df961a4913ca4c.md": "qualified PASS on what it configures \u2014 two model families share one CVM with every logging flag minimal, revisions pinned on both engines, dcgm **digest**-pinned (the only recipe in this repo that does), and dcgm's port unpublished; but this is the first recipe found with a **`${VAR}` interpolation inside an engine command**, and it leaves the same three gaps as its siblings: a shared `external: true` network, six bare `location /` servers, no `--admin-api-key`, and a fixed unscrubbed stdout pipeline",
+    "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-795aab8598653d4f74e3826d662d35d0040a71bca6e6256e5e3646bd5738d5c8.md": "QUALIFIED PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on all five proxies, watchdog labels are truthful, and the A/B tag machinery carries only deployment metadata; but the sglang upgrade to v0.5.16 turned both Qwen3.6 engines multimodal, so this file now runs two request-driven media fetchers with NO allowlist beside a Gemma-4 that constrains both controls \u2014 plus the carried residuals: two Qwen3.6 engines `--trust-remote-code` with no `--revision`, unredacted double stdout shipping, unauthenticated engine admin behind allowlist-free proxies, and the documented `/compose/up` env-splice channel",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-cf11b98ccd81a738e051e8c743a67ded88af181648ab05d44d647409c5127d5e.md": "qualified PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on all four proxies, Gemma-4's media fetch fully constrained; residuals are the fleet's \u2014 an unauthenticated engine admin surface behind allowlist-free proxies, unredacted double stdout shipping, a documented `/compose/up` env-splice channel, and two Qwen3.6 engines carrying `--trust-remote-code` with **no `--revision` pin**",
     "manifests/nearai/cvm-compose-files/prod/qwen35-dsv4-flash/sha256-11da948ba44faae3f0fd7419197495fe82cbeb221bec5f5f03ea6caf580e9964.md": "QUALIFIED PASS \u2014 delta review against the audited A/B revision 5be223d3: the change is removals-only (the DeepSeek prefill-fairness A/B ends; r2 drops its image override and env block and inherits the audited anchor image, with zero experiment residue anywhere in the file); no content-logging switch exists, OHTTP is forced on for all three proxies, every model is revision-pinned; the carried residuals are the fleet's \u2014 splice-reachable env, an unauthenticated engine admin surface behind allowlist-free proxies, unredacted stdout shipping (off-box twice on the qwen35-122b host, once on dsv4-flash), and one unpinned PyPI resolve in the weight downloader",
     "manifests/nearai/cvm-compose-files/prod/qwen35-dsv4-flash/sha256-5be223d330932d118eb8ceee6414304af43c98d9a0f43b8195c8d86dfb77d000.md": "qualified PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on, every model revision-pinned; the two-image DeepSeek A/B diverges by exactly one env var (`SGLANG_EAGLE_PREFILL_FAIRNESS=1`), confirmed; residuals are the fleet's \u2014 splice-reachable env, an unauthenticated engine admin surface behind allowlist-free proxies, unredacted double stdout shipping, and one unpinned PyPI resolve in the weight downloader",
@@ -265,6 +267,7 @@
     "manifests/nearai/cvm-compose-files/prod/GLM-5.2-W4AFP8-SGL-2xTP4/sha256-f408de5c89d7e7f8b4715b1f62409f67cadf52e232cfdce663f94482a134bba2.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/GLM-5.2-W4AFP8-SGL-TP8/sha256-db6f4e8ffd0324fcc3b2c3ef51ec2a4735b888bd9293057295d9161c9585bf38.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/dsv4-flash-glm51/sha256-d085dcfc4ee0fbb13b183d52cf3a140cbc075e5e3de44fc039df961a4913ca4c.md": "qualified-pass",
+    "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-795aab8598653d4f74e3826d662d35d0040a71bca6e6256e5e3646bd5738d5c8.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-cf11b98ccd81a738e051e8c743a67ded88af181648ab05d44d647409c5127d5e.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/qwen35-dsv4-flash/sha256-11da948ba44faae3f0fd7419197495fe82cbeb221bec5f5f03ea6caf580e9964.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/qwen35-dsv4-flash/sha256-5be223d330932d118eb8ceee6414304af43c98d9a0f43b8195c8d86dfb77d000.md": "qualified-pass",
@@ -1432,6 +1435,57 @@
         "qualifier": "deployed: ON",
         "title": "one flat shared network spans management and all ten models' plaintext services; no egress restriction (egress)",
         "anchor": "medium-deployed-on--one-flat-shared-network-spans-management-and-all-ten-models-plaintext-services-no-egress-restriction-egress"
+      }
+    ],
+    "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-795aab8598653d4f74e3826d662d35d0040a71bca6e6256e5e3646bd5738d5c8.md": [
+      {
+        "severity": "high",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "every plaintext service's stdout leaves the CVM via the recipe's own otelcol-contrib, unredacted, to near.ai's telemetry gateway; on datadog-bearing nodes a measured agent ships it again to a third-party SaaS \u2014 sink: telemetry / egress",
+        "anchor": "high-deployed-on--every-plaintext-services-stdout-leaves-the-cvm-via-the-recipes-own-otelcol-contrib-unredacted-to-nearais-telemetry-gateway-on-datadog-bearing-nodes-a-measured-agent-ships-it-again-to-a-third-party-saas--sink-telemetry--egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "two Qwen3.6 engines are multimodal at v0.5.16 and fetch request-supplied media URLs with no domain allowlist, while sibling Gemma-4 in the same file constrains both controls \u2014 sink: egress (request-driven)",
+        "anchor": "medium-deployed-on--two-qwen36-engines-are-multimodal-at-v0516-and-fetch-request-supplied-media-urls-with-no-domain-allowlist-while-sibling-gemma-4-in-the-same-file-constrains-both-controls--sink-egress-request-driven"
+      },
+      {
+        "severity": "medium",
+        "deployed": "off",
+        "qualifier": "deployed: OFF",
+        "title": "a documented /compose/up env-splice channel can enable hidden-state passthrough and widen the media allowlist with no attestation-visible change \u2014 sink: response / egress",
+        "anchor": "medium-deployed-off--a-documented-composeup-env-splice-channel-can-enable-hidden-state-passthrough-and-widen-the-media-allowlist-with-no-attestation-visible-change--sink-response--egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the engines' unauthenticated admin surface is reachable through allowlist-free nginx and proxies on the flat network \u2014 sink: log / egress",
+        "anchor": "medium-deployed-on--the-engines-unauthenticated-admin-surface-is-reachable-through-allowlist-free-nginx-and-proxies-on-the-flat-network--sink-log--egress"
+      },
+      {
+        "severity": "low",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "both Qwen3.6 engines run --trust-remote-code with no --revision pin, unlike every other model in this file \u2014 sink: potential in-enclave code execution",
+        "anchor": "low-deployed-armed--both-qwen36-engines-run---trust-remote-code-with-no---revision-pin-unlike-every-other-model-in-this-file--sink-potential-in-enclave-code-execution"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the A/B experiment tag machinery carries only deployment metadata, and the one service asserting watchdog_timeout:1800 in a label actually deploys that flag",
+        "anchor": "info-deployed-on--the-ab-experiment-tag-machinery-carries-only-deployment-metadata-and-the-one-service-asserting-watchdogtimeout1800-in-a-label-actually-deploys-that-flag"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "privileges, mounts, volumes, build blocks, and the Gemma patch: structural in-box exposure, no new reader",
+        "anchor": "info-deployed-on--privileges-mounts-volumes-build-blocks-and-the-gemma-patch-structural-in-box-exposure-no-new-reader"
       }
     ],
     "manifests/nearai/cvm-compose-files/prod/qwen35-dsv4-flash/sha256-11da948ba44faae3f0fd7419197495fe82cbeb221bec5f5f03ea6caf580e9964.md": [
