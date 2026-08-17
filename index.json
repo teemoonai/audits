@@ -1637,7 +1637,7 @@
       {
         "severity": "info",
         "deployed": "off",
-        "qualifier": "deployed: OFF for this deployment",
+        "qualifier": "deployed: OFF, for this deployment",
         "title": "the base's Datadog fork does not apply here; stdout leaves to one destination",
         "anchor": "info-deployed-off-for-this-deployment--the-bases-datadog-fork-does-not-apply-here-stdout-leaves-to-one-destination"
       },
@@ -1651,9 +1651,9 @@
       {
         "severity": "critical",
         "deployed": "on",
-        "qualifier": "(deployed: ON, exposure",
-        "title": "inherited from [sglang@1c64fde9](/images/docker.io/lmsysorg/sglang/sha256-1c64fde976bdf0d56474a30bccbcfc19667e5b3ab34c826a534c9d6aaca41212.md); this document supplies no containment)",
-        "anchor": "critical-deployed-on-exposure--inherited-from-sglang1c64fde9-this-document-supplies-no-containment"
+        "qualifier": "deployed: ON, exposure",
+        "title": "unauthenticated engine logging switch reachable over the shared bridge and allowlist-free listeners, feeding the off-box stdout pipeline",
+        "anchor": "critical-deployed-on-exposure--unauthenticated-engine-logging-switch-reachable-over-the-shared-bridge-and-allowlist-free-listeners-feeding-the-off-box-stdout-pipeline"
       },
       {
         "severity": "high",
