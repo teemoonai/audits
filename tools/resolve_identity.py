@@ -46,6 +46,7 @@ import os
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 
 # Images whose attestations are published by a repo the image name does not name.
@@ -60,10 +61,32 @@ ACCEPT = ",".join([
 ])
 
 
+class _StripAuthOnCrossHostRedirect(urllib.request.HTTPRedirectHandler):
+    """Registries hand blob reads off to a CDN with a pre-signed URL. urllib
+    replays the bearer token to that new host; the CDN sees two credentials and
+    answers 400, which reads exactly like "this image has no labels". curl drops
+    the header on a cross-host hop -- so did every by-hand check that contradicted
+    this script. Drop it here too, or rung 2 silently misses and a live image gets
+    published INCONCLUSIVE on the strength of a transport bug."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        new = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if new is not None and urllib.parse.urlsplit(newurl).netloc != \
+                urllib.parse.urlsplit(req.full_url).netloc:
+            for h in list(new.headers):
+                if h.lower() == "authorization":
+                    del new.headers[h]
+            new.unredirected_hdrs.pop("Authorization", None)
+        return new
+
+
+_OPENER = urllib.request.build_opener(_StripAuthOnCrossHostRedirect)
+
+
 def get(url, headers=None, timeout=60):
     req = urllib.request.Request(url, headers=headers or {})
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
+        with _OPENER.open(req, timeout=timeout) as r:
             return r.status, r.read()
     except urllib.error.HTTPError as e:
         return e.code, e.read()
