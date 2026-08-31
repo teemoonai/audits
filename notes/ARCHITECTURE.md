@@ -143,8 +143,9 @@ the gateway-side findings do not touch message content for teemoon.
 
 ### 3b. Degraded (non-E2EE) path — teemoon avoids this
 
-If a request is *not* E2EE (a different client, or teemoon during a cold-start
-window — the client review is not published in this repo), the picture changes:
+If a request is *not* E2EE (a different client, or a teemoon send to an
+unattested provider the user configured — the fail-open cold-start window is
+closed, see the [client review](teemoon-ios-plaintext-audit.md)), the picture changes:
 
 ```
 [device] PLAINTEXT ──TLS──▶ cvm-ingress ──▶ cloud-api ──mesh──▶ model node ──▶ SGLang
@@ -170,7 +171,7 @@ image's file; the one-line answers:
 
 | Hop (plaintext present) | Could it leak? | Verdict | Detail |
 |---|---|---|---|
-| teemoon (device) | Logs / at-rest store / egress | Protected (in-app); Siri intent CRITICAL | At-rest store now protected + backup-excluded; no telemetry SDKs. Gaps: Siri/Shortcuts sends plaintext, and a cold-start window can send non-E2EE without confirmation | teemoon client — reviewed in the teemoon project, not published here |
+| teemoon (device) | Logs / at-rest store / egress / renderer | QUALIFIED-PASS (1 HIGH found & fixed pre-publish) | A **no-tap markdown-image auto-fetch** in the transcript renderer, driven by assistant-authored content, could have exfiltrated reply-side plaintext over a URLSession outside the E2EE transport — found and fixed pre-publish (renderer `imageURL` strip + a non-fetching attachment loader). At-rest store **and** the FTS search sidecar are encrypted (`completeUnlessOpen`) + backup-excluded; no telemetry SDKs; key copy confined to a concealed, expiring pasteboard. The Siri/Shortcuts entry fails closed (`RequestLLMIntent` → `session.sendPolicy`, teemoon-ios `846dc5c`). Residual by design: an unattested provider is plaintext by definition | [teemoon iOS client](/notes/teemoon-ios-plaintext-audit.md) |
 | cvm-ingress (degraded only) | Access logs / body spool | PRIVATE (qualified) | Logs are metadata-only; but request bodies >16 KB transiently spool to nginx temp files (`proxy_request_buffering` left on) | cvm-ingress |
 | cloud-api (degraded only) | Logs / persistence | PRIVATE (stateless) / LEAKS (stateful) | Stateless `/v1/chat/completions` stores no content; stateful `/v1/responses` persists to external Postgres and ignores `store:false` (teemoon never calls it) | cloud-api — gateway-side, out of this repo's scope rule |
 | mesh (transit) | Capture / weak admission | PRIVATE (structural caveats) | WireGuard+mTLS, no content logged; caveats are peer-admission and a pre-send app_id check | dstack-vpc |

@@ -13,6 +13,22 @@ path spec below). A build with no page has not been audited, and the
 [teemoon](https://teemoon.ai) app shows no audit link for it. Fail-closed,
 never overclaim.
 
+## The two sides of the question
+
+Your plaintext exists in two places — near.ai's sealed enclave, and your own
+device. This repo reviews both.
+
+- **Server side — near.ai's confidential-inference stack.** Per attested
+  identity: [`images/`](images/) (each plaintext-handling image),
+  [`manifests/`](manifests/) (the configs that define them), and
+  [`os/`](os/) (the guest OS underneath). Mapped end to end by
+  [`notes/ARCHITECTURE.md`](notes/ARCHITECTURE.md).
+- **Client side — the teemoon app on your device.** The
+  [teemoon iOS/macOS client review](notes/teemoon-ios-plaintext-audit.md) — the
+  other end of the E2EE, which composes every prompt and decrypts every reply. A
+  Tier-2 note, not a gated identity page: a client build carries no attested
+  digest for a link to key on.
+
 ## Scope rule
 
 Under end-to-end encryption, plaintext exists in exactly three places on
@@ -146,9 +162,10 @@ The honest rule is transitive: **anything a published page links to, directly
 or through another note, moves only with tier-1 care**, because renaming it
 breaks live links in published reviews. Today that closure is
 `notes/method.md` (linked from every page), `notes/ARCHITECTURE.md`,
-`notes/audit-surface.md` (reached via `method.md`), and
-`notes/reviewer-comparison-2026-08-03.md` (reached via `audit-surface.md`) —
-plus the in-tree lineage READMEs. Notes outside that closure are editorial
+`notes/audit-surface.md` (reached via `method.md`),
+`notes/reviewer-comparison-2026-08-03.md` (reached via `audit-surface.md`), and
+`notes/teemoon-ios-plaintext-audit.md` (reached via `ARCHITECTURE.md`) — plus the
+in-tree lineage READMEs. Notes outside that closure are editorial
 and may be reorganised freely.
 
 **Tier 3 — machinery. Free to change.**
