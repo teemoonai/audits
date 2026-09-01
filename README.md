@@ -24,7 +24,7 @@ device. This repo reviews both.
   [`os/`](os/) (the guest OS underneath). Mapped end to end by
   [`notes/ARCHITECTURE.md`](notes/ARCHITECTURE.md).
 - **Client side — the teemoon app on your device.** The
-  [teemoon iOS/macOS client review](notes/teemoon-ios-plaintext-audit.md) — the
+  [teemoon iPhone client review](notes/teemoon-ios-plaintext-audit.md) — the
   other end of the E2EE, which composes every prompt and decrypts every reply. A
   Tier-2 note, not a gated identity page: a client build carries no attested
   digest for a link to key on.

@@ -1,4 +1,4 @@
-> **teemoonai/audits** — the teemoon iOS/macOS client, plaintext-exfiltration review.
+> **teemoonai/audits** — the teemoon iPhone client, plaintext-exfiltration review.
 > The one plaintext-holding component with no attested identity, so this is a
 > Tier-2 note, **not** a gated `index.json` identity page: a client build carries
 > no image digest / compose hash for a link to key on, and the app shows no audit
@@ -6,10 +6,12 @@
 > (device)" hop. Method: [`/notes/method.md`](/notes/method.md) — point-in-time,
 > AI-assisted, verify everything yourself.
 
-# teemoon iOS/macOS client — can anything exfiltrate your plaintext?
+# teemoon iPhone client — can anything exfiltrate your plaintext?
 
-Scoped to the Apple (iOS/macOS) build — the `teemoon-ios` source. The coming
-Android client is a separate codebase and gets its own note when it ships.
+Scoped to the iPhone build — the `teemoon-ios` source. The app target ships
+iPhone-only (`TARGETED_DEVICE_FAMILY = 1`, `SUPPORTS_MACCATALYST = NO`); the
+source's `#if os(macOS)` branches were read but are not a shipped product. The
+coming Android client is a separate codebase and gets its own note when it ships.
 
 The rest of this repo audits near.ai's side of end-to-end encryption: given that
 plaintext exists in the model CVM, can any attested server component copy it
@@ -73,8 +75,8 @@ auto-fetchable `imageURL` for `![]()`, pinned by test.
 
 1. `CachedMarkdownParser.withoutRemoteImages` strips the `imageURL` attribute —
    the exact attribute the resolver keys off — at the single shared parser every
-   transcript render flows through, on both iOS and macOS. Alt text stays
-   visible; no image is fetched.
+   transcript render flows through (the strip is not platform-gated). Alt text
+   stays visible; no image is fetched.
 2. `NoRemoteAttachmentLoader` (resolves nothing, issues no request) is installed
    at both hosting roots via `blockingRemoteTranscriptAttachments()`, beside the
    existing transcript styling, disabling both the image and custom-emoji
@@ -114,8 +116,9 @@ Each verified in `teemoonai/teemoon-ios` source at the reviewed commit.
   (`Chat/Search/ChatSearchService.swift:64`) and `rehardenIfNeeded` (`:87`) both
   run the identical hardening on it, so it is not a softer copy of the store.
 - **Key copy is confined.** API-key copies go through
-  `Clipboard.copySensitive` (`Views/PlatformChrome.swift:134`): iOS `localOnly`
-  with a 120 s expiration, macOS `org.nspasteboard.ConcealedType`. Regression:
+  `Clipboard.copySensitive` (`Views/PlatformChrome.swift:134`): `localOnly` with a
+  120 s expiration on the shipped iPhone build (the unshipped macOS branch uses
+  `org.nspasteboard.ConcealedType`). Regression:
   `SensitiveClipboardTests`.
 - **The last-request debug card does not leak keys on copy.** `Authorization`
   and key-bearing headers are redacted on the copy path in every build (on-screen
