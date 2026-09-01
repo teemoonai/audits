@@ -27,7 +27,8 @@ device. This repo reviews both.
   [teemoon iPhone client review](notes/teemoon-ios-plaintext-audit.md) — the
   other end of the E2EE, which composes every prompt and decrypts every reply. A
   Tier-2 note, not a gated identity page: a client build carries no attested
-  digest for a link to key on.
+  digest for a link to key on. The client source is public:
+  [teemoonai/teemoon-ios](https://github.com/teemoonai/teemoon-ios), AGPL-3.0.
 
 ## Scope rule
 
