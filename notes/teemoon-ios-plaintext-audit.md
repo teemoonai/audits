@@ -24,13 +24,23 @@ file, the pasteboard, or a network destination other than the sealed send path?
 
 ## verdict: QUALIFIED-PASS — private at the reviewed commit, with one HIGH finding found and fixed before publish, and two residuals that are by-design, not defects
 
-**Reviewed source:** `teemoonai/teemoon-ios` `main @ 722e6b2` plus the client
-markdown-image fix described below (in the working tree at review time,
-2026-08-31; the finding and its fix are what re-pin the publish candidate). The
-final identity this note is keyed to is the published release commit — stamped
-in when the code-only candidate is re-assembled (`assemble_publish_candidate.sh`,
-release step 6.1). A client build with no page has not been reviewed; the same
-fail-closed rule this repo applies to server images applies here.
+**Reviewed source:** dev `main @ 722e6b2` plus the client markdown-image fix
+described below (in the working tree at review time, 2026-08-31; that history
+is private and was squashed at publish). The published release root is
+[`3521656`](https://github.com/teemoonai/teemoon-ios/commit/3521656) in
+`teemoonai/teemoon-ios`, cut from a later dev commit; on 2026-09-01 the full
+shipping-code delta between the reviewed tree and the published root (app
+sources and package manifests; tests, docs, and assets excluded) was
+re-reviewed against this note's one question. The published root carries the
+markdown-image fix exactly as adjudicated below
+(`MarkdownParseCache.withoutRemoteImages` + `NoRemoteAttachmentLoader`, applied
+at every transcript hosting root); no other change sends, stores, or logs
+message content anywhere new, and no property this note relies on was weakened
+— the rest of the delta is comment and preview scrubbing plus a local-only Siri
+failure message. **The verdict is re-pinned to `3521656`.** That was a delta
+review, not a second full audit. A client build with no page has not been
+reviewed; the same fail-closed rule this repo applies to server images applies
+here.
 
 This is a close-out review, not a from-scratch exhaustive audit: it re-walks the
 device plaintext surface, verifies each load-bearing claim against source, and
