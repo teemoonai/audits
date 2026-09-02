@@ -1,4 +1,4 @@
-# Where things stand — 2026-08-04
+# Where things stand — 2026-08-04 (upstream-ask table extended 2026-09-02)
 
 Working notes, not part of the published artifact. Delete when the open items close.
 Written so the work does not depend on a chat session surviving.
@@ -95,6 +95,11 @@ None of these can be fixed in this repo.
 | move `FUSION_ENABLED` / `WEB_CONTEXT_SEARCH_*` into the attested compose | turns a vendor assertion into a verifiable fact |
 | FLUX engine: prompt logging at INFO + generated images never deleted | the one *actual* leak found, not a latent one. Escalated to **CRITICAL** 2026-08-17 on `small-models.yaml@2443fde4`: the recipe's own otelcol-contrib ships that prompt log off-box to `telemetry.infra.near.ai`, so it is egress, not just a local log |
 | pass `--watchdog-timeout` explicitly on every sglang service | **new 2026-08-17.** Upstream dropped the `watchdog_timeout` default from 1800 s to **300 s** (`server_args.py:1226` at `c4271c3f`). The hang-time prompt dump is undisableable, so any service not setting the flag is now armed at a 6x shorter trigger. DeepSeek sets it; the Qwen engines do not |
+| set `ulimits: core: 0` (or a `core_pattern` sink) on every engine service | **new 2026-09-02** (drift #7). The upstream `dstack-nvidia-0.5.11` guest that `glm-5-3-flash` now boots has `CONFIG_COREDUMP=y`, no core-dump handler, and `LimitCORE=infinity` on both `docker.service` and `containerd.service`; no recipe sets a core ulimit, so a crashing engine writes its full memory image into its container layer on the data disk. Rated MEDIUM (ARMED) on the OS page; the fix is one compose line per engine |
+| fix the glm47 tool-call parser's WARNING log (`glm47_moe_detector.py`, upstream and Phala fork) | **new 2026-09-02.** `Failed to parse '{value}' as number` prints a model-emitted argument value verbatim whenever it is not numeric; the recipe's otelcol ships it to `telemetry.infra.near.ai`. The only live content path on the GLM-5.3 engine page and the reason it is LEAKS rather than PRIVATE. Ask upstream sglang, not just Phala |
+| pass `--allowed-media-domains` on GLM-5.3 (sglang now HAS the flag) and on Qwen3.6/3.8 once their builds carry it | **widened 2026-09-02.** The Phala fork at `26f67bd9` ships `download_remote_media` with an exact-hostname allowlist, manual redirects and a 64 MiB cap — but the flag defaults to empty and the recipe does not set it. On the v0.5.16 / nightly Qwen engines the mechanism does not exist yet |
+| stop replaying the compose-manager image override at boot without a signature check (`pre_launch_script` on the 0.5.11 harnesses) | **new 2026-09-02.** `341313ae` / `c82b1a2e` read `/var/lib/docker/volumes/dstack_work/_data/.env.launcher` before compose and export `COMPOSE_MANAGER_IMAGE` unvalidated, so the measured digest is the first-boot value only. HIGH on both measured pages |
+| vLLM: the shared parser engine logs tool-call argument prefixes at DEBUG with no flag (`vllm/parser/engine/parser_engine.py:948,984,1036` at `ffd46bfa`) | **new 2026-09-02.** OFF at `VLLM_LOGGING_LEVEL=INFO`; a single env change arms it. LOW on the `770fe65b` page |
 
 ## Known residue
 
