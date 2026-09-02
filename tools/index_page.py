@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """index_page.py — gate a published page, and keep index.json honest.
 
 Step 4 of responding to a fleet-drift issue. Adding a page is not publishing it:

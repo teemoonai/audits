@@ -100,7 +100,7 @@ jobs:
             cat report.txt
             echo '```'
             echo
-            echo "**What to do:** follow [\`tools/README.md\`](../blob/main/tools/README.md)."
+            echo "**What to do:** follow [\`tools/RUNBOOK.md\`](../blob/main/tools/RUNBOOK.md)."
             echo
             echo "Short version — resolve identity first, then commission the review:"
             echo

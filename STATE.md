@@ -15,17 +15,17 @@ Written so the work does not depend on a chat session surviving.
 
 ## Open items, ranked (from the 2026-08-04 organization review)
 
-1. **`manifests/measured/` has no README** — eight opaque hashes, no map from hash to
+1. ~~**`manifests/measured/` has no README**~~ **Closed 2026-09-02** (measured README, `nearaidev/sglang` + `pytorch/pytorch` lineage READMEs, a README in every `prod/*/` recipe dir, and every stale lineage table brought up to date). Original text: — eight opaque hashes, no map from hash to
    node. Called the worst orientation spot in the tree. Also `images/docker.io/nearaidev/sglang/`
    has no lineage README while every sibling ref does, and sits beside
    `images/docker.io/lmsysorg/sglang/` with nothing explaining the relationship.
    Only **1 of 7** `manifests/nearai/cvm-compose-files/prod/*/` dirs has one — a
    half-applied pattern reads as an oversight.
-2. **`tools/README.md` is a runbook.** Renaming `RUNBOOK.md` was a mistake: GitHub
+2. ~~**`tools/README.md` is a runbook.**~~ **Closed 2026-09-02**: `tools/RUNBOOK.md` restored, `README.md` is a three-row index; SKILL.md and the workflow issue text point at the runbook. Original text: Renaming `RUNBOOK.md` was a mistake: GitHub
    renders it as the directory's face and it opens `# Runbook: a fleet-drift issue
    just opened`, so a browsing reader thinks something is on fire. Restore
    `tools/RUNBOOK.md`; make `README.md` a short index of the three scripts.
-3. **`SECURITY.md`** — genuinely earns its place: this repo publishes security
+3. ~~**`SECURITY.md`**~~ **Closed 2026-09-02**: SECURITY.md added (verdict errors → public issue; stack vulnerabilities → near.ai; private channel = GitHub private vulnerability reporting, enabled on the repo the same day); LICENSE.md now dual — CC BY 4.0 docs, **MIT** for `tools/`, `.github/`, `.claude/` with SPDX headers on the scripts (license choice is the orchestrator's default, swap if you prefer another). Original text: genuinely earns its place: this repo publishes security
    verdicts about someone else's stack and states no disclosure channel. **Code
    license gap:** `LICENSE.md` is CC BY 4.0 "for documentation"; `tools/*.py` is now
    unlicensed.

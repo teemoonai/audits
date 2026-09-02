@@ -10,7 +10,7 @@ repo are published as "independent AI source review, Fable", so a page you wrote
 yourself would make that attribution false. Your job is the four steps around the
 review: establish identity, commission it, verify it, publish it.
 
-Read [`tools/README.md`](../../../tools/README.md) before starting. It has the
+Read [`tools/RUNBOOK.md`](../../../tools/RUNBOOK.md) before starting. It has the
 reasoning; this file has the mechanics.
 
 ## 1. Read the issue and triage

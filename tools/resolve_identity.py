@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """resolve_identity.py — what source tree is this digest actually built from?
 
 Step 1 of responding to a fleet-drift issue. A review keyed to the wrong tree is

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """fleet_drift.py — is what near.ai is running still what this repo has reviewed?
 
 Every page in this repo is a point-in-time claim about a configuration nobody is

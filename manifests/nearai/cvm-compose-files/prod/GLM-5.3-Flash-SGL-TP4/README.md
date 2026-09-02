@@ -1,6 +1,6 @@
-# prod/GLM-5.1-SGL-AWQ-TP4.yaml
+# prod/GLM-5.3-Flash-SGL-TP4.yaml
 
-Inner (model-layer) compose for zai-org/GLM-5.1-FP8 (QuantTrio AWQ) — two sglang TP4 replicas from a patched in-enclave build. **Log-pinned**: keyed by
+Inner (model-layer) compose for z-ai/glm-5.3-flash — two sglang TP4/EP4 replicas from an in-enclave build on a Phala sglang base. **Log-pinned**: keyed by
 `file_sha256` against the signed compose-manager action log (commit + path +
 file hash), not hardware-measured; the measured layer is the node harness under
 [`../../../../measured/`](../../../../measured/). Per-image behavior is deferred
@@ -14,9 +14,8 @@ verdict column is each page's own `## verdict:` line, truncated.
 
 | file_sha256 | verdict | review |
 |---|---|---|
-| [`eb00b404e321…`](sha256-eb00b404e3218e2e8c8ab8da5845af10ce79929fd232fe8ac3d2f688582817be.md) | Qualified PASS (see caveats in the review) | 2026-07-15 |
-| [`3c5f8891d1e4…`](sha256-3c5f8891d1e47a2762ae3172c0ce88899a11987df5c8531bfa0ce04f10881067.md) | QUALIFIED PASS — delta review against the audited base eb00b404 | 2026-08-17 |
-| [`ae05e2035325…`](sha256-ae05e203532562170e62e7ec7f9c7e271b1e5bfc3cdc9bd658d5dcc6c7814eb1.md) | QUALIFIED PASS — delta review against the audited base 3c5f8891 | 2026-08-21 |
+| [`d1cc22eb8a25…`](sha256-d1cc22eb8a25890e42a090d2c309b5045cdf374e000ed7228d9394f36f7f96d1.md) | LEAKS — narrowly, and the leak is completed by this document | 2026-09-02 |
+| [`d76413cd231a…`](sha256-d76413cd231a4e871a515e4fa829c6510a374fe335e77fae3ea5a6dccf783909.md) | LEAKS — narrowly, identical in class and in every finding to the d1cc22eb sibling page | 2026-09-02 |
 
 A revision not listed here has not been audited — the teemoon app shows no audit
 link for it (fail-closed by design). `python3 tools/fleet_drift.py` reports which

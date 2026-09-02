@@ -10,6 +10,8 @@ The inference engine - runs the model on decrypted text; sees plaintext by role.
 | [`sha256:9e02c8e1fe27...`](sha256-9e02c8e1fe2790a1c445bd5f6814305fe43639a4adb01c8ad1e8e21e750bf581.md) | `v0.5.12-cu129` (`127b9e32`) — Qwen3.6-27B & -35B | PRIVATE at deployed flags | 2026-07-22 |
 | [`sha256:6bb5fee34b6c...`](sha256-6bb5fee34b6c4537c09a4775e2292ac40350d5ad1218fcc835b2692142f443b1.md) | cu13 nightly (`7de33ce8`) — DeepSeek-V4-Flash | PRIVATE at deployed flags | 2026-07-22 |
 | [`sha256:5027e95bf6ec...`](sha256-5027e95bf6ec536856b1b52a91d1f35ff5c564ab83e8a94758a169ff09bb8df3.md) | **`v0.5.14`** (`49e384ce`) — `z-ai/glm-5.2` (2 × TP4) | private at deployed flags; **CRITICAL + HIGH residuals live** | 2026-08-03 |
+| [`sha256:984699c298a9...`](sha256-984699c298a95b73c469b2191403ddc85fd780506e13c39c4afff3845e27bc6c.md) | **`v0.5.16-cu129`** (`fdebc938`) — Qwen3.6-27B & -35B-A3B (now multimodal) | PRIVATE at deployed flags; **CRITICAL + HIGH residuals live**; watchdog default now 300 s | 2026-08-17 |
+| [`sha256:febfb971c735...`](sha256-febfb971c7352570fc445c466ebd6ffc9d896024958e544a60f2137fd85856b1.md) | nightly (`c4271c3f`) — Qwen3.8-27B (multimodal) | PRIVATE at deployed flags; **CRITICAL + HIGH residuals live** | 2026-08-17 |
 
 All four carry the same CRITICAL residual — the unauthenticated `/configure_logging` runtime switch — which is OFF at deployed flags.
 

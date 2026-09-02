@@ -1,6 +1,6 @@
-# prod/GLM-5.1-SGL-AWQ-TP4.yaml
+# prod/dsv4-flash-glm51.yaml
 
-Inner (model-layer) compose for zai-org/GLM-5.1-FP8 (QuantTrio AWQ) — two sglang TP4 replicas from a patched in-enclave build. **Log-pinned**: keyed by
+Inner (model-layer) compose for DeepSeek-V4-Flash + GLM-5.1 sharing one CVM. **Log-pinned**: keyed by
 `file_sha256` against the signed compose-manager action log (commit + path +
 file hash), not hardware-measured; the measured layer is the node harness under
 [`../../../../measured/`](../../../../measured/). Per-image behavior is deferred
@@ -14,9 +14,7 @@ verdict column is each page's own `## verdict:` line, truncated.
 
 | file_sha256 | verdict | review |
 |---|---|---|
-| [`eb00b404e321…`](sha256-eb00b404e3218e2e8c8ab8da5845af10ce79929fd232fe8ac3d2f688582817be.md) | Qualified PASS (see caveats in the review) | 2026-07-15 |
-| [`3c5f8891d1e4…`](sha256-3c5f8891d1e47a2762ae3172c0ce88899a11987df5c8531bfa0ce04f10881067.md) | QUALIFIED PASS — delta review against the audited base eb00b404 | 2026-08-17 |
-| [`ae05e2035325…`](sha256-ae05e203532562170e62e7ec7f9c7e271b1e5bfc3cdc9bd658d5dcc6c7814eb1.md) | QUALIFIED PASS — delta review against the audited base 3c5f8891 | 2026-08-21 |
+| [`d085dcfc4ee0…`](sha256-d085dcfc4ee0fbb13b183d52cf3a140cbc075e5e3de44fc039df961a4913ca4c.md) | qualified PASS on what it configures | 2026-08-03 |
 
 A revision not listed here has not been audited — the teemoon app shows no audit
 link for it (fail-closed by design). `python3 tools/fleet_drift.py` reports which
