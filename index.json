@@ -188,7 +188,8 @@
     ],
     "nearai/cvm-compose-files/prod/dsv4-qwen38-glm51.yaml": [
       "46edfb72e0d15618429cedde9fb527bc4d4c4c4073eac08099e854b43c44bc96",
-      "c27ed3b357f44673e4a84ef89f4625e1009de619d83ffdaae27c1265f676f4bb"
+      "c27ed3b357f44673e4a84ef89f4625e1009de619d83ffdaae27c1265f676f4bb",
+      "0c1c6841eeaa837f2083660327b34c70df8c69501189f14508aa4fe052692e40"
     ]
   },
   "measured": [
@@ -235,6 +236,7 @@
     "images/docker.io/vllm/vllm-openai/sha256-770fe65b2c73ee74a5c42165cf3433de4048cc2cd9c57a937ca4e35aba5aa87b.md": "PRIVATE at deployed flags \u2014 no content path to log, disk or telemetry at the deployed command; the v0.12.0 crash-path token-ID leak is fixed at this commit; residuals are a metadata-only phone-home to stats.vllm.ai (ON) and three latent switches (an env var, a log level, a flag pair) that would put content on stdout, which the recipe's own collector ships to telemetry.infra.near.ai",
     "images/docker.io/vllm/vllm-openai/sha256-960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403.md": "PRIVATE at deployed flags",
     "images/docker.io/vllm/vllm-openai/sha256-ccd6a6dbf4aba4e94c6f7052d1835d6e742082b6a5095276552e9b7a5a47c2e5.md": "PRIVATE for message plaintext \u2014 but media-fetch egress is unrestricted, unlike its sibling",
+    "images/ghcr.io/phala-network/sglang/sha256-2488ca13aee77ffd24ba2181b1b05dcf5e1c76e6477002c7b2f074b44fa49193.md": "TODO",
     "images/nvcr.io/nvidia/k8s/dcgm-exporter/sha256-ed594cf53fe6942e84b07b0740cdcbb249fa4b39cb21feeebf93881ae51f0b5e.md": "telemetry-not-content at deployed config \u2014 GPU-privileged, and the bytes are now pinned",
     "images/docker.io/pytorch/pytorch/tag-2.5.1-cuda12.4-cudnn9-runtime.md": "QUALIFIED PASS at configuration and inline-source level \u2014 the measured file embeds the privacy filter's entire application source, and that source logs, stores, and transmits no message content; but the build stands on a mutable base tag plus unpinned pip installs, so nothing binds this review to the bytes actually running",
     "images/nvcr.io/nvidia/k8s/dcgm-exporter/tag-4.5.2-4.8.1-distroless.md": "telemetry-not-content at audited config \u2014 but GPU-privileged, and the tag can drift",
@@ -264,6 +266,7 @@
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-99892545ebf1f31c53b3239dc24e3ecf6a2add3366e70b3792496485c9b5e7b3.md": "QUALIFIED PASS on logging config \u2014 the sparse-prefill flip is a clean four-class delta (engine image swap to the published-PRIVATE nightly 5bc4bc0dfd36, SGLANG_OPT_FLASHMLA_SPARSE_PREFILL 0->1, two new literal kernel/dtype env selectors that the engine review traced to no log/dump/path sink, and datadog/otel label churn whose every asserted value matches the deployed command/env) with no command-flag, mount, volume, port, or interpolation change anywhere in the diff; but every base qualification carries: two multimodal Qwen3.6 engines with no media allowlist, unredacted double stdout shipping, both Qwen3.6 engines --trust-remote-code with no --revision, unauthenticated engine admin behind allowlist-free proxies, and the documented /compose/up env-splice channel",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-c6ef1271ffdaed7e936b271d371da944644d63f0c277fe84e29582f334119fec.md": "QUALIFIED PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on all four proxies, the A/B arm machinery and the hidden-state splice lever are gone, and the DeepSeek engine now pins --revision; but the DeepSeek move to vLLM 0.26 adds an ARMED NCCL hang-dump path (flight-recorder trace to container /tmp, desync report to shipped stderr) and a 1M-token context whose request bodies nginx spools to a container-local temp file, plus the carried residuals: two Qwen3.6 multimodal engines with no media allowlist beside a constrained Gemma, two Qwen3.6 engines --trust-remote-code with no --revision, unredacted stdout shipping to telemetry.infra.near.ai with the Datadog label path still wired, unauthenticated sglang admin behind allowlist-free proxies, and a proxy build (e665ebb9) whose behavior is reviewed concurrently",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-cf11b98ccd81a738e051e8c743a67ded88af181648ab05d44d647409c5127d5e.md": "qualified PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on all four proxies, Gemma-4's media fetch fully constrained; residuals are the fleet's \u2014 an unauthenticated engine admin surface behind allowlist-free proxies, unredacted double stdout shipping, a documented `/compose/up` env-splice channel, and two Qwen3.6 engines carrying `--trust-remote-code` with **no `--revision` pin**",
+    "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-0c1c6841eeaa837f2083660327b34c70df8c69501189f14508aa4fe052692e40.md": "QUALIFIED PASS on logging config \u2014 delta review against the audited c27ed3b3 revision, the whole 35-hunk diff read against the base bytes: GLM-5.1 (patched in-enclave build, compile volume, EAGLE flags) is removed, the two Qwen3.6 sglang engines and their proxies, dcgm exporters, scrape jobs, nginx listeners and registrar routes are re-added with command lines byte-identical to the ones the c6ef1271 page reviewed yesterday, a second DeepSeek-V4-Flash TP2 replica on GPUs 6-7 is added off the unchanged anchor and pooled by the DeepSeek proxy, and the Datadog OpenMetrics check labels are deleted while the Datadog logs label the collector keys on stays on all 19 services; no content-logging switch anywhere, --log-requests-level 0 on all six engines, OHTTP forced on all four proxies, watchdog labels truthful; but stdout of every plaintext service still ships off-box unredacted, FOUR sglang engines (both Qwen3.8 and both Qwen3.6) are now unguarded multimodal media fetchers on the 300 s watchdog default, both Qwen3.6 engines run --trust-remote-code with no --revision and this file's downloader also pre-fetches them unpinned, the unauthenticated engine admin surface sits behind eight allowlist-free nginx location / blocks and four proxies on the flat network, and the /compose/up env-splice can still arm hidden-state passthrough and web-search egress with no attestation-visible change",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-46edfb72e0d15618429cedde9fb527bc4d4c4c4073eac08099e854b43c44bc96.md": "QUALIFIED PASS on logging config \u2014 no content-logging switch anywhere, all three engines pin --revision beside --trust-remote-code, OHTTP forced on all three proxies, both watchdog_timeout:1800 labels are truthful, the in-enclave GLM build resolves every input from a pinned digest and its patch is the audited privacy-neutral one; but stdout of every plaintext service still ships off-box unredacted, both Qwen3.8 engines are multimodal media fetchers with no allowlist running the hang-dump watchdog at the 300 s default, the unauthenticated engine admin surface sits behind allowlist-free nginx and proxies on the flat network, and the /compose/up env-splice can arm hidden-state passthrough and web-search egress with no attestation-visible change",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-c27ed3b357f44673e4a84ef89f4625e1009de619d83ffdaae27c1265f676f4bb.md": "QUALIFIED PASS on logging config \u2014 delta review against the audited 46edfb72 revision: the whole diff is two config-tuning changes and their metadata, verified against the base bytes \u2014 the dsv4 anchor's --chunked-prefill-size drops 8192 to 4096 (a scheduler batching flag naming no log, dump, or debug behavior) with the chunk_size telemetry labels updated to match (labels stay truthful to the deployed command; the in-file prose comment now stale at 8192), and num_consumers: 1 is added to the otelcol otlphttp sending_queue, which serializes export draining only \u2014 no receiver, filter, processor, destination, or collection change anywhere in the diff; every base finding carries unchanged and none retires \u2014 no content-logging switch anywhere, all three engines pin --revision beside --trust-remote-code, OHTTP forced on all three proxies, watchdog labels truthful; stdout of every plaintext service still ships off-box unredacted, both Qwen3.8 replicas remain unguarded multimodal media fetchers on the 300 s watchdog default, the unauthenticated engine admin surface remains behind allowlist-free nginx and proxies on the flat network, and the /compose/up env-splice can still arm hidden-state passthrough and web-search egress with no attestation-visible change",
     "manifests/nearai/cvm-compose-files/prod/qwen35-dsv4-flash/sha256-11da948ba44faae3f0fd7419197495fe82cbeb221bec5f5f03ea6caf580e9964.md": "QUALIFIED PASS \u2014 delta review against the audited A/B revision 5be223d3: the change is removals-only (the DeepSeek prefill-fairness A/B ends; r2 drops its image override and env block and inherits the audited anchor image, with zero experiment residue anywhere in the file); no content-logging switch exists, OHTTP is forced on for all three proxies, every model is revision-pinned; the carried residuals are the fleet's \u2014 splice-reachable env, an unauthenticated engine admin surface behind allowlist-free proxies, unredacted stdout shipping (off-box twice on the qwen35-122b host, once on dsv4-flash), and one unpinned PyPI resolve in the weight downloader",
@@ -275,7 +278,8 @@
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-a385f19a51054767b8be49a64ebc3111e0e62f721a861e54c78984b186904599.md": "qualified PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on; but three services build from mutable sources inside the enclave, FLUX runs unpinned remote code, and Qwen3-VL's media fetch is unrestricted",
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-cb9040a3e32a0e9157baf26b804d95a3ec55b91d9ae87383e0acd4300490078e.md": "LEAKS \u2014 the FLUX diffusion service this file launches logs every user prompt at INFO and writes every generated image to disk, both unconditionally, and this file's own otelcol pipeline ships that prompt log to telemetry.infra.near.ai unredacted; the delta since the previous revision retires Gemma-4-31B and two gpt-oss replicas (cleanly, no dangling route, scrape target or registrar entry) and adds a GLM-5.1 AWQ TP4 engine built in-enclave from a digest-pinned sglang base plus a visible fail-loud weight-loader patch, launched with the minimum request-log level, a 1800 s watchdog, a pinned revision beside --trust-remote-code and no dump, file or trace flag, behind a proxy whose environment is line-identical to its eight siblings; the otelcol receivers, processors and exporter are byte-identical to the base, so the new engine's stdout joins the same unredacted off-box stream; every finding of the previous review carries forward, the Qwen3-VL media-fetch gap now stands with no in-file counterexample since Gemma-4 left, and the Qwen3.6 replicas remain the only sglang LLM engines in the file without a watchdog pin",
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-ce39ea4cfe0ddf4dc2e4fbb96b6c66ab9f72954444d5419b196d06940db5e297.md": "LEAKS \u2014 the FLUX diffusion service this file launches logs every user prompt at INFO and writes every generated image to disk, both unconditionally, and this file's own otelcol pipeline ships that prompt log to telemetry.infra.near.ai unredacted; the only change since the previous revision is a one-line export-concurrency setting (num_consumers: 1) inside that same telemetry exporter, which alters delivery ordering and throughput of the leaking log and reduces or scrubs nothing \u2014 every finding of the previous review carries forward, the other twelve model services hold their prior qualified pass at deployed flags, and the unpinned-build and Qwen3-VL media-fetch gaps remain open",
-    "os/sha256-9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677.md": "PRIVATE at measured configuration"
+    "os/sha256-9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677.md": "PRIVATE at measured configuration",
+    "os/sha256-a6eafc5f007f642d8ea90c7fa8881f1e6715720ccb531941a28218f4f26d7b02.md": "INCONCLUSIVE \u2014 page under construction; no privacy claim is made until the TODO markers below are resolved"
   },
   "verdictClass": {
     "images/docker.io/datadog/agent/sha256-5556fb80b952832719a76b016f905616c76ee0989a239c4680c6220148e865d6.md": "private",
@@ -333,6 +337,7 @@
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-99892545ebf1f31c53b3239dc24e3ecf6a2add3366e70b3792496485c9b5e7b3.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-c6ef1271ffdaed7e936b271d371da944644d63f0c277fe84e29582f334119fec.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-cf11b98ccd81a738e051e8c743a67ded88af181648ab05d44d647409c5127d5e.md": "qualified-pass",
+    "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-0c1c6841eeaa837f2083660327b34c70df8c69501189f14508aa4fe052692e40.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-46edfb72e0d15618429cedde9fb527bc4d4c4c4073eac08099e854b43c44bc96.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-c27ed3b357f44673e4a84ef89f4625e1009de619d83ffdaae27c1265f676f4bb.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/qwen35-dsv4-flash/sha256-11da948ba44faae3f0fd7419197495fe82cbeb221bec5f5f03ea6caf580e9964.md": "qualified-pass",
@@ -344,7 +349,8 @@
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-a385f19a51054767b8be49a64ebc3111e0e62f721a861e54c78984b186904599.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-cb9040a3e32a0e9157baf26b804d95a3ec55b91d9ae87383e0acd4300490078e.md": "leaks",
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-ce39ea4cfe0ddf4dc2e4fbb96b6c66ab9f72954444d5419b196d06940db5e297.md": "leaks",
-    "os/sha256-9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677.md": "private"
+    "os/sha256-9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677.md": "private",
+    "os/sha256-a6eafc5f007f642d8ea90c7fa8881f1e6715720ccb531941a28218f4f26d7b02.md": "inconclusive"
   },
   "findings": {
     "images/docker.io/lmsysorg/sglang/sha256-1c64fde976bdf0d56474a30bccbcfc19667e5b3ab34c826a534c9d6aaca41212.md": [
@@ -2536,6 +2542,71 @@
         "qualifier": "deployed: ON",
         "title": "privileges, mounts, volumes, the Gemma patch, and named egress destinations: structural in-box exposure, no new reader",
         "anchor": "info-deployed-on--privileges-mounts-volumes-the-gemma-patch-and-named-egress-destinations-structural-in-box-exposure-no-new-reader"
+      }
+    ],
+    "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-0c1c6841eeaa837f2083660327b34c70df8c69501189f14508aa4fe052692e40.md": [
+      {
+        "severity": "high",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "every plaintext service's stdout leaves the CVM via the recipe's own otelcol-contrib, unredacted, to near.ai's telemetry gateway; the Datadog OpenMetrics removal did not narrow the shipped set \u2014 sink: telemetry / egress",
+        "anchor": "high-deployed-on--every-plaintext-services-stdout-leaves-the-cvm-via-the-recipes-own-otelcol-contrib-unredacted-to-nearais-telemetry-gateway-the-datadog-openmetrics-removal-did-not-narrow-the-shipped-set--sink-telemetry--egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "four sglang engines fetch request-supplied media URLs with no domain allowlist: both Qwen3.8-27B replicas (carried) and both re-added Qwen3.6 engines, and this file adds no containment \u2014 sink: egress (request-driven)",
+        "anchor": "medium-deployed-on--four-sglang-engines-fetch-request-supplied-media-urls-with-no-domain-allowlist-both-qwen38-27b-replicas-carried-and-both-re-added-qwen36-engines-and-this-file-adds-no-containment--sink-egress-request-driven"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the engines' unauthenticated admin surface is reachable through eight allowlist-free nginx location / blocks and four proxies on the flat external network \u2014 sink: log / egress",
+        "anchor": "medium-deployed-on--the-engines-unauthenticated-admin-surface-is-reachable-through-eight-allowlist-free-nginx-location--blocks-and-four-proxies-on-the-flat-external-network--sink-log--egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, splice-armed",
+        "title": "the /compose/up env-splice can arm hidden-state passthrough on both DeepSeek replicas and hand all four E2EE terminators an external search URL, with no attestation-visible change \u2014 sink: response / egress",
+        "anchor": "medium-deployed-off-splice-armed--the-composeup-env-splice-can-arm-hidden-state-passthrough-on-both-deepseek-replicas-and-hand-all-four-e2ee-terminators-an-external-search-url-with-no-attestation-visible-change--sink-response--egress"
+      },
+      {
+        "severity": "low",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "both Qwen3.6 engines run --trust-remote-code with no --revision pin, and this file's downloader pre-fetches them at whatever Hugging Face main resolves to \u2014 sink: potential in-enclave code execution",
+        "anchor": "low-deployed-armed--both-qwen36-engines-run---trust-remote-code-with-no---revision-pin-and-this-files-downloader-pre-fetches-them-at-whatever-hugging-face-main-resolves-to--sink-potential-in-enclave-code-execution"
+      },
+      {
+        "severity": "low",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "four sglang engines run the undisableable watchdog hang-dump at the 300 s default (both Qwen3.8 and both Qwen3.6), while both DeepSeek replicas run at 1800 s \u2014 sink: log (feeding the telemetry egress)",
+        "anchor": "low-deployed-armed--four-sglang-engines-run-the-undisableable-watchdog-hang-dump-at-the-300-s-default-both-qwen38-and-both-qwen36-while-both-deepseek-replicas-run-at-1800-s--sink-log-feeding-the-telemetry-egress"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the DeepSeek second replica: anchor-identical, pooled by VLLM_BACKEND_URLS, per-replica difference is GPUs and static labels only \u2014 sink: none new",
+        "anchor": "info-deployed-on--the-deepseek-second-replica-anchor-identical-pooled-by-vllmbackendurls-per-replica-difference-is-gpus-and-static-labels-only--sink-none-new"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the Qwen3.6 re-add compared line by line with the c6ef1271 review: commands identical, proxies on b183677a with the sibling env, one new shared kernel-cache volume \u2014 sink: none new",
+        "anchor": "info-deployed-on--the-qwen36-re-add-compared-line-by-line-with-the-c6ef1271-review-commands-identical-proxies-on-b183677a-with-the-sibling-env-one-new-shared-kernel-cache-volume--sink-none-new"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "GLM-5.1 removal: the in-enclave patched build, its whole-cache compile volume and EAGLE flags are gone; the filename is now stale \u2014 sink: none",
+        "anchor": "info-deployed-on--glm-51-removal-the-in-enclave-patched-build-its-whole-cache-compile-volume-and-eagle-flags-are-gone-the-filename-is-now-stale--sink-none"
       }
     ],
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-46edfb72e0d15618429cedde9fb527bc4d4c4c4073eac08099e854b43c44bc96.md": [

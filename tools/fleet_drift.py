@@ -154,10 +154,17 @@ def service_blocks(yaml):
 
 
 def expand(block, anchors):
-    text = block
-    for name in re.findall(r"\*([A-Za-z0-9_\-]+)", block):
-        if name in anchors:
-            text += "\n" + anchors[name]
+    # Transitive: a service may alias an `x-*` anchor whose body aliases
+    # another (`<<: *engine-common` -> `build: *engine-build`). One level
+    # missed the `FROM` of every in-enclave build on the GLM-5.3 node.
+    text, seen, todo = block, set(), re.findall(r"\*([A-Za-z0-9_\-]+)", block)
+    while todo:
+        name = todo.pop()
+        if name in seen or name not in anchors:
+            continue
+        seen.add(name)
+        text += "\n" + anchors[name]
+        todo += re.findall(r"\*([A-Za-z0-9_\-]+)", anchors[name])
     return text
 
 
