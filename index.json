@@ -1,10 +1,11 @@
 {
   "schema": 1,
-  "updated": "2026-08-21",
+  "updated": "2026-09-02",
   "images": {
     "docker.io/nearaidev/vllm-proxy-rs": [
       "b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36",
-      "b0c5cd0786b19dfa46144107be15e340b7a338b1c341d02ffa994c9f1ea77dfd"
+      "b0c5cd0786b19dfa46144107be15e340b7a338b1c341d02ffa994c9f1ea77dfd",
+      "e665ebb9998fcf333a1611ecb4c49bd209b90aa9e09547ed792bd0436b132f30"
     ],
     "docker.io/nearaidev/compose-manager": [
       "b487f39160e9a53c3d98943a9c709d28e12babef75e0bb5a6cd5692abc8b2db6",
@@ -28,7 +29,8 @@
     "docker.io/vllm/vllm-openai": [
       "960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403",
       "6766ce0c459e24b76f3e9ba14ffc0442131ef4248c904efdcbf0d89e38be01fe",
-      "ccd6a6dbf4aba4e94c6f7052d1835d6e742082b6a5095276552e9b7a5a47c2e5"
+      "ccd6a6dbf4aba4e94c6f7052d1835d6e742082b6a5095276552e9b7a5a47c2e5",
+      "770fe65b2c73ee74a5c42165cf3433de4048cc2cd9c57a937ca4e35aba5aa87b"
     ],
     "docker.io/datadog/agent": [
       "5556fb80b952832719a76b016f905616c76ee0989a239c4680c6220148e865d6"
@@ -88,12 +90,20 @@
       "6766ce0c459e24b76f3e9ba14ffc0442131ef4248c904efdcbf0d89e38be01fe": {
         "repo": "vllm-project/vllm",
         "commit": "4fd9d6a85c00ac0186aa9abbeff73fc2ac6c721e"
+      },
+      "770fe65b2c73ee74a5c42165cf3433de4048cc2cd9c57a937ca4e35aba5aa87b": {
+        "repo": "vllm-project/vllm",
+        "commit": "ffd46bfab2128bb84146050e98b51a617c6575ab"
       }
     },
     "docker.io/nearaidev/vllm-proxy-rs": {
       "b0c5cd0786b19dfa46144107be15e340b7a338b1c341d02ffa994c9f1ea77dfd": {
         "repo": "nearai/inference-proxy",
         "commit": "48d7e349f6ea76d6ec5a3ca234c5c254967abf9c"
+      },
+      "e665ebb9998fcf333a1611ecb4c49bd209b90aa9e09547ed792bd0436b132f30": {
+        "repo": "nearai/inference-proxy",
+        "commit": "101aa49f9aab655bbece4335bf8017ed4b378d95"
       }
     },
     "docker.io/nearaidev/compose-manager": {
@@ -147,7 +157,8 @@
     "nearai/cvm-compose-files/prod/small-models.yaml": [
       "a385f19a51054767b8be49a64ebc3111e0e62f721a861e54c78984b186904599",
       "2443fde49e26f83d931c443501544fa0c510c658360c45324190c3d243dfefa3",
-      "ce39ea4cfe0ddf4dc2e4fbb96b6c66ab9f72954444d5419b196d06940db5e297"
+      "ce39ea4cfe0ddf4dc2e4fbb96b6c66ab9f72954444d5419b196d06940db5e297",
+      "cb9040a3e32a0e9157baf26b804d95a3ec55b91d9ae87383e0acd4300490078e"
     ],
     "nearai/cvm-compose-files/prod/GLM-5.2-W4AFP8-SGL-2xTP4.yaml": [
       "f408de5c89d7e7f8b4715b1f62409f67cadf52e232cfdce663f94482a134bba2",
@@ -169,7 +180,8 @@
       "cf11b98ccd81a738e051e8c743a67ded88af181648ab05d44d647409c5127d5e",
       "795aab8598653d4f74e3826d662d35d0040a71bca6e6256e5e3646bd5738d5c8",
       "52ef39d9746c0c4ac961c881c75efa2893257d2a10cb247f9af364302299a658",
-      "99892545ebf1f31c53b3239dc24e3ecf6a2add3366e70b3792496485c9b5e7b3"
+      "99892545ebf1f31c53b3239dc24e3ecf6a2add3366e70b3792496485c9b5e7b3",
+      "c6ef1271ffdaed7e936b271d371da944644d63f0c277fe84e29582f334119fec"
     ],
     "nearai/cvm-compose-files/prod/dsv4-flash-glm51.yaml": [
       "d085dcfc4ee0fbb13b183d52cf3a140cbc075e5e3de44fc039df961a4913ca4c"
@@ -190,7 +202,8 @@
     "0fccab4eb7ffc4c9ec1be8e2851e7b820efef0485cfd21ac027bf1408dc836b0",
     "d4c89033fb55cdac9db00c775fbbbeff6319fba7249344b2dca99b23ff048479",
     "546161bcde5ef901652e7b5b774322e790748e725fbfb158d0f394153271bc86",
-    "5c027cc86ab48fa98550f5be9be0621adff811fa231d955653396f6e13f85bd2"
+    "5c027cc86ab48fa98550f5be9be0621adff811fa231d955653396f6e13f85bd2",
+    "341313aed4336a5fb592cef58004b3abc82f2ba751df32be69f3169eeba40c14"
   ],
   "os": [
     "9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677"
@@ -216,8 +229,10 @@
     "images/docker.io/nearaidev/sglang/sha256-ec518148762ea02c23aa8615f69ca79b0c18bcd59b3c21c10229db3df323c615.md": "PRIVATE at the deployed flags \u2014 a from-source build of upstream sglang v0.5.16 (fdebc938) plus TWO local patches that I recovered from the image and verified by hash; both patches are privacy-neutral, and the engine's residual posture is the same family posture found in every other near.ai SGLang build here",
     "images/docker.io/nearaidev/vllm-proxy-rs/sha256-b0c5cd0786b19dfa46144107be15e340b7a338b1c341d02ffa994c9f1ea77dfd.md": "core request path clean \u2014 no plaintext in logs, files, or telemetry; two **client-opt-in** features (web search, fusion) deliberately egress message-derived plaintext",
     "images/docker.io/nearaidev/vllm-proxy-rs/sha256-b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36.md": "PRIVATE (2 opt-in egress caveats)",
+    "images/docker.io/nearaidev/vllm-proxy-rs/sha256-e665ebb9998fcf333a1611ecb4c49bd209b90aa9e09547ed792bd0436b132f30.md": "QUALIFIED PASS \u2014 core request path clean at this commit (no plaintext in logs, files, or telemetry; the new DP-affinity key is a salted digest that never leaves process memory, and the new attribution diagnostics emit only bounded labels); the two client-opt-in egress features (web search, fusion) carry over unchanged and remain live-or-latent at deployed config",
     "images/docker.io/otel/opentelemetry-collector-contrib/sha256-85ac41c2db88d0df9bd6145e608a3cb023f5d8443868adbfbbf66efb51087917.md": "management-logs only by configuration",
     "images/docker.io/vllm/vllm-openai/sha256-6766ce0c459e24b76f3e9ba14ffc0442131ef4248c904efdcbf0d89e38be01fe.md": "clean at deployed flags in steady state; one crash-path token-ID leak into Datadog, plus metadata-only phone-home",
+    "images/docker.io/vllm/vllm-openai/sha256-770fe65b2c73ee74a5c42165cf3433de4048cc2cd9c57a937ca4e35aba5aa87b.md": "PRIVATE at deployed flags \u2014 no content path to log, disk or telemetry at the deployed command; the v0.12.0 crash-path token-ID leak is fixed at this commit; residuals are a metadata-only phone-home to stats.vllm.ai (ON) and three latent switches (an env var, a log level, a flag pair) that would put content on stdout, which the recipe's own collector ships to telemetry.infra.near.ai",
     "images/docker.io/vllm/vllm-openai/sha256-960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403.md": "PRIVATE at deployed flags",
     "images/docker.io/vllm/vllm-openai/sha256-ccd6a6dbf4aba4e94c6f7052d1835d6e742082b6a5095276552e9b7a5a47c2e5.md": "PRIVATE for message plaintext \u2014 but media-fetch egress is unrestricted, unlike its sibling",
     "images/nvcr.io/nvidia/k8s/dcgm-exporter/sha256-ed594cf53fe6942e84b07b0740cdcbb249fa4b39cb21feeebf93881ae51f0b5e.md": "telemetry-not-content at deployed config \u2014 GPU-privileged, and the bytes are now pinned",
@@ -226,6 +241,7 @@
     "manifests/measured/sha256-002b406e4770df733eba8f7dfce066f1c8e8d041d972cc02da8b9e3756ebca9a.md": "qualified PASS at the manifest layer \u2014 no allowed env is a content switch \u2014 but this node measures in a **Datadog agent collecting all container stdout to a third-party US SaaS**, runs a **launcher build with no resolvable provenance**, and defines the shared network on which the engine's unauthenticated logging switch sits",
     "manifests/measured/sha256-0fccab4eb7ffc4c9ec1be8e2851e7b820efef0485cfd21ac027bf1408dc836b0.md": "qualified PASS at the manifest layer, **weaker than its sibling on the one axis that decides who reads your prompts** \u2014 a measured `datadog-agent` collects **all** container stdout and ships it to `us3.datadoghq.com`, adding a second off-box log destination and an **open OTLP *logs* receiver on the shared network**; everything else (22 identical `allowed_envs`, fail-closed management filter, audited control-plane images) matches gpu02",
     "manifests/measured/sha256-2c650eae81601afade86d1aa5ad898473b992081998026bb42ee1524ce99ee38.md": "management-only; zero plaintext-toucher signals",
+    "manifests/measured/sha256-341313aed4336a5fb592cef58004b3abc82f2ba751df32be69f3169eeba40c14.md": "QUALIFIED PASS at the manifest layer \u2014 gpu30 leaves the Datadog side of the node lottery (the measured agent that shipped every container's stdout to us3.datadoghq.com is gone, along with its open OTLP and dogstatsd ingestion surfaces), the management filter is fail-closed twice over, both control-plane images resolve to audited builds and vm.swappiness=0 is now measured in; but the measured boot path now replays a persisted compose-manager image override from a docker volume with no boot-time signature check \u2014 a widening of the base's default-not-a-pin channel that the document's own comment says previously reverted on reboot \u2014 the root-equivalent ptrace-capable compose-manager holds write access to the very file that decides which compose-manager boots next, the collector now mounts the entire guest root filesystem, the compose-fetch tag-age floor remains an operator env defaulting to 0, and gateway_enabled: false turns off a guest-side control whose consequences only the unreviewed 0.5.11 guest-OS page can settle",
     "manifests/measured/sha256-546161bcde5ef901652e7b5b774322e790748e725fbfb158d0f394153271bc86.md": "QUALIFIED PASS at the manifest layer \u2014 the Datadog agent is gone from the flagship pair's measurement, so the measured off-box log path is near.ai's own gateway alone and the management filter is fail-closed twice over; the launcher now resolves to a signed, audited build, closing the base's unauditable-mutation-engine finding; but the base's one hardening delta is reversed (the compose-fetch tag-age floor is again an operator env defaulting to 0), the root-equivalent ptrace-capable compose-manager sits unchanged on the flat network where the engine's unauthenticated logging switch listens, and the collector now mounts the entire guest root filesystem",
     "manifests/measured/sha256-5c027cc86ab48fa98550f5be9be0621adff811fa231d955653396f6e13f85bd2.md": "QUALIFIED PASS at the manifest layer \u2014 the regenerated no-Datadog harness carries to a third flagship node with the management filter fail-closed twice over and the boot-path re-pin literal finally consistent with the fallback; but the management log stream now exports to the staging ingest host telemetry-stg.infra.near.ai instead of the fleet's production endpoint \u2014 splitting this production node's off-box telemetry across two near.ai environments \u2014 the compose-fetch tag-age floor remains an operator env defaulting to 0, the root-equivalent ptrace-capable compose-manager and the guest-root-mounting collector carry over unchanged, and the measured boot path still replays the persisted compose-manager image override",
     "manifests/measured/sha256-66007399f064f058af68771c552bcae150c9f88622305631b5141da1aa2f7b7e.md": "qualified PASS at the manifest layer \u2014 no allowed env is a content switch and every telemetry destination is literal; but this node is on the **Datadog side of the node lottery** (a measured agent ships every container's stdout, engines included, to `us3.datadoghq.com`), it measures a root-equivalent, ptrace-capable compose-manager whose image is a *default, not a pin*, and it defines the shared network that keeps the engines' unauthenticated logging switch reachable",
@@ -246,6 +262,7 @@
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-52ef39d9746c0c4ac961c881c75efa2893257d2a10cb247f9af364302299a658.md": "QUALIFIED PASS on logging config \u2014 the arm consolidation adds no logging/dump/debug switch (the only new env is the kernel-dispatch toggle SGLANG_OPT_FLASHMLA_SPARSE_PREFILL=0) and strictly shrinks the surface: one DS4F TP4 sparse-off arm replaces two TP2 arms, host ports 8004/8005, one proxy, one dcgm and the second TLS listener are gone with zero dangling references, and the new ab_arm/sparse_prefill tags are static deployment metadata; but every base qualification carries: two multimodal Qwen3.6 engines with no media allowlist, unredacted double stdout shipping, both Qwen3.6 engines --trust-remote-code with no --revision, unauthenticated engine admin behind allowlist-free proxies, and the documented /compose/up env-splice channel",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-795aab8598653d4f74e3826d662d35d0040a71bca6e6256e5e3646bd5738d5c8.md": "QUALIFIED PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on all five proxies, watchdog labels are truthful, and the A/B tag machinery carries only deployment metadata; but the sglang upgrade to v0.5.16 turned both Qwen3.6 engines multimodal, so this file now runs two request-driven media fetchers with NO allowlist beside a Gemma-4 that constrains both controls \u2014 plus the carried residuals: two Qwen3.6 engines `--trust-remote-code` with no `--revision`, unredacted double stdout shipping, unauthenticated engine admin behind allowlist-free proxies, and the documented `/compose/up` env-splice channel",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-99892545ebf1f31c53b3239dc24e3ecf6a2add3366e70b3792496485c9b5e7b3.md": "QUALIFIED PASS on logging config \u2014 the sparse-prefill flip is a clean four-class delta (engine image swap to the published-PRIVATE nightly 5bc4bc0dfd36, SGLANG_OPT_FLASHMLA_SPARSE_PREFILL 0->1, two new literal kernel/dtype env selectors that the engine review traced to no log/dump/path sink, and datadog/otel label churn whose every asserted value matches the deployed command/env) with no command-flag, mount, volume, port, or interpolation change anywhere in the diff; but every base qualification carries: two multimodal Qwen3.6 engines with no media allowlist, unredacted double stdout shipping, both Qwen3.6 engines --trust-remote-code with no --revision, unauthenticated engine admin behind allowlist-free proxies, and the documented /compose/up env-splice channel",
+    "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-c6ef1271ffdaed7e936b271d371da944644d63f0c277fe84e29582f334119fec.md": "QUALIFIED PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on all four proxies, the A/B arm machinery and the hidden-state splice lever are gone, and the DeepSeek engine now pins --revision; but the DeepSeek move to vLLM 0.26 adds an ARMED NCCL hang-dump path (flight-recorder trace to container /tmp, desync report to shipped stderr) and a 1M-token context whose request bodies nginx spools to a container-local temp file, plus the carried residuals: two Qwen3.6 multimodal engines with no media allowlist beside a constrained Gemma, two Qwen3.6 engines --trust-remote-code with no --revision, unredacted stdout shipping to telemetry.infra.near.ai with the Datadog label path still wired, unauthenticated sglang admin behind allowlist-free proxies, and a proxy build (e665ebb9) whose behavior is reviewed concurrently",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-cf11b98ccd81a738e051e8c743a67ded88af181648ab05d44d647409c5127d5e.md": "qualified PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on all four proxies, Gemma-4's media fetch fully constrained; residuals are the fleet's \u2014 an unauthenticated engine admin surface behind allowlist-free proxies, unredacted double stdout shipping, a documented `/compose/up` env-splice channel, and two Qwen3.6 engines carrying `--trust-remote-code` with **no `--revision` pin**",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-46edfb72e0d15618429cedde9fb527bc4d4c4c4073eac08099e854b43c44bc96.md": "QUALIFIED PASS on logging config \u2014 no content-logging switch anywhere, all three engines pin --revision beside --trust-remote-code, OHTTP forced on all three proxies, both watchdog_timeout:1800 labels are truthful, the in-enclave GLM build resolves every input from a pinned digest and its patch is the audited privacy-neutral one; but stdout of every plaintext service still ships off-box unredacted, both Qwen3.8 engines are multimodal media fetchers with no allowlist running the hang-dump watchdog at the 300 s default, the unauthenticated engine admin surface sits behind allowlist-free nginx and proxies on the flat network, and the /compose/up env-splice can arm hidden-state passthrough and web-search egress with no attestation-visible change",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-c27ed3b357f44673e4a84ef89f4625e1009de619d83ffdaae27c1265f676f4bb.md": "QUALIFIED PASS on logging config \u2014 delta review against the audited 46edfb72 revision: the whole diff is two config-tuning changes and their metadata, verified against the base bytes \u2014 the dsv4 anchor's --chunked-prefill-size drops 8192 to 4096 (a scheduler batching flag naming no log, dump, or debug behavior) with the chunk_size telemetry labels updated to match (labels stay truthful to the deployed command; the in-file prose comment now stale at 8192), and num_consumers: 1 is added to the otelcol otlphttp sending_queue, which serializes export draining only \u2014 no receiver, filter, processor, destination, or collection change anywhere in the diff; every base finding carries unchanged and none retires \u2014 no content-logging switch anywhere, all three engines pin --revision beside --trust-remote-code, OHTTP forced on all three proxies, watchdog labels truthful; stdout of every plaintext service still ships off-box unredacted, both Qwen3.8 replicas remain unguarded multimodal media fetchers on the 300 s watchdog default, the unauthenticated engine admin surface remains behind allowlist-free nginx and proxies on the flat network, and the /compose/up env-splice can still arm hidden-state passthrough and web-search egress with no attestation-visible change",
@@ -256,6 +273,7 @@
     "manifests/nearai/cvm-compose-files/prod/qwen35-dsv4-flash/sha256-d1cdff7016b9b1fef4ad1662678404eca67c07c4e2ca8993795a0f8dbe15af1c.md": "QUALIFIED PASS at the manifest layer, with one qualification that outranks the rest: both DeepSeek replicas now run a near-built engine image (nearaidev/sglang@ec518148) that had NO published source review at deploy time \u2014 the base page's posture leaned on both replicas running an audited image, and that support is gone until the in-flight engine review lands; the recipe itself stays clean on delta review against 11da948b (no content-logging switch, --log-requests-level 0 kept, OHTTP forced on, every checkpoint revision-pinned and pre-fetched at its pin, all new flags and labels config-metadata only), and the carried residuals are the fleet's \u2014 splice-reachable env, an engine admin surface behind allowlist-free proxies, unredacted stdout shipping (twice on the one live host, including a third-party US SaaS), and one unpinned PyPI resolve in the weight downloader",
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-2443fde49e26f83d931c443501544fa0c510c658360c45324190c3d243dfefa3.md": "LEAKS \u2014 the FLUX diffusion service this file launches logs every user prompt at INFO and writes every generated image to disk, both unconditionally, and this file's own otelcol pipeline ships that prompt log to telemetry.infra.near.ai unredacted; the other twelve model services hold the prior qualified pass at deployed flags, with the unpinned-build and Qwen3-VL media-fetch gaps carried over open",
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-a385f19a51054767b8be49a64ebc3111e0e62f721a861e54c78984b186904599.md": "qualified PASS on logging config \u2014 no content-logging switch anywhere, OHTTP forced on; but three services build from mutable sources inside the enclave, FLUX runs unpinned remote code, and Qwen3-VL's media fetch is unrestricted",
+    "manifests/nearai/cvm-compose-files/prod/small-models/sha256-cb9040a3e32a0e9157baf26b804d95a3ec55b91d9ae87383e0acd4300490078e.md": "LEAKS \u2014 the FLUX diffusion service this file launches logs every user prompt at INFO and writes every generated image to disk, both unconditionally, and this file's own otelcol pipeline ships that prompt log to telemetry.infra.near.ai unredacted; the delta since the previous revision retires Gemma-4-31B and two gpt-oss replicas (cleanly, no dangling route, scrape target or registrar entry) and adds a GLM-5.1 AWQ TP4 engine built in-enclave from a digest-pinned sglang base plus a visible fail-loud weight-loader patch, launched with the minimum request-log level, a 1800 s watchdog, a pinned revision beside --trust-remote-code and no dump, file or trace flag, behind a proxy whose environment is line-identical to its eight siblings; the otelcol receivers, processors and exporter are byte-identical to the base, so the new engine's stdout joins the same unredacted off-box stream; every finding of the previous review carries forward, the Qwen3-VL media-fetch gap now stands with no in-file counterexample since Gemma-4 left, and the Qwen3.6 replicas remain the only sglang LLM engines in the file without a watchdog pin",
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-ce39ea4cfe0ddf4dc2e4fbb96b6c66ab9f72954444d5419b196d06940db5e297.md": "LEAKS \u2014 the FLUX diffusion service this file launches logs every user prompt at INFO and writes every generated image to disk, both unconditionally, and this file's own otelcol pipeline ships that prompt log to telemetry.infra.near.ai unredacted; the only change since the previous revision is a one-line export-concurrency setting (num_consumers: 1) inside that same telemetry exporter, which alters delivery ordering and throughput of the leaking log and reduces or scrubs nothing \u2014 every finding of the previous review carries forward, the other twelve model services hold their prior qualified pass at deployed flags, and the unpinned-build and Qwen3-VL media-fetch gaps remain open",
     "os/sha256-9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677.md": "PRIVATE at measured configuration"
   },
@@ -280,8 +298,10 @@
     "images/docker.io/nearaidev/sglang/sha256-ec518148762ea02c23aa8615f69ca79b0c18bcd59b3c21c10229db3df323c615.md": "private",
     "images/docker.io/nearaidev/vllm-proxy-rs/sha256-b0c5cd0786b19dfa46144107be15e340b7a338b1c341d02ffa994c9f1ea77dfd.md": "private",
     "images/docker.io/nearaidev/vllm-proxy-rs/sha256-b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36.md": "private",
+    "images/docker.io/nearaidev/vllm-proxy-rs/sha256-e665ebb9998fcf333a1611ecb4c49bd209b90aa9e09547ed792bd0436b132f30.md": "qualified-pass",
     "images/docker.io/otel/opentelemetry-collector-contrib/sha256-85ac41c2db88d0df9bd6145e608a3cb023f5d8443868adbfbbf66efb51087917.md": "private",
     "images/docker.io/vllm/vllm-openai/sha256-6766ce0c459e24b76f3e9ba14ffc0442131ef4248c904efdcbf0d89e38be01fe.md": "private",
+    "images/docker.io/vllm/vllm-openai/sha256-770fe65b2c73ee74a5c42165cf3433de4048cc2cd9c57a937ca4e35aba5aa87b.md": "private",
     "images/docker.io/vllm/vllm-openai/sha256-960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403.md": "private",
     "images/docker.io/vllm/vllm-openai/sha256-ccd6a6dbf4aba4e94c6f7052d1835d6e742082b6a5095276552e9b7a5a47c2e5.md": "private",
     "images/nvcr.io/nvidia/k8s/dcgm-exporter/sha256-ed594cf53fe6942e84b07b0740cdcbb249fa4b39cb21feeebf93881ae51f0b5e.md": "private",
@@ -290,6 +310,7 @@
     "manifests/measured/sha256-002b406e4770df733eba8f7dfce066f1c8e8d041d972cc02da8b9e3756ebca9a.md": "qualified-pass",
     "manifests/measured/sha256-0fccab4eb7ffc4c9ec1be8e2851e7b820efef0485cfd21ac027bf1408dc836b0.md": "qualified-pass",
     "manifests/measured/sha256-2c650eae81601afade86d1aa5ad898473b992081998026bb42ee1524ce99ee38.md": "qualified-pass",
+    "manifests/measured/sha256-341313aed4336a5fb592cef58004b3abc82f2ba751df32be69f3169eeba40c14.md": "qualified-pass",
     "manifests/measured/sha256-546161bcde5ef901652e7b5b774322e790748e725fbfb158d0f394153271bc86.md": "qualified-pass",
     "manifests/measured/sha256-5c027cc86ab48fa98550f5be9be0621adff811fa231d955653396f6e13f85bd2.md": "qualified-pass",
     "manifests/measured/sha256-66007399f064f058af68771c552bcae150c9f88622305631b5141da1aa2f7b7e.md": "qualified-pass",
@@ -310,6 +331,7 @@
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-52ef39d9746c0c4ac961c881c75efa2893257d2a10cb247f9af364302299a658.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-795aab8598653d4f74e3826d662d35d0040a71bca6e6256e5e3646bd5738d5c8.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-99892545ebf1f31c53b3239dc24e3ecf6a2add3366e70b3792496485c9b5e7b3.md": "qualified-pass",
+    "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-c6ef1271ffdaed7e936b271d371da944644d63f0c277fe84e29582f334119fec.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-cf11b98ccd81a738e051e8c743a67ded88af181648ab05d44d647409c5127d5e.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-46edfb72e0d15618429cedde9fb527bc4d4c4c4073eac08099e854b43c44bc96.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-c27ed3b357f44673e4a84ef89f4625e1009de619d83ffdaae27c1265f676f4bb.md": "qualified-pass",
@@ -320,6 +342,7 @@
     "manifests/nearai/cvm-compose-files/prod/qwen35-dsv4-flash/sha256-d1cdff7016b9b1fef4ad1662678404eca67c07c4e2ca8993795a0f8dbe15af1c.md": "qualified-pass",
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-2443fde49e26f83d931c443501544fa0c510c658360c45324190c3d243dfefa3.md": "leaks",
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-a385f19a51054767b8be49a64ebc3111e0e62f721a861e54c78984b186904599.md": "qualified-pass",
+    "manifests/nearai/cvm-compose-files/prod/small-models/sha256-cb9040a3e32a0e9157baf26b804d95a3ec55b91d9ae87383e0acd4300490078e.md": "leaks",
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-ce39ea4cfe0ddf4dc2e4fbb96b6c66ab9f72954444d5419b196d06940db5e297.md": "leaks",
     "os/sha256-9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677.md": "private"
   },
@@ -1169,6 +1192,50 @@
         "anchor": "info-6--no-zeroization-of-plaintext-or-derived-keys"
       }
     ],
+    "images/docker.io/nearaidev/vllm-proxy-rs/sha256-e665ebb9998fcf333a1611ecb4c49bd209b90aa9e09547ed792bd0436b132f30.md": [
+      {
+        "severity": "critical",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED, client-opt-in",
+        "title": "web_context_search egresses model-written queries derived from the decrypted conversation to an external search API (telemetry-class egress to a third party)",
+        "anchor": "critical-deployed-armed-client-opt-in--webcontextsearch-egresses-model-written-queries-derived-from-the-decrypted-conversation-to-an-external-search-api-telemetry-class-egress-to-a-third-party"
+      },
+      {
+        "severity": "high",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED, unknown gate + client-opt-in",
+        "title": "fusion forwards the FULL plaintext conversation to remote endpoints chosen by a runtime-fetched listing (network egress)",
+        "anchor": "high-deployed-armed-unknown-gate--client-opt-in--fusion-forwards-the-full-plaintext-conversation-to-remote-endpoints-chosen-by-a-runtime-fetched-listing-network-egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "no engine path allowlist; the authenticated catch-all forwards any path to the engine (egress to engine admin surface)",
+        "anchor": "medium-deployed-on--no-engine-path-allowlist-the-authenticated-catch-all-forwards-any-path-to-the-engine-egress-to-engine-admin-surface"
+      },
+      {
+        "severity": "low",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the decrypted inner request path is logged and exported (log \u2192 telemetry)",
+        "anchor": "low-deployed-on--the-decrypted-inner-request-path-is-logged-and-exported-log--telemetry"
+      },
+      {
+        "severity": "low",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, activates with a domain allowlist",
+        "title": "image URL host logged to telemetry when the media-domain allowlist rejects (log \u2192 telemetry)",
+        "anchor": "low-deployed-off-activates-with-a-domain-allowlist--image-url-host-logged-to-telemetry-when-the-media-domain-allowlist-rejects-log--telemetry"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "stdout and /metrics are telemetry-collected; verified content-free at this commit, with more identity metadata than the base tree",
+        "anchor": "info-deployed-on--stdout-and-metrics-are-telemetry-collected-verified-content-free-at-this-commit-with-more-identity-metadata-than-the-base-tree"
+      }
+    ],
     "images/docker.io/vllm/vllm-openai/sha256-6766ce0c459e24b76f3e9ba14ffc0442131ef4248c904efdcbf0d89e38be01fe.md": [
       {
         "severity": "medium",
@@ -1231,6 +1298,92 @@
         "deployed": null,
         "title": "--tool-call-parser openai does not log model output; --load-format runai_streamer reaches only HF Hub here",
         "anchor": "info----tool-call-parser-openai-does-not-log-model-output---load-format-runaistreamer-reaches-only-hf-hub-here"
+      }
+    ],
+    "images/docker.io/vllm/vllm-openai/sha256-770fe65b2c73ee74a5c42165cf3433de4048cc2cd9c57a937ca4e35aba5aa87b.md": [
+      {
+        "severity": "low",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, activates on VLLM_LOGGING_LEVEL=DEBUG alone with no flag needed",
+        "title": "parser engine logs the first 80 characters of model-generated tool-call arguments to stdout, outside the request-logger gate",
+        "anchor": "low-deployed-off-activates-on-vllmloggingleveldebug-alone-with-no-flag-needed--parser-engine-logs-the-first-80-characters-of-model-generated-tool-call-arguments-to-stdout-outside-the-request-logger-gate"
+      },
+      {
+        "severity": "medium",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, one env var away",
+        "title": "response-body logging middleware writes full API responses to stdout, which the collector ships out of the enclave",
+        "anchor": "medium-deployed-off-one-env-var-away--response-body-logging-middleware-writes-full-api-responses-to-stdout-which-the-collector-ships-out-of-the-enclave"
+      },
+      {
+        "severity": "low",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "usage-stats phone-home to stats.vllm.ai (egress; metadata only, no message content; also writes a local JSON line per report)",
+        "anchor": "low-deployed-on--usage-stats-phone-home-to-statsvllmai-egress-metadata-only-no-message-content-also-writes-a-local-json-line-per-report"
+      },
+      {
+        "severity": "low",
+        "deployed": "off",
+        "qualifier": "deployed: OFF",
+        "title": "request/prompt logging to stdout: opt-in, default-off, no deprecated alias survives, and the level split still holds",
+        "anchor": "low-deployed-off--requestprompt-logging-to-stdout-opt-in-default-off-no-deprecated-alias-survives-and-the-level-split-still-holds"
+      },
+      {
+        "severity": "low",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "HTTP surface is unauthenticated inside the enclave network; no runtime switch can turn content logging on, and every mutable-state route is gated at process start (no sink: nothing a caller can flip writes content anywhere)",
+        "anchor": "low-deployed-on--http-surface-is-unauthenticated-inside-the-enclave-network-no-runtime-switch-can-turn-content-logging-on-and-every-mutable-state-route-is-gated-at-process-start-no-sink-nothing-a-caller-can-flip-writes-content-anywhere"
+      },
+      {
+        "severity": "info",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED, fires only on engine-step crash",
+        "title": "engine-crash dump to stdout is redacted at this commit: token IDs print as lengths; sampling params (including client-supplied stop strings) still print",
+        "anchor": "info-deployed-armed-fires-only-on-engine-step-crash--engine-crash-dump-to-stdout-is-redacted-at-this-commit-token-ids-print-as-lengths-sampling-params-including-client-supplied-stop-strings-still-print"
+      },
+      {
+        "severity": "info",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED, fires on NCCL watchdog timeout or collective exception",
+        "title": "PyTorch flight-recorder dump writes collective metadata and stack frames, not tensor content, to a container-local disk file; the desync report goes to stderr (log)",
+        "anchor": "info-deployed-armed-fires-on-nccl-watchdog-timeout-or-collective-exception--pytorch-flight-recorder-dump-writes-collective-metadata-and-stack-frames-not-tensor-content-to-a-container-local-disk-file-the-desync-report-goes-to-stderr-log"
+      },
+      {
+        "severity": "info",
+        "deployed": "off",
+        "qualifier": "deployed: OFF",
+        "title": "OTLP tracing: off, and no content span attribute exists at this version",
+        "anchor": "info-deployed-off--otlp-tracing-off-and-no-content-span-attribute-exists-at-this-version"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "metrics and access logs shipped to telemetry.infra.near.ai are content-free",
+        "anchor": "info-deployed-on--metrics-and-access-logs-shipped-to-telemetryinfranearai-are-content-free"
+      },
+      {
+        "severity": "info",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, none configured",
+        "title": "disk: the persistent kernel_cache volume receives only config-hash-keyed artifacts; the 1M-token KV cache is GPU-resident with no offload, transfer or swap tier",
+        "anchor": "info-deployed-off-none-configured--disk-the-persistent-kernelcache-volume-receives-only-config-hash-keyed-artifacts-the-1m-token-kv-cache-is-gpu-resident-with-no-offload-transfer-or-swap-tier"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "DP internals bind Unix-domain ZMQ sockets and loopback TCP only; prompt token IDs transit a /dev/shm ring buffer that ipc: host shares with sibling containers (in-enclave shared memory, no sink)",
+        "anchor": "info-deployed-on--dp-internals-bind-unix-domain-zmq-sockets-and-loopback-tcp-only-prompt-token-ids-transit-a-devshm-ring-buffer-that-ipc-host-shares-with-sibling-containers-in-enclave-shared-memory-no-sink"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "model is text-only at this commit; the only steady-state ingress is HF Hub metadata with HF_TOKEN (egress); parsers and tokenizer carry no log statements",
+        "anchor": "info-deployed-on--model-is-text-only-at-this-commit-the-only-steady-state-ingress-is-hf-hub-metadata-with-hftoken-egress-parsers-and-tokenizer-carry-no-log-statements"
       }
     ],
     "images/docker.io/vllm/vllm-openai/sha256-960ac5b3fda0547c3ce64d8f69bae9fa242d5ae5382fc74a98cd8ef13950e403.md": [
@@ -1433,6 +1586,106 @@
         "qualifier": "deployed: ON",
         "title": "unauthenticated classify endpoint and host IPC namespace: lateral plaintext exposure inside the enclave, no external sink",
         "anchor": "info-deployed-on--unauthenticated-classify-endpoint-and-host-ipc-namespace-lateral-plaintext-exposure-inside-the-enclave-no-external-sink"
+      }
+    ],
+    "manifests/measured/sha256-341313aed4336a5fb592cef58004b3abc82f2ba751df32be69f3169eeba40c14.md": [
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "gpu30 leaves the Datadog side of the node lottery; the measured off-box log destination count drops from two to one (telemetry)",
+        "anchor": "info-deployed-on--gpu30-leaves-the-datadog-side-of-the-node-lottery-the-measured-off-box-log-destination-count-drops-from-two-to-one-telemetry"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON, carried",
+        "title": "the compose-fetch tag-age floor is an operator env defaulting to zero (supply chain)",
+        "anchor": "medium-deployed-on-carried--the-compose-fetch-tag-age-floor-is-an-operator-env-defaulting-to-zero-supply-chain"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON, new",
+        "title": "num_consumers: 1 serializes export dispatch; it changes neither what is collected, filtered, nor where it goes (telemetry)",
+        "anchor": "info-deployed-on-new--numconsumers-1-serializes-export-dispatch-it-changes-neither-what-is-collected-filtered-nor-where-it-goes-telemetry"
+      },
+      {
+        "severity": "medium",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, one condition wide",
+        "title": "every engine's stdout is ingested by the measured collector and excluded by filter expression, not by scoping (telemetry)",
+        "anchor": "medium-deployed-off-one-condition-wide--every-engines-stdout-is-ingested-by-the-measured-collector-and-excluded-by-filter-expression-not-by-scoping-telemetry"
+      },
+      {
+        "severity": "high",
+        "deployed": "on",
+        "qualifier": "deployed: ON, architectural",
+        "title": "compose-manager is root-equivalent and can read the engine's process memory (structural)",
+        "anchor": "high-deployed-on-architectural--compose-manager-is-root-equivalent-and-can-read-the-engines-process-memory-structural"
+      },
+      {
+        "severity": "high",
+        "deployed": "on",
+        "qualifier": "deployed: ON, architectural",
+        "title": "the launcher holds the docker socket on the host network (structural)",
+        "anchor": "high-deployed-on-architectural--the-launcher-holds-the-docker-socket-on-the-host-network-structural"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON, capability unused at this config; new for this host",
+        "title": "the collector mounts the entire guest root filesystem and the docker socket (disk)",
+        "anchor": "medium-deployed-on-capability-unused-at-this-config-new-for-this-host--the-collector-mounts-the-entire-guest-root-filesystem-and-the-docker-socket-disk"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "certbot holds the wildcard TLS key and the Cloudflare token in-enclave (disk)",
+        "anchor": "info-deployed-on--certbot-holds-the-wildcard-tls-key-and-the-cloudflare-token-in-enclave-disk"
+      },
+      {
+        "severity": "high",
+        "deployed": "on",
+        "qualifier": "deployed: ON, widened vs base",
+        "title": "the measured boot path replays a persisted compose-manager image override from a docker volume with no boot-time signature check, and the compose-manager it replaces can write that file (supply chain)",
+        "anchor": "high-deployed-on-widened-vs-base--the-measured-boot-path-replays-a-persisted-compose-manager-image-override-from-a-docker-volume-with-no-boot-time-signature-check-and-the-compose-manager-it-replaces-can-write-that-file-supply-chain"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "both control-plane images resolve to audited builds, and the dead re-pin literal is consistent with the fallback (supply chain)",
+        "anchor": "info-deployed-on--both-control-plane-images-resolve-to-audited-builds-and-the-dead-re-pin-literal-is-consistent-with-the-fallback-supply-chain"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "one flat shared network spans management and the plaintext services that attach to it; no egress restriction (egress)",
+        "anchor": "medium-deployed-on--one-flat-shared-network-spans-management-and-the-plaintext-services-that-attach-to-it-no-egress-restriction-egress"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON, guest-OS dependent",
+        "title": "gateway_enabled: false turns off the dstack gateway for this CVM; what that removes on the guest side is a question for the unreviewed 0.5.11 OS page (egress)",
+        "anchor": "info-deployed-on-guest-os-dependent--gatewayenabled-false-turns-off-the-dstack-gateway-for-this-cvm-what-that-removes-on-the-guest-side-is-a-question-for-the-unreviewed-0511-os-page-egress"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON, resolves base MEDIUM",
+        "title": "vm.swappiness=0 is measured in; KV-cache pages are kept out of swap by a measured sysctl (disk)",
+        "anchor": "info-deployed-on-resolves-base-medium--vmswappiness0-is-measured-in-kv-cache-pages-are-kept-out-of-swap-by-a-measured-sysctl-disk"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the k256 app key is exported into the compose env namespace; no consumer exists in this document (log)",
+        "anchor": "info-deployed-on--the-k256-app-key-is-exported-into-the-compose-env-namespace-no-consumer-exists-in-this-document-log"
       }
     ],
     "manifests/measured/sha256-546161bcde5ef901652e7b5b774322e790748e725fbfb158d0f394153271bc86.md": [
@@ -2199,6 +2452,92 @@
         "anchor": "info-deployed-on--privileges-mounts-volumes-and-topology-byte-identical-to-the-audited-base-the-delta-adds-no-reader-sink-or-surface"
       }
     ],
+    "manifests/nearai/cvm-compose-files/prod/dsv4-qwen36-gemma4/sha256-c6ef1271ffdaed7e936b271d371da944644d63f0c277fe84e29582f334119fec.md": [
+      {
+        "severity": "high",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "every plaintext service's stdout leaves the CVM via the recipe's own otelcol-contrib, unredacted, to near.ai's telemetry gateway, with the Datadog label path still wired alongside \u2014 sink: telemetry / egress",
+        "anchor": "high-deployed-on--every-plaintext-services-stdout-leaves-the-cvm-via-the-recipes-own-otelcol-contrib-unredacted-to-nearais-telemetry-gateway-with-the-datadog-label-path-still-wired-alongside--sink-telemetry--egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "two Qwen3.6 engines are multimodal at sglang v0.5.16 and fetch request-supplied media URLs with no domain allowlist, while sibling Gemma-4 in the same file constrains both controls \u2014 sink: egress (request-driven)",
+        "anchor": "medium-deployed-on--two-qwen36-engines-are-multimodal-at-sglang-v0516-and-fetch-request-supplied-media-urls-with-no-domain-allowlist-while-sibling-gemma-4-in-the-same-file-constrains-both-controls--sink-egress-request-driven"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the sglang engines' unauthenticated admin surface is reachable through allowlist-free nginx and proxies on the flat network \u2014 sink: log / egress",
+        "anchor": "medium-deployed-on--the-sglang-engines-unauthenticated-admin-surface-is-reachable-through-allowlist-free-nginx-and-proxies-on-the-flat-network--sink-log--egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "off",
+        "qualifier": "deployed: OFF",
+        "title": "the documented /compose/up env-splice channel can still widen the Gemma media allowlist and supply the web-search URL, with no attestation-visible change; the hidden-state lever is gone \u2014 sink: egress",
+        "anchor": "medium-deployed-off--the-documented-composeup-env-splice-channel-can-still-widen-the-gemma-media-allowlist-and-supply-the-web-search-url-with-no-attestation-visible-change-the-hidden-state-lever-is-gone--sink-egress"
+      },
+      {
+        "severity": "low",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "both Qwen3.6 engines run --trust-remote-code with no --revision pin, unlike every other model in this file \u2014 sink: potential in-enclave code execution",
+        "anchor": "low-deployed-armed--both-qwen36-engines-run---trust-remote-code-with-no---revision-pin-unlike-every-other-model-in-this-file--sink-potential-in-enclave-code-execution"
+      },
+      {
+        "severity": "low",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "the DeepSeek vLLM engine sets TORCH_NCCL_DUMP_ON_TIMEOUT=1 and TORCH_NCCL_DESYNC_DEBUG=1: an NCCL hang writes a flight-recorder trace to container-local /tmp and a desync report to the shipped stderr \u2014 sink: disk / log",
+        "anchor": "low-deployed-armed--the-deepseek-vllm-engine-sets-torchnccldumpontimeout1-and-torchnccldesyncdebug1-an-nccl-hang-writes-a-flight-recorder-trace-to-container-local-tmp-and-a-desync-report-to-the-shipped-stderr--sink-disk--log"
+      },
+      {
+        "severity": "low",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the 1M-token DeepSeek context and 100 MB request cap put request bodies through nginx's client-body spool to a container-local temp file; OHTTP ciphertext if OHTTP is in use \u2014 sink: disk",
+        "anchor": "low-deployed-on--the-1m-token-deepseek-context-and-100-mb-request-cap-put-request-bodies-through-nginxs-client-body-spool-to-a-container-local-temp-file-ohttp-ciphertext-if-ohttp-is-in-use--sink-disk"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "DeepSeek moved to vLLM 0.26 DP4+EP: every logging/dump/disk/egress-touching flag and env enumerated; --revision pinned; no request-logging flag; VLLM_CACHE_ROOT on the persistent, now cross-engine-shared kernel_cache volume; prefix cache is GPU-resident at these flags",
+        "anchor": "info-deployed-on--deepseek-moved-to-vllm-026-dp4ep-every-loggingdumpdiskegress-touching-flag-and-env-enumerated---revision-pinned-no-request-logging-flag-vllmcacheroot-on-the-persistent-now-cross-engine-shared-kernelcache-volume-prefix-cache-is-gpu-resident-at-these-flags"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "proxy-dsv4-flash runs proxy build e665ebb9 while the other three stay on b183677a; env compared line by line, behavior deferred to the concurrent page",
+        "anchor": "info-deployed-on--proxy-dsv4-flash-runs-proxy-build-e665ebb9-while-the-other-three-stay-on-b183677a-env-compared-line-by-line-behavior-deferred-to-the-concurrent-page"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the A/B arm removal: what left, what the single remaining arm tag carries, and that no sglang watchdog is set or claimed anywhere now",
+        "anchor": "info-deployed-on--the-ab-arm-removal-what-left-what-the-single-remaining-arm-tag-carries-and-that-no-sglang-watchdog-is-set-or-claimed-anywhere-now"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "documentation drift: the anchor comment says GPU04 A/B canary only, the action log has it on four hosts",
+        "anchor": "info-deployed-on--documentation-drift-the-anchor-comment-says-gpu04-ab-canary-only-the-action-log-has-it-on-four-hosts"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "privileges, mounts, volumes, the Gemma patch, and named egress destinations: structural in-box exposure, no new reader",
+        "anchor": "info-deployed-on--privileges-mounts-volumes-the-gemma-patch-and-named-egress-destinations-structural-in-box-exposure-no-new-reader"
+      }
+    ],
     "manifests/nearai/cvm-compose-files/prod/dsv4-qwen38-glm51/sha256-46edfb72e0d15618429cedde9fb527bc4d4c4c4073eac08099e854b43c44bc96.md": [
       {
         "severity": "high",
@@ -2890,6 +3229,155 @@
         "qualifier": "deployed: ON",
         "title": "registrar probes now authenticate with PROXY_TOKEN over plaintext HTTP to the host-published ports (local hop)",
         "anchor": "info-deployed-on--registrar-probes-now-authenticate-with-proxytoken-over-plaintext-http-to-the-host-published-ports-local-hop"
+      }
+    ],
+    "manifests/nearai/cvm-compose-files/prod/small-models/sha256-cb9040a3e32a0e9157baf26b804d95a3ec55b91d9ae87383e0acd4300490078e.md": [
+      {
+        "severity": "critical",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "FLUX logs every user prompt at INFO to stdout, and this file's otelcol pipeline ships it off-box (log + telemetry egress)",
+        "anchor": "critical-deployed-on--flux-logs-every-user-prompt-at-info-to-stdout-and-this-files-otelcol-pipeline-ships-it-off-box-log--telemetry-egress"
+      },
+      {
+        "severity": "high",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "FLUX writes every generated image to disk inside the enclave and never deletes it (disk)",
+        "anchor": "high-deployed-on--flux-writes-every-generated-image-to-disk-inside-the-enclave-and-never-deletes-it-disk"
+      },
+      {
+        "severity": "high",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "FLUX runs --trust-remote-code with no --revision pin: unpinned Hugging Face head code executes in the plaintext-prompt process (any sink)",
+        "anchor": "high-deployed-on--flux-runs---trust-remote-code-with-no---revision-pin-unpinned-hugging-face-head-code-executes-in-the-plaintext-prompt-process-any-sink"
+      },
+      {
+        "severity": "high",
+        "deployed": "on",
+        "qualifier": "deployed: ON, systemic",
+        "title": "every app container's stdout leaves the box unredacted via otelcol-contrib, and the new GLM engine joins that stream (telemetry egress)",
+        "anchor": "high-deployed-on-systemic--every-app-containers-stdout-leaves-the-box-unredacted-via-otelcol-contrib-and-the-new-glm-engine-joins-that-stream-telemetry-egress"
+      },
+      {
+        "severity": "high",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "three in-enclave build: blocks and a new in-enclave downloader resolve code from mutable sources at deploy time; vllm[audio] can replace whisper's pinned engine (any sink)",
+        "anchor": "high-deployed-armed--three-in-enclave-build-blocks-and-a-new-in-enclave-downloader-resolve-code-from-mutable-sources-at-deploy-time-vllmaudio-can-replace-whispers-pinned-engine-any-sink"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "Qwen3-VL fetches request-supplied media URLs with no domain allowlist and redirects enabled; the file no longer contains the counterexample (egress)",
+        "anchor": "medium-deployed-on--qwen3-vl-fetches-request-supplied-media-urls-with-no-domain-allowlist-and-redirects-enabled-the-file-no-longer-contains-the-counterexample-egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the engines' unauthenticated sglang admin surface is reachable through allowlist-free nginx and proxies on the flat external network (log / egress)",
+        "anchor": "medium-deployed-on--the-engines-unauthenticated-sglang-admin-surface-is-reachable-through-allowlist-free-nginx-and-proxies-on-the-flat-external-network-log--egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "the /compose/up env-splice channel bypasses the measured allowed_envs without a measurement change (config channel arming egress)",
+        "anchor": "medium-deployed-armed--the-composeup-env-splice-channel-bypasses-the-measured-allowedenvs-without-a-measurement-change-config-channel-arming-egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "WEB_CONTEXT_SEARCH_URL + _API_KEY on all nine plaintext-terminating proxies, proxy-glm51 included: an operator-suppliable egress URL (egress)",
+        "anchor": "medium-deployed-armed--webcontextsearchurl--apikey-on-all-nine-plaintext-terminating-proxies-proxy-glm51-included-an-operator-suppliable-egress-url-egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "dcgm-exporter x4 pinned by tag, not digest, with SYS_ADMIN + nvidia runtime: privileged bytes can drift under the attestation (telemetry, any sink under drift)",
+        "anchor": "medium-deployed-on--dcgm-exporter-x4-pinned-by-tag-not-digest-with-sysadmin--nvidia-runtime-privileged-bytes-can-drift-under-the-attestation-telemetry-any-sink-under-drift"
+      },
+      {
+        "severity": "medium",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "ipc: host on every engine and proxy, including the privacy-filter and the new GLM engine (cross-container shared memory)",
+        "anchor": "medium-deployed-on--ipc-host-on-every-engine-and-proxy-including-the-privacy-filter-and-the-new-glm-engine-cross-container-shared-memory"
+      },
+      {
+        "severity": "low",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "both Qwen3.6 replicas run the undisableable watchdog hang-dump at the engine's 300 s default while the new GLM engine pins 1800 s (log, feeding the telemetry egress)",
+        "anchor": "low-deployed-armed--both-qwen36-replicas-run-the-undisableable-watchdog-hang-dump-at-the-engines-300-s-default-while-the-new-glm-engine-pins-1800-s-log-feeding-the-telemetry-egress"
+      },
+      {
+        "severity": "low",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "all 27 services carry com.datadoghq.ad.logs labels: stdout becomes third-party SaaS egress on any node whose harness measures a Datadog agent (egress, latent)",
+        "anchor": "low-deployed-armed--all-27-services-carry-comdatadoghqadlogs-labels-stdout-becomes-third-party-saas-egress-on-any-node-whose-harness-measures-a-datadog-agent-egress-latent"
+      },
+      {
+        "severity": "info",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, engine-side residuals ARMED",
+        "title": "the GLM-5.1 AWQ TP4 addition: a digest-pinned base plus a visible weight-loader patch, minimum request-log level, pinned revision beside --trust-remote-code, 1800 s watchdog, no dump/file/trace flag, and a proxy line-identical to its siblings (log / disk)",
+        "anchor": "info-deployed-off-engine-side-residuals-armed--the-glm-51-awq-tp4-addition-a-digest-pinned-base-plus-a-visible-weight-loader-patch-minimum-request-log-level-pinned-revision-beside---trust-remote-code-1800-s-watchdog-no-dumpfiletrace-flag-and-a-proxy-line-identical-to-its-siblings-log--disk"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the retirements are clean: Gemma-4-31B and two gpt-oss replicas leave with their proxies, dcgm, nginx routes, otel scrape jobs and registrar entries, nothing dangles (structural)",
+        "anchor": "info-deployed-on--the-retirements-are-clean-gemma-4-31b-and-two-gpt-oss-replicas-leave-with-their-proxies-dcgm-nginx-routes-otel-scrape-jobs-and-registrar-entries-nothing-dangles-structural"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the otelcol collector config is byte-identical to the base outside the scrape-job swaps: no receiver, processor, exporter, or attribute changed (telemetry)",
+        "anchor": "info-deployed-on--the-otelcol-collector-config-is-byte-identical-to-the-base-outside-the-scrape-job-swaps-no-receiver-processor-exporter-or-attribute-changed-telemetry"
+      },
+      {
+        "severity": "info",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, engine-side residuals ARMED",
+        "title": "Qwen3.6's engine digest is audited: deployed logging flags genuinely consumed on the LLM path; the live residuals are the image page's (log)",
+        "anchor": "info-deployed-off-engine-side-residuals-armed--qwen36s-engine-digest-is-audited-deployed-logging-flags-genuinely-consumed-on-the-llm-path-the-live-residuals-are-the-image-pages-log"
+      },
+      {
+        "severity": "info",
+        "deployed": "off",
+        "qualifier": "deployed: OFF",
+        "title": "no metrics-to-file path exists on any of the three sglang LLM/diffusion commands; the sglang metrics/logging coupling bug is not armed (disk)",
+        "anchor": "info-deployed-off--no-metrics-to-file-path-exists-on-any-of-the-three-sglang-llmdiffusion-commands-the-sglang-metricslogging-coupling-bug-is-not-armed-disk"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the nine vllm-proxy-rs E2EE terminators run user: root + privileged: true; nginx's GLM TLS block adds long keepalives (structural)",
+        "anchor": "info-deployed-on--the-nine-vllm-proxy-rs-e2ee-terminators-run-user-root--privileged-true-nginxs-glm-tls-block-adds-long-keepalives-structural"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "volumes: caches hold weights and config-keyed compile artifacts, not request-derived data; the one request-derived write is FLUX's, off-volume; one volume added (disk)",
+        "anchor": "info-deployed-on--volumes-caches-hold-weights-and-config-keyed-compile-artifacts-not-request-derived-data-the-one-request-derived-write-is-fluxs-off-volume-one-volume-added-disk"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "registrar probes authenticate with PROXY_TOKEN over plaintext HTTP to the host-published ports; the :8009 probe now targets GLM-5.1 (local hop)",
+        "anchor": "info-deployed-on--registrar-probes-authenticate-with-proxytoken-over-plaintext-http-to-the-host-published-ports-the-8009-probe-now-targets-glm-51-local-hop"
       }
     ],
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-ce39ea4cfe0ddf4dc2e4fbb96b6c66ab9f72954444d5419b196d06940db5e297.md": [
