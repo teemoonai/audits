@@ -10,7 +10,7 @@ the teemoon app to the model and back.
 
 > Companion to the per-image audits in this folder and to the method in
 > [`/notes/method.md`](/notes/method.md). Scope (image → source commit) was
-> re-derived from live attestation on 2026-07-15; see [`README.md`](README.md).
+> re-derived from live attestation on 2026-07-15; see [`/README.md`](/README.md).
 
 ---
 
