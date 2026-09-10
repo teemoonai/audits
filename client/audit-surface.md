@@ -155,6 +155,14 @@ the conversation somewhere.
       verbatim on screen (a developer feature the user opens), `copyHeaderBlock`
       redacts on copy in every build, and nothing persists it — the `Message`
       model has no debug field. Any of those three changing is a finding.
+- [ ] **The disk cache behind `URLSession.shared`.** Every authenticated
+      fetch through the default session is archived to
+      `Library/Caches/<bundle>/Cache.db` with its headers if the server's
+      cache headers allow — the near.ai key was found there nine times after
+      one session. Confirm `urlCache = nil` or an ephemeral configuration on
+      every session that carries a key, and a cache purge on key removal.
+      Found by the runtime pass; invisible to a source read that does not
+      ask what the default session does.
 - [ ] No URL query item ever carries a key; the copy path's
       `secretQueryParams` mask is a belt, not the reason.
 - [ ] No `Logger` line interpolates a key at any privacy level; the Keychain
