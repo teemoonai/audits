@@ -10,7 +10,8 @@ structural, not a finding. The question this tree answers is the same one the
 server-side pages answer for each attested image: **can anything on the device
 copy that plaintext to a place you did not intend** — a log, an unprotected or
 backed-up file, the system pasteboard, or a network destination other than the
-sealed send path you chose?
+sealed send path you chose? And its device-side twin: **can your provider API
+key reach anywhere but the Keychain and the provider it belongs to?**
 
 **One page per audited release, named by tag and commit.** A client build has no
 attested digest: nothing measures an App Store binary, and Apple re-signs and
@@ -34,7 +35,7 @@ and will get its own lineage when it ships.
 |---|---|---|---|
 | 1.0 (25) | [`v1.0.0` → `2d9e206`](teemoon-ios/v1.0.0-2d9e206.md) | QUALIFIED-PASS — private at the reviewed tree; one HIGH (no-tap markdown-image auto-fetch) found and fixed before publish; residuals are by design | full review 2026-08-31, re-pinned to the public root 2026-09-01 |
 | 1.0.1 (26) | [`v1.0.1` → `0dfad8b`](teemoon-ios/v1.0.1-0dfad8b.md) | QUALIFIED-PASS (carried) — zero app-code change from 1.0; covered by the 1.0 read | delta 2026-09-10 (tree comparison) |
-| 1.0.2 (33) | [`v1.0.2` → `21d534e`](teemoon-ios/v1.0.2-21d534e.md) | QUALIFIED-PASS — no new plaintext sink in the 38-file delta; two independent reviewers, no finding; two new by-design residuals | delta 2026-09-10 (two blinded reviewers) |
+| 1.0.2 (33) | [`v1.0.2` → `21d534e`](teemoon-ios/v1.0.2-21d534e.md) | QUALIFIED-PASS — no new plaintext or key sink in the 38-file delta; keys leave only to their own provider; two independent reviewers, no finding; two new by-design residuals | delta 2026-09-10 (two blinded reviewers) |
 
 A release not listed here has not been audited. The same fail-closed rule the
 server-side pages follow applies: no page, no claim.

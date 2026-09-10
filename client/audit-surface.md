@@ -133,15 +133,35 @@ the conversation somewhere.
       their own content, stated as such.
 - [ ] Handoff / universal clipboard broadcast: absent.
 
-## 9. Keys
+## 9. Keys — the second axis, walked end to end
 
-- [ ] `kSecAttrAccessibleAfterFirstUnlock`, not `ThisDeviceOnly`, not
-      `kSecAttrSynchronizable`: keys restore through an encrypted backup and do
-      not sync. A deliberate decision; state it as a residual each time.
-- [ ] Any request that sends a key to a host other than its own provider (a
-      catalog fetch, a key-check probe, the signature fetch). The near.ai key
-      to near.ai is fine; the near.ai key to anything else is a finding.
-- [ ] Error text and log lines name the provider, never the key.
+- [ ] **Enumerate every header site.** Grep every `forHTTPHeaderField:
+      "Authorization"` and every provider-specific auth header
+      (`X-Subscription-Token`, `Provider.authHeaderName`); for each, name the
+      host. The near.ai key to near.ai's chat, catalog, attestation-report and
+      signature endpoints is fine; the near.ai key to anything else is a
+      finding. The certificate-agnostic TLS probe once carried it
+      (`probeRequest_carriesNoAuthorizationHeader`).
+- [ ] Storage: `kSecAttrAccessibleAfterFirstUnlock`, not `ThisDeviceOnly`, not
+      `kSecAttrSynchronizable` — restores through an encrypted backup, no
+      iCloud Keychain sync. Deliberate; a residual each time. `ConfigStore`
+      holds the provider id, never the key.
+- [ ] Entry: `SecureField` with `.oneTimeCode` content type so Passwords
+      autofill never captures it; the reveal toggle switches to a plain
+      `TextField` — note it, it is user-held.
+- [ ] **Error and debug structs that carry request headers.**
+      `BraveWebSearchTool` and `HTTPTransport` put the full header dictionary
+      into their error / turn reports. Follow it: the debug panel shows it
+      verbatim on screen (a developer feature the user opens), `copyHeaderBlock`
+      redacts on copy in every build, and nothing persists it — the `Message`
+      model has no debug field. Any of those three changing is a finding.
+- [ ] No URL query item ever carries a key; the copy path's
+      `secretQueryParams` mask is a belt, not the reason.
+- [ ] No `Logger` line interpolates a key at any privacy level; the Keychain
+      logs the account name (`.private`) on failure, never the value.
+- [ ] Exported artifacts: the self-verify script reads the key from an
+      environment variable and tells the user to export it; confirm it is never
+      embedded, and that nothing else exports (share sheet, file, QR).
 - [ ] UI-test key seeding: `#if DEBUG` end to end **and** gated on a launch
       flag; absent from a shipping build.
 

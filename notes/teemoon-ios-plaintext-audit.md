@@ -7,7 +7,7 @@
 
 # teemoon iPhone client — can anything exfiltrate your plaintext?
 
-## verdict: QUALIFIED-PASS — private at App Store 1.0.2 (`21d534e`) and at every release since 1.0; one HIGH found and fixed before the 1.0 publish; residuals are by design, not defects; the on-device runtime binary is not traced
+## verdict: QUALIFIED-PASS — private at App Store 1.0.2 (`21d534e`) and at every release since 1.0: messages reach only the send path you chose and the protected store, and provider keys reach only the Keychain and their own provider; one HIGH found and fixed before the 1.0 publish; residuals are by design, not defects; the on-device runtime binary is not traced
 
 The rest of this repo audits near.ai's side of end-to-end encryption: given
 that plaintext exists in the model CVM, can any attested server component copy
@@ -17,7 +17,9 @@ prompt and decrypts every reply, so it holds plaintext unconditionally (the
 yellow `APP` box in the [server-side map](ARCHITECTURE.md)). Does anything on
 the device copy that plaintext to a log, an unprotected file, the pasteboard,
 or a network destination other than the send path you chose — with no user
-action, or driven by content a hostile model controls?
+action, or driven by content a hostile model controls? And the device-side
+twin: can your provider API key reach anywhere but the Keychain and the
+provider it belongs to?
 
 A client build carries no attested identity, so this is not a gated
 `index.json` page and the app shows no audit link for it. The identity a page

@@ -154,6 +154,41 @@ it true.
 
 ---
 
+## 3b. The key path — the second thing on the device worth stealing
+
+A provider key is entered once and then used on every request. It has exactly
+one legitimate resting place and one legitimate direction of travel.
+
+```
+[keyboard]  SecureField (reveal toggle → plain TextField)   Views/Settings/ProviderConnectionSection.swift
+    │
+    ▼
+Keychain — kSecAttrAccessibleAfterFirstUnlock, not synchronizable,     Providers/Keychain.swift
+    │       account = provider id; the providers JSON holds the id only  Providers/ConfigStore.swift
+    │
+    ├── ProviderStore.credential(for:)  ──▶  request header, ONLY to the key's own provider:
+    │       near.ai key  → cloud-api.near.ai / *.completions.near.ai  (chat, model catalog,
+    │                      attestation reports, per-reply signature fetch)
+    │       Brave key    → api.search.brave.com                     (key check, web_search)
+    │       Fireworks / xAI / custom key → the base URL you configured with it
+    │
+    ├── copy button  ──▶  Clipboard.copySensitive: local-only, expires   Views/PlatformChrome.swift
+    │
+    ├── debug panel  ──▶  headers verbatim ON SCREEN (developer feature, user opens it)
+    │                     redacted ON COPY in every build               Views/Chat/DebugHeaderRedaction.swift
+    │                     memory-only; never written to the store
+    │
+    └── self-verify script ──▶ key read from the environment at run time, never embedded
+```
+
+What must never happen, and is checked on every page: a key in a log line at
+any privacy level; a key in a URL query; a key to a host that is not its own
+provider (the TLS-attestation probe once carried it — fixed before 1.0); a key
+in the config JSON or any file; a key on the general pasteboard; a key in an
+exported artifact.
+
+---
+
 ## 4. Where cleartext could leak — and the answer per hop
 
 For each place plaintext exists on the device, the page for a release asks: does
@@ -178,6 +213,21 @@ destination other than the send path? One-line answers at the current pin
 | Verification egress | Message bytes in a report | Clean | Quotes, nonces, digests, chat ids; the signature fetch carries your near.ai key to near.ai itself |
 | Model downloads | Content in the request | Clean | Bare request to a compiled catalog URL; weights land backup-excluded |
 | Third-party pipes | Analytics / crash SDK | Clean | None in `Package.resolved`; no app extensions, widgets, or share targets exist |
+
+### 4b. Where a key could leak — and the answer per hop
+
+| Hop (key present) | Could it leak? | Answer at `v1.0.2` | Detail |
+|---|---|---|---|
+| Entry field | Autofill, snapshot | Clean, one note | `SecureField` classed as one-time-code so Passwords never captures it; the reveal toggle shows plain text while the user holds it open |
+| Keychain | Sync, backup | By-design residual | `AfterFirstUnlock`, not `ThisDeviceOnly`, not synchronizable: no iCloud Keychain sync; restores with an encrypted backup |
+| Config JSON | Key at rest outside the Keychain | Clean | Holds the provider id; the key is looked up by it |
+| Request headers | A host that is not the key's provider | Clean (fixed pre-1.0) | Twelve header sites, each to the key's own provider or the endpoint configured with it; the certificate-agnostic TLS probe carries no key |
+| URL query strings | Key in a URL | Clean | No query item carries a key; the copy path also masks known key parameters as a belt |
+| Logs | Key interpolated | Clean | No `Logger` line interpolates a key; the Keychain logs the account name at `.private` on failure, never the value |
+| Error / debug structs | Key surfaced | Clean, by design on screen | Tool and transport errors carry request headers into the debug panel; shown verbatim on screen (a developer feature the user opens), redacted on copy unconditionally, held in memory only |
+| Pasteboard | Broadcast | Clean | Key copy is local-only and expires; no Handoff |
+| Exported script | Key embedded | Clean | The self-verify script takes the key from an environment variable |
+| Test seeding | Shipping build | Clean | `#if DEBUG` and `--uitesting` |
 
 ---
 
