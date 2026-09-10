@@ -1,0 +1,81 @@
+name: client drift
+
+# The client counterpart of fleet-drift. Server identities are attested and
+# fleet_drift.py reads them live; the client has no attestation, so the
+# identity a page can key on is the App Store tag and the commit it points at.
+# This asks, on a schedule, whether every release tag of teemoonai/teemoon-ios
+# has a page under client/teemoon-ios/ whose pinned sha still matches the tag.
+# Deterministic, stdlib-only, no key, no model. It never writes a page; it
+# files an issue and stops.
+
+on:
+  schedule:
+    - cron: "40 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: client-drift
+  cancel-in-progress: false
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check every App Store tag against client/teemoon-ios/
+        id: check
+        run: |
+          set +e
+          python3 tools/client_drift.py | tee report.txt
+          echo "exit=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: File, update, or close the client drift issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXIT: ${{ steps.check.outputs.exit }}
+        run: |
+          set -euo pipefail
+          TITLE="client drift: a teemoon-ios release has no page"
+          EXISTING=$(gh issue list --state open --label client-drift \
+                       --json number --jq '.[0].number // empty' || true)
+          if [ "${EXIT}" = "0" ]; then
+            if [ -n "${EXISTING}" ]; then
+              gh issue comment "${EXISTING}" --body "Cleared as of \`${GITHUB_SHA:0:12}\` ($(date -u +%Y-%m-%dT%H:%MZ)): every App Store tag has a page pinning the commit it points at. Closing."
+              gh issue close "${EXISTING}"
+            fi
+            echo "no drift"; exit 0
+          fi
+          {
+            echo "An App Store release of teemoonai/teemoon-ios has no page under \`client/teemoon-ios/\`,"
+            echo "or its page pins a commit the tag no longer points at. Until a page exists, the"
+            echo "release is unaudited — fail-closed, like a server identity with no page."
+            echo
+            echo "Detected by \`tools/client_drift.py\` — deterministic, no model involved. It reports only."
+            echo
+            echo '```'; cat report.txt; echo '```'
+            echo
+            echo "**What to do:** run the delta form of the prompt in [\`client/method.md\` §3](../blob/main/client/method.md)"
+            echo "against the new tag, then the runtime pass (§4b), and publish"
+            echo "\`client/teemoon-ios/<tag>-<short sha>.md\` with the full sha in its identity table."
+            echo
+            echo "<sub>run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}</sub>"
+          } > body.md
+          if [ -n "${EXISTING}" ]; then
+            gh issue comment "${EXISTING}" --body-file body.md
+          else
+            gh label create client-drift --color d93f0b \
+              --description "A teemoon-ios release has no audit page" --force >/dev/null 2>&1 || true
+            URL=$(gh issue create --title "${TITLE}" --body-file body.md)
+            gh issue edit "${URL}" --add-label client-drift --add-assignee "${GITHUB_REPOSITORY_OWNER}" || \
+              echo "::warning::issue ${URL} filed but could not be labelled or assigned"
+          fi
