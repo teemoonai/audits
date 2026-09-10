@@ -355,3 +355,30 @@ and Keychain; the App Store's signing and thinning of the uploaded binary
 (§5.2); the native on-device runtime binary; the vendored renderer beyond its
 loader entry points unless re-read; and the endpoint you chose when it is not
 near.ai — it reads your plaintext because you sent it there.
+
+## 7. What this audit does not cover, on purpose
+
+A reader should not assume a page checked these. They are adjacent to the
+question and answered elsewhere or not at all:
+
+- **Correctness of the E2EE itself.** A wrong seal would expose plaintext in
+  transit without touching any sink these pages look at. The client repo's
+  `ATTESTATION.md` describes the construction (X25519, HKDF, XChaCha20-Poly1305
+  via CryptoKit; the only hand-written primitive is HChaCha20, pinned to the
+  IETF draft vectors) and its tests pin it. This repo verifies that sealing
+  fails closed and that the key is bound to the attested quote — not that the
+  cipher is used correctly.
+- **What dependencies do on the network.** The pages check `Package.resolved`
+  for telemetry and crash SDKs and read the vendored renderer's loader. They do
+  not trace the Hugging Face model layer, the SSE client, the DCAP verifier, or
+  the secp256k1 binding for network calls of their own. The runtime pass's
+  endpoint list is the only evidence on that, and it covers only the code paths
+  a session exercised.
+- **Whether the UI's claims match what the code verifies.** The client repo's
+  security policy treats an overstating checkmark as a security bug; that is a
+  separate review of the attestation surface, not of exfiltration.
+- **A jailbroken or otherwise compromised device**, and Apple's platform
+  itself.
+- **Metadata.** Model id, sampling parameters, message count and ciphertext
+  lengths are readable by the gateway by protocol; the server-side pages cover
+  that perimeter.
