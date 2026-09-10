@@ -23,11 +23,14 @@ device. This repo reviews both.
   [`manifests/`](manifests/) (the configs that define them), and
   [`os/`](os/) (the guest OS underneath). Mapped end to end by
   [`notes/ARCHITECTURE.md`](notes/ARCHITECTURE.md).
-- **Client side — the teemoon app on your device.** The
-  [teemoon iPhone client review](notes/teemoon-ios-plaintext-audit.md) — the
-  other end of the E2EE, which composes every prompt and decrypts every reply. A
-  Tier-2 note, not a gated identity page: a client build carries no attested
-  digest for a link to key on. The client source is public:
+- **Client side — the teemoon app on your device.** Per release, named by
+  tag and commit: [`client/`](client/README.md) (one page per App Store
+  release), mapped by [`client/ARCHITECTURE.md`](client/ARCHITECTURE.md), with
+  its own [method](client/method.md) and [audit surface](client/audit-surface.md).
+  The other end of the E2EE, which composes every prompt and decrypts every
+  reply. Not gated by `index.json`: a client build carries no attested digest
+  for a link to key on, and the pages say what binds the binary to the commit
+  (the developer's word, or your own build). Source:
   [teemoonai/teemoon-ios](https://github.com/teemoonai/teemoon-ios), AGPL-3.0.
 
 ## Scope rule
@@ -164,9 +167,10 @@ or through another note, moves only with tier-1 care**, because renaming it
 breaks live links in published reviews. Today that closure is
 `notes/method.md` (linked from every page), `notes/ARCHITECTURE.md`,
 `notes/audit-surface.md` (reached via `method.md`),
-`notes/reviewer-comparison-2026-08-03.md` (reached via `audit-surface.md`), and
-`notes/teemoon-ios-plaintext-audit.md` (reached via `ARCHITECTURE.md`) — plus the
-in-tree lineage READMEs. Notes outside that closure are editorial
+`notes/reviewer-comparison-2026-08-03.md` (reached via `audit-surface.md`),
+`notes/teemoon-ios-plaintext-audit.md` (reached via `ARCHITECTURE.md`; now the
+entry to the client tree), and everything under `client/` — plus the in-tree
+lineage READMEs. Notes outside that closure are editorial
 and may be reorganised freely.
 
 **Tier 3 — machinery. Free to change.**
@@ -201,8 +205,11 @@ can read exactly what produced them and re-run it, which is what
   hardware-measured node harness (by `compose_hash`).
 - [`os/`](os/) — the confidential-VM guest OS (kernel + rootfs) measured into
   the boot, keyed by `os_image_hash`: the substrate that sees all plaintext.
-- [`notes/`](notes/) — the review method and the deployment architecture
-  (which derives the scope rule above).
+- [`client/`](client/) — the device side: per-release review pages for the
+  teemoon iPhone app, keyed by tag and commit, with the client's own
+  architecture map, method and audit surface.
+- [`notes/`](notes/) — the server-side review method and deployment
+  architecture (which derives the scope rule above).
 
 ## Audit policy
 
