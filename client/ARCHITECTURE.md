@@ -16,53 +16,67 @@ each of them, so a page can say which it cleared and which it did not.
 
 ```mermaid
 flowchart TB
-    subgraph dev["YOUR iPHONE — no enclave; the app holds plaintext"]
-        direction TB
-        SIRI["Siri / Shortcuts<br/>RequestLLMIntent"]
-        UI["Composer · transcript<br/>ChatViewModel"]
-        STORE[("SwiftData store<br/>+ FTS sidecar<br/>encrypted at rest,<br/>backup-excluded")]
-        SINKS["os Logger · pasteboard<br/>must stay content-free"]
-        GATE{"sendPolicy<br/>one definition"}
-        ENGINE["GenerationEngine<br/>tool rounds"]
-        KEYS[("Keychain<br/>provider keys")]
-        E2EE["HTTPTransport<br/>+ E2EEPeer<br/>seals here"]
-        PLAIN["HTTPTransport<br/>plain"]
-        LOCAL["LiteRTTransport<br/>native runtime<br/>in-process"]
-        TOOLS["web_search tool<br/>opt-in Brave key"]
-        RENDER["Textual renderer<br/>no remote fetch"]
-        SIRI --> GATE
-        UI --> GATE
+    subgraph dev["YOUR iPHONE (no enclave — the app holds plaintext)"]
+        UI["Composer · transcript · ChatViewModel"]
+        STORE[("SwiftData store + FTS sidecar (-wal/-shm)")]
+        ENGINE["GenerationEngine (tool rounds, shared by every place)"]
+        E2EE["HTTPTransport + E2EEPeer — SEALS here"]
+        PLAIN["HTTPTransport — plain (home / custom / other clouds)"]
+        LOCAL["LiteRTTransport → LiteRT native runtime (in-process)"]
+        RENDER["Textual markdown renderer (no remote fetch)"]
+        SIRI["Siri / Shortcuts — RequestLLMIntent"]
+        TOOLS["web_search tool (opt-in Brave key)"]
+        VERIFY["Attestation verifiers (quotes, nonces, digests)"]
+        KEYS[("Keychain — provider keys")]
+        LOG["os Logger (content-free) · DiagLog (env-gated)"]
+        PB["Pasteboard: general (user copy) · local+expiring (keys)"]
         UI --> STORE
-        UI -.-> SINKS
-        GATE --> ENGINE
-        KEYS --> ENGINE
+        UI --> ENGINE
+        SIRI --> ENGINE
         ENGINE --> E2EE
         ENGINE --> PLAIN
         ENGINE --> LOCAL
         ENGINE --> TOOLS
-        E2EE --> RENDER
-        PLAIN --> RENDER
-        LOCAL --> RENDER
+        ENGINE --> RENDER
+        KEYS --> E2EE
+        KEYS --> PLAIN
     end
-    subgraph off["OFF THE DEVICE"]
-        direction LR
-        NEAR["near.ai gateway CVM<br/>ciphertext only →<br/>model node decrypts"]
-        OTHER["home · other clouds<br/>plaintext by definition"]
-        BRAVE["Brave Search<br/>one fixed host"]
+
+    subgraph near["near.ai (sealed TDX fleet — the server-side map)"]
+        GW["gateway CVM (ciphertext only)"]
+        MN["model node: vllm-proxy-rs decrypts → SGLang"]
     end
-    E2EE ==>|"TLS · E2EE ciphertext"| NEAR
-    PLAIN -->|"TLS · plaintext"| OTHER
-    TOOLS -.->|"model-written query"| BRAVE
+    subgraph other["Endpoints you chose — plaintext by definition"]
+        HOME["home: ollama / LM Studio / any OpenAI-compatible server"]
+        CLOUD["other clouds: Grok · Fireworks · custom"]
+    end
+    subgraph attest["Attestation & provenance services (no message content)"]
+        NAI["near.ai attestation + signature endpoints"]
+        PCS["Intel PCS"]
+        NRAS["NVIDIA NRAS"]
+        GH["GitHub API / raw · Sigstore/Rekor · teemoonai/audits index"]
+    end
+    BRAVE["Brave Search (opt-in, fixed host)"]
+    HF["Hugging Face (model weights in)"]
+
+    E2EE -->|"TLS · E2EE ciphertext"| GW --> MN
+    PLAIN -->|"TLS · plaintext"| HOME
+    PLAIN -->|"TLS · plaintext"| CLOUD
+    TOOLS -.->|"model-authored query"| BRAVE
+    VERIFY -.-> NAI
+    VERIFY -.-> PCS
+    VERIFY -.-> NRAS
+    VERIFY -.-> GH
+    LOCAL -.->|"background download (weights only)"| HF
 
     classDef plaintext fill:#fde68a,stroke:#d97706,color:#000
     classDef ciphertext fill:#bfdbfe,stroke:#2563eb,color:#000
     classDef mustbeclean fill:#fecaca,stroke:#dc2626,color:#000
     classDef keys fill:#ddd6fe,stroke:#7c3aed,color:#000
-    class UI,SIRI,STORE,GATE,ENGINE,E2EE,PLAIN,LOCAL,TOOLS,RENDER,OTHER plaintext
-    class NEAR ciphertext
-    class SINKS mustbeclean
+    class UI,STORE,ENGINE,E2EE,PLAIN,LOCAL,RENDER,SIRI,TOOLS,MN,HOME,CLOUD plaintext
+    class GW ciphertext
+    class LOG,PB mustbeclean
     class KEYS keys
-    class BRAVE ciphertext
 ```
 
 **Yellow = holds your plaintext.** Everything inside the app that touches a
@@ -74,11 +88,6 @@ and each page verifies that no message reaches them without a user tap.
 **Purple = keys,** not messages; they have their own residuals. **Blue** is
 the ciphertext-only gateway from the server-side map. The endpoint you chose
 outside near.ai is yellow because it reads your plaintext by definition.
-
-Not drawn, because they never carry a message: the app's attestation and
-provenance traffic (near.ai report and signature endpoints, Intel PCS, NVIDIA
-NRAS, GitHub, Sigstore, this repo's index) and the model-weight download from
-Hugging Face. They are in the table below so a page still has to clear them.
 
 ---
 
