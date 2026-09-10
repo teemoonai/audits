@@ -292,9 +292,13 @@ sends and receives messages:
    (`xcrun simctl get_app_container <sim> ai.teemoon.app data`): list every
    file; search all of them for the session's message text and for the
    provider key's value (compare, never print); read UserDefaults key names
-   and cookie-storage tables. Message text may appear only in the store and
-   its search index; a key may appear nowhere; anything else that holds
-   prompt text is a finding.
+   and cookie-storage tables; and **parse the URL cache's archived requests**
+   (`Library/Caches/<bundle>/Cache.db`, table `cfurl_cache_blob_data`, column
+   `request_object`, a binary plist — a byte grep misses UTF-16 strings) for
+   any `Authorization` or provider-header value. Message text may appear only
+   in the store and its search index; a key may appear nowhere; anything else
+   that holds prompt text is a finding. The 1.0.2 pass found the near.ai key
+   in that cache after neither source read had.
 
 What the simulator cannot measure: iOS data-protection classes are not
 enforced there, so the store's `.completeUnlessOpen` claim stays a source and

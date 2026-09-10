@@ -116,14 +116,34 @@ definition of "may this be sent" — `ConfidentialSession.sendPolicy` — and an
 attested provider with no sealed channel is refused, never sent in the clear.
 A second definition of that rule is how Siri once bypassed it.
 
-## Keys, in three lines
+## Keys — the second thing on the device worth stealing
 
-A key is meant to live in the Keychain and nowhere else on disk; at every
-shipped release it also sits in the shared URL cache, because authenticated
-fetches use the default session with caching on. It leaves the device only
-inside a request to the provider it belongs to. It is shown only where you
-open it — the entry field's reveal toggle and the developer debug panel — and
-copies of it are redacted or expire.
+A key is entered once and used on every request. It is meant to have one
+resting place and one direction of travel:
+
+```
+[keyboard]  SecureField, reveal toggle          Views/Settings/ProviderConnectionSection.swift
+    ▼
+Keychain — AfterFirstUnlock, not synced           Providers/Keychain.swift
+    │       (the providers file holds only the id)
+    ├──▶ request header, ONLY to the key's own provider   (twelve sites; the page lists them)
+    │        └──▶ and, uninvited, the shared URL cache on disk   ← MEDIUM, every release
+    ├──▶ copy: local-only, expiring pasteboard         Views/PlatformChrome.swift
+    ├──▶ debug panel: verbatim on screen when you open it; redacted on copy; never persisted
+    └──▶ self-verify script: reads the key from the environment, never embeds it
+```
+
+| Hop (key present) | Must never happen | At `v1.0.2` |
+|---|---|---|
+| Entry field | Passwords autofill capturing it | clean — classed as a one-time code; the reveal toggle is user-held |
+| Keychain | sync; a key anywhere else on disk | by design: restores with an encrypted backup, no iCloud sync. **MEDIUM:** also on disk in the URL cache |
+| Request headers | a host that is not the key's provider | clean — all twelve sites; the certificate-agnostic TLS probe carries no key (fixed pre-1.0) |
+| Shared URL cache | any authenticated request archived | **MEDIUM** — the attestation-report fetch is archived with its `Authorization` header, nine copies after one session |
+| URL query strings | a key in a URL | clean |
+| Logs | a key at any privacy level | clean — the Keychain logs the account name, never the value |
+| Error and debug records | persisted or copied unredacted | clean — memory-only; verbatim on screen by design; redacted on every copy path |
+| Pasteboard | a broadcast or a plain copy | clean — local-only, expires |
+| Exported script | the key embedded | clean — read from the environment |
 
 ## What to keep watching
 
