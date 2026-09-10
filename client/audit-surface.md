@@ -165,6 +165,18 @@ the conversation somewhere.
 - [ ] UI-test key seeding: `#if DEBUG` end to end **and** gated on a launch
       flag; absent from a shipping build.
 
+## 9b. What only running it shows
+
+- [ ] **UserDefaults.** Read the key names in `Library/Preferences/ai.teemoon.app.plist`
+      after a session. The user-editable system prompt lives there — prompt
+      text the user wrote, outside the protected store, in a file backups
+      include. Found by the 1.0.2 runtime pass, not by either source read.
+- [ ] **Cookie and HSTS storage** (`Library/HTTPStorages`): tables present,
+      cookie domains. The app sets no cookies; a `cookies` table appearing
+      is a finding to explain.
+- [ ] **Every endpoint the process opened**, mapped to the exits table. The
+      only measurement that covers the native runtime.
+
 ## 10. Identity, before any of the above
 
 - [ ] `git checkout <tag>; git rev-parse HEAD` equals the page's full sha.

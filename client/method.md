@@ -217,6 +217,8 @@ OUTPUT
 - Findings as `### SEVERITY (deployed: yes/no[ — qualifier]) — title`, each
   with file:line evidence and a concrete leak scenario.
 - Per surface (1–10): traced, with the evidence; or not traced, by name.
+- The runtime pass (method §4b): each of its four measurements, with the
+  observed endpoint list, or the step skipped and why.
 - Residuals that are by design, stated not hidden.
 - What was not covered.
 
@@ -255,6 +257,50 @@ the server side's manifest-only checks. Verify these directly:
   swift-collections, swift-concurrency-extras, swift-nio, swift-secp256k1,
   swift-syntax, swift-system, swiftui-math; the vendored renderer adds pointfree
   test/support packages.
+
+---
+
+## 4b. Runtime pass (required per release)
+
+The server side cannot observe its enclave; the client side can be run. A
+static read answers "does the code copy plaintext"; this pass answers "does
+the running app, including the binaries the source read cannot see, actually
+do it." It is mechanical, needs no reading, and every release page records
+its result or says which step was skipped and why. Build the tag yourself,
+run it on a simulator, and measure four things while a scripted session
+sends and receives messages:
+
+1. **Egress.** Record every remote endpoint the app process opens during the
+   session and map each to a host the source names. Root-free: poll
+   `lsof -a -i -n -P -c teemoon` and reverse-resolve; with packet-capture
+   permission, `tshark -i en0 -Y 'tls.handshake.type == 1' -T fields -e
+   tls.handshake.extensions_server_name` gives exact hostnames. Any endpoint
+   not in the exits table is a finding. This is the one measurement that
+   covers the native inference runtime.
+2. **Logs.** Stream the unified log for the app process
+   (`xcrun simctl spawn <sim> log stream --predicate 'process == "teemoon"'`)
+   through the session, then search it for the session's message text and
+   for credential patterns. Attribute every hit to its subsystem: the UI-test
+   runner logs accessibility snapshots inside the app process, which is a
+   harness artifact, not the app; an `ai.teemoon` hit is a finding.
+3. **Keychain.** Read the simulator's Keychain database attributes only —
+   `sqlite3 <sim>/data/Library/Keychains/keychain-2-debug.db "select agrp,
+   pdmn, sync from genp"` — and confirm the app's items carry the protection
+   domain the source claims (`ck` = AfterFirstUnlock) and `sync = 0`. Never
+   select the `data` column.
+4. **Container.** After the session, inventory the app's data container
+   (`xcrun simctl get_app_container <sim> ai.teemoon.app data`): list every
+   file; search all of them for the session's message text and for the
+   provider key's value (compare, never print); read UserDefaults key names
+   and cookie-storage tables. Message text may appear only in the store and
+   its search index; a key may appear nowhere; anything else that holds
+   prompt text is a finding.
+
+What the simulator cannot measure: iOS data-protection classes are not
+enforced there, so the store's `.completeUnlessOpen` claim stays a source and
+unit-test claim; and the shipped UI-test harness runs the app on an in-memory
+store, so step 4 sees the store only when the session is driven by hand.
+Record both as skipped when they are.
 
 ---
 
