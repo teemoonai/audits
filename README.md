@@ -1,9 +1,11 @@
 # teemoon audits
 
-Source-level reviews answering exactly one question about near.ai's
-confidential inference stack: **can anything exfiltrate your plaintext?**
-Keyed to exact attested identities, so a review only ever claims to cover the
-bytes it covered.
+Source-level reviews answering one question about near.ai's confidential
+inference stack — **can anything exfiltrate your plaintext?** — and two about
+the teemoon app on your device — **can anything exfiltrate your provider
+keys, or your plaintext?** Keyed to exact identities (attested digests on the
+server side, release tags and commits on the client side), so a review only
+ever claims to cover the bytes it covered.
 
 **The model: one page per audited build, named by its attested identity.**
 `sha256-<digest>.md` *is* the review — verdict first, full analysis beneath —
@@ -16,7 +18,8 @@ never overclaim.
 ## The two sides of the question
 
 Your plaintext exists in two places — near.ai's sealed enclave, and your own
-device. This repo reviews both.
+device. Your provider keys exist in one: the device. This repo reviews both
+places, and on the device it asks about the keys first.
 
 - **Server side — near.ai's confidential-inference stack.** Per attested
   identity: [`images/`](images/) (each plaintext-handling image),
@@ -27,11 +30,27 @@ device. This repo reviews both.
   tag and commit: [`client/`](client/README.md) (one page per App Store
   release), mapped by [`client/ARCHITECTURE.md`](client/ARCHITECTURE.md), with
   its own [method](client/method.md) and [audit surface](client/audit-surface.md).
-  The other end of the E2EE, which composes every prompt and decrypts every
-  reply. Not gated by `index.json`: a client build carries no attested digest
-  for a link to key on, and the pages say what binds the binary to the commit
-  (the developer's word, or your own build). Source:
-  [teemoonai/teemoon-ios](https://github.com/teemoonai/teemoon-ios), AGPL-3.0.
+  The app is the other end of the E2EE — it composes every prompt and decrypts
+  every reply — and it is the only place your **provider API keys** live. In a
+  bring-your-own-key app the key is the asset the app alone custodies, the one
+  most easily leaked by accident (logs, caches, crash reports, URL strings),
+  and the one that pays off directly for whoever takes it: a stolen key bills
+  you and speaks as you. So the client audit asks about keys first: **does a
+  key ever leave the Keychain for anywhere but a request to its own
+  provider?** — every request that carries one is enumerated with the host it
+  reaches, and the shared URL cache, logs, files, pasteboard, exported scripts
+  and error records are checked for a copy. Then it asks the plaintext
+  question the server side asks. Each release gets a source read and a
+  **runtime pass** (the app built from the tag and run, with its endpoints,
+  logs, Keychain attributes and container inspected), because the one
+  deployed finding so far — the near.ai key at rest in the URL cache, fixed in
+  1.0.3 — was invisible to two independent source reads and found only by
+  running the app. Not gated by `index.json`: a client build carries no
+  attested digest for a link to key on, and the pages say what binds the
+  binary to the commit (the developer's word, or your own build). A daily
+  [drift check](tools/client_drift.py) files an issue when a release has no
+  page. Source: [teemoonai/teemoon-ios](https://github.com/teemoonai/teemoon-ios),
+  AGPL-3.0.
 
 ## Scope rule
 
@@ -206,8 +225,11 @@ can read exactly what produced them and re-run it, which is what
 - [`os/`](os/) — the confidential-VM guest OS (kernel + rootfs) measured into
   the boot, keyed by `os_image_hash`: the substrate that sees all plaintext.
 - [`client/`](client/) — the device side: per-release review pages for the
-  teemoon iPhone app, keyed by tag and commit, with the client's own
-  architecture map, method and audit surface.
+  teemoon iPhone app, keyed by tag and commit, asking first whether your
+  provider keys can leave the Keychain for anywhere but their own provider
+  and then whether plaintext can leave the send path you chose, with the
+  client's own architecture map, method (source read plus a runtime pass)
+  and audit surface.
 - [`notes/`](notes/) — the server-side review method and deployment
   architecture (which derives the scope rule above).
 
