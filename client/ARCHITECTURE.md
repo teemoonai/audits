@@ -2,18 +2,18 @@
 > map in [`/notes/ARCHITECTURE.md`](/notes/ARCHITECTURE.md). Method:
 > [`method.md`](method.md) · Pages: [`README.md`](README.md).
 
-# Client Architecture — The Device, and Every Way Out of It for Messages and Keys
+# Client Architecture — The Device, and Every Way Out of It for Keys and Messages
 
 On the server the map shows which processes see plaintext, because only two
 do. On the device that question has a one-word answer: the app does. It
 composes every prompt, decrypts every reply, and holds every provider key. So
 the map shows the app's parts, and the question it serves is **the exits** —
 every way anything can leave the app — asked twice for each one: what
-**messages** may cross it, and what **keys** may. The exits table beneath the
-diagram answers the first; the key path and key table further down answer
-the second, because a key has one legitimate resting place (the Keychain)
-and one legitimate direction of travel (a request to its own provider), and
-that is a different set of checks from where a message may go.
+**keys** may cross it, and what **messages** may. Keys first: a key has one
+legitimate resting place (the Keychain) and one legitimate direction of
+travel (a request to its own provider), it is the asset most easily leaked by
+accident, and it is directly monetisable. The key path and key table beneath
+the diagram answer that; the exits table that follows answers the second.
 
 ```mermaid
 flowchart TB
@@ -92,38 +92,7 @@ outside near.ai is yellow because it reads your plaintext by definition.
 
 ---
 
-## The exits, and the answer at the current pin
-
-Messages first. The same exits are walked again for keys in the
-[key table](#keys--the-second-thing-on-the-device-worth-stealing) below.
-
-| Exit | Carries, by design | Must never carry | At `v1.0.2` |
-|---|---|---|---|
-| **near.ai** | your messages, sealed on the device to the attested model's key; your near.ai key as the request's identity | plaintext — sealing fails closed, never falls back | clean |
-| **An endpoint you chose** (home server, Grok, Fireworks, custom) | plaintext, because you sent it there; the key you paired with it | anything to a second host | clean — by-design residual: that endpoint reads it |
-| **On-device model** | nothing leaves the process | — | clean for the app's code; the native runtime is a binary, **not traced** as source. Added 2026-09-10: its shipped bytes were checked — no HTTP stack linked, and no code path in it reaches its socket layer; a dynamic capture on a phone is still to do |
-| **Brave Search** | a search query the model writes, only if you added a Brave key | a fetched result URL; anything without your key | clean — by-design residual: the model chooses the words |
-| **The app's own store** | every message, twice (store + search index) | an unprotected or backed-up copy | clean — `.completeUnlessOpen`, backup-excluded, re-applied each launch |
-| **Keychain** | provider keys | a key anywhere else on disk | **MEDIUM, fixed in 1.0.3** — the near.ai key is also written to the shared URL cache on disk by the attestation-report fetch; by-design residual: keys restore through an encrypted backup |
-| **Logs** | counts, provider names, fixed strings | message text or a key at any privacy level | clean |
-| **Pasteboard** | what you tap copy on; keys only to a local, expiring pasteboard | anything without a tap | clean |
-| **Files** | model weights, download bookkeeping, the providers file, UserDefaults | message text, a key | **LOW** — the user-edited system prompt is in UserDefaults, inside backups; **MEDIUM** — the URL cache holds the near.ai key; one env-gated developer log capture ships in the binary, unreachable without developer tooling |
-| **Attestation & provenance services** (near.ai reports, Intel, NVIDIA, GitHub, Sigstore, this repo) | quotes, nonces, digests, a chat id | a message; a key to anyone but near.ai | clean |
-| **Renderer** | — (it draws; it must not fetch) | a URL from a reply, fetched with no tap | clean — the one HIGH in the client's history, fixed before 1.0 |
-
-Evidence for every cell is on the [release page](teemoon-ios/v1.0.2-21d534e.md).
-
----
-
-## The entries
-
-Three things can start a send: the composer, a Siri or Shortcuts request, and
-a re-ask after the app returns from the background. All three go through one
-definition of "may this be sent" — `ConfidentialSession.sendPolicy` — and an
-attested provider with no sealed channel is refused, never sent in the clear.
-A second definition of that rule is how Siri once bypassed it.
-
-## Keys — the second thing on the device worth stealing
+## Keys — the first thing on the device worth stealing
 
 A key is entered once and used on every request. It is meant to have one
 resting place and one direction of travel:
@@ -151,6 +120,36 @@ Keychain — AfterFirstUnlock, not synced           Providers/Keychain.swift
 | Error and debug records | persisted or copied unredacted | clean — memory-only; verbatim on screen by design; redacted on every copy path |
 | Pasteboard | a broadcast or a plain copy | clean — local-only, expires |
 | Exported script | the key embedded | clean — read from the environment |
+
+## The exits, and the answer at the current pin
+
+Messages, walked exit by exit as the keys were above.
+
+| Exit | Carries, by design | Must never carry | At `v1.0.2` |
+|---|---|---|---|
+| **near.ai** | your messages, sealed on the device to the attested model's key; your near.ai key as the request's identity | plaintext — sealing fails closed, never falls back | clean |
+| **An endpoint you chose** (home server, Grok, Fireworks, custom) | plaintext, because you sent it there; the key you paired with it | anything to a second host | clean — by-design residual: that endpoint reads it |
+| **On-device model** | nothing leaves the process | — | clean for the app's code; the native runtime is a binary, **not traced** as source. Added 2026-09-10: its shipped bytes were checked — no HTTP stack linked, and no code path in it reaches its socket layer; a dynamic capture on a phone is still to do |
+| **Brave Search** | a search query the model writes, only if you added a Brave key | a fetched result URL; anything without your key | clean — by-design residual: the model chooses the words |
+| **The app's own store** | every message, twice (store + search index) | an unprotected or backed-up copy | clean — `.completeUnlessOpen`, backup-excluded, re-applied each launch |
+| **Keychain** | provider keys | a key anywhere else on disk | **MEDIUM, fixed in 1.0.3** — the near.ai key is also written to the shared URL cache on disk by the attestation-report fetch; by-design residual: keys restore through an encrypted backup |
+| **Logs** | counts, provider names, fixed strings | message text or a key at any privacy level | clean |
+| **Pasteboard** | what you tap copy on; keys only to a local, expiring pasteboard | anything without a tap | clean |
+| **Files** | model weights, download bookkeeping, the providers file, UserDefaults | message text, a key | **LOW** — the user-edited system prompt is in UserDefaults, inside backups; **MEDIUM** — the URL cache holds the near.ai key; one env-gated developer log capture ships in the binary, unreachable without developer tooling |
+| **Attestation & provenance services** (near.ai reports, Intel, NVIDIA, GitHub, Sigstore, this repo) | quotes, nonces, digests, a chat id | a message; a key to anyone but near.ai | clean |
+| **Renderer** | — (it draws; it must not fetch) | a URL from a reply, fetched with no tap | clean — the one HIGH in the client's history, fixed before 1.0 |
+
+Evidence for every cell is on the [release page](teemoon-ios/v1.0.2-21d534e.md).
+
+---
+
+## The entries
+
+Three things can start a send: the composer, a Siri or Shortcuts request, and
+a re-ask after the app returns from the background. All three go through one
+definition of "may this be sent" — `ConfidentialSession.sendPolicy` — and an
+attested provider with no sealed channel is refused, never sent in the clear.
+A second definition of that rule is how Siri once bypassed it.
 
 ## What to keep watching
 

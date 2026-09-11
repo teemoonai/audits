@@ -6,12 +6,14 @@
 
 The other end of the end-to-end encryption. The app composes every prompt and
 decrypts every reply, so it holds your plaintext unconditionally — that is
-structural, not a finding. The question this tree answers is the same one the
-server-side pages answer for each attested image: **can anything on the device
-copy that plaintext to a place you did not intend** — a log, an unprotected or
-backed-up file, the system pasteboard, or a network destination other than the
-sealed send path you chose? And its device-side twin: **can your provider API
-key reach anywhere but the Keychain and the provider it belongs to?**
+structural, not a finding. This tree answers two questions, keys first
+because in a bring-your-own-key app the key is the asset the app alone
+custodies and the one most easily leaked: **can your provider API key reach
+anywhere but the Keychain and the provider it belongs to?** And the same
+question the server-side pages answer for each attested image: **can anything
+on the device copy your plaintext to a place you did not intend** — a log, an
+unprotected or backed-up file, the system pasteboard, or a network destination
+other than the sealed send path you chose?
 
 **One page per audited release, named by tag and commit.** A client build has no
 attested digest: nothing measures an App Store binary, and Apple re-signs and

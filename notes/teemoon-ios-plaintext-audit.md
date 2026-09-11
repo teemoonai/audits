@@ -5,21 +5,22 @@
 > · Map: [`/client/ARCHITECTURE.md`](/client/ARCHITECTURE.md) · Surface:
 > [`/client/audit-surface.md`](/client/audit-surface.md).
 
-# teemoon iPhone client — can anything exfiltrate your plaintext or your keys?
+# teemoon iPhone client — can anything exfiltrate your keys or your plaintext?
 
-## verdict: QUALIFIED-PASS — messages reach only the send path you chose and the protected store, at App Store 1.0.2 (`21d534e`) and every release since 1.0; keys leave the device only to their own provider, but running the app found the near.ai key at rest in cleartext in the shared URL cache on disk (MEDIUM, since 1.0, fixed in 1.0.3) and the user-edited system prompt in UserDefaults inside backups (LOW); one HIGH fixed before the 1.0 publish; the on-device runtime is not traced
+## verdict: QUALIFIED-PASS — keys: they leave the device only to their own provider, but running the app found the near.ai key at rest in cleartext in the shared URL cache on disk (MEDIUM, since 1.0, fixed in 1.0.3); messages: they reach only the send path you chose and the protected store, at App Store 1.0.2 (`21d534e`) and every release since 1.0, with the user-edited system prompt in UserDefaults inside backups (LOW); one HIGH fixed before the 1.0 publish; the on-device runtime is shown unable to reach the network, its file writes are not traced
 
 The rest of this repo audits near.ai's side of end-to-end encryption: given
 that plaintext exists in the model CVM, can any attested server component copy
 it somewhere the operator or a third party can read? The client tree asks the
 same single question of the **other** end — the device. The app composes every
 prompt and decrypts every reply, so it holds plaintext unconditionally (the
-yellow `APP` box in the [server-side map](ARCHITECTURE.md)). Does anything on
-the device copy that plaintext to a log, an unprotected file, the pasteboard,
-or a network destination other than the send path you chose — with no user
-action, or driven by content a hostile model controls? And the device-side
-twin: can your provider API key reach anywhere but the Keychain and the
-provider it belongs to?
+yellow `APP` box in the [server-side map](ARCHITECTURE.md)) — and it holds
+your provider keys, which no server-side component does. Keys first: can your
+provider API key reach anywhere but the Keychain and the provider it belongs
+to? Then plaintext: does anything on the device copy it to a log, an
+unprotected file, the pasteboard, or a network destination other than the
+send path you chose — with no user action, or driven by content a hostile
+model controls?
 
 A client build carries no attested identity, so this is not a gated
 `index.json` page and the app shows no audit link for it. The identity a page

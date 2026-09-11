@@ -2,12 +2,15 @@
 > Companion to the server-side method in [`/notes/method.md`](/notes/method.md).
 > Architecture: [`ARCHITECTURE.md`](ARCHITECTURE.md) · Surface: [`audit-surface.md`](audit-surface.md) · Pages: [`README.md`](README.md).
 
-# Plaintext and Key Exfiltration Source Audit — teemoon Client
+# Key and Plaintext Exfiltration Source Audit — teemoon Client
 
 A **tool-independent** procedure for auditing whether the teemoon app on your
-phone can move either of the two things it holds for you — your plaintext
-(prompt text and model replies) and your provider API keys — to a place you
-did not intend. Like the server-side method it pins
+phone can move either of the two things it holds for you — your provider API
+keys, and your plaintext (prompt text and model replies) — to a place you did
+not intend. Keys come first, deliberately: in a bring-your-own-key app the key
+is the one asset the app alone custodies, it is the asset most often leaked by
+accident (logs, caches, crash reports, URL strings), and it is directly
+monetisable by whoever gets it. Like the server-side method it pins
 exact source commits so that anyone — a different LLM/agent, an independent
 reviewer, or you — can run the identical review and compare. Its credibility
 must not depend on trusting any one tool, including the ones that produced the
@@ -27,6 +30,16 @@ pages here.
 ---
 
 ## 1. Threat model the audit must answer
+
+**Keys first.** On the device they matter at least as much as the messages, and they leak more easily. A provider API key is what lets anyone bill you and speak as you;
+the near.ai key is the identity the whole attested session hangs on. "Private"
+for a key means: it exists in the Keychain and in the memory of a request to
+**the provider it belongs to**, and nowhere else. A key reaching a log, a file
+outside the Keychain, the general pasteboard, a URL query string, an exported
+script, a screenshot-able surface the user did not open, or **any host other
+than its own provider** — a probe, a catalog fetch, a third-party service — is
+a finding. The one pre-publish key finding was exactly that last kind: a
+certificate-agnostic TLS probe carrying the Bearer token.
 
 **"Private"** here means: on the device, message plaintext and provider keys
 are visible only to (a) you, on screen, and (b) the send path you aimed at —
@@ -49,17 +62,6 @@ Where plaintext legitimately exists on the device:
 - the **plain transport**, when you chose a non-attested endpoint — that
   endpoint reads plaintext by definition, and the audit's job is to confirm
   nothing else does and the UI never calls it sealed.
-
-**Keys are the second axis, and on the device they are as important as the
-messages.** A provider API key is what lets anyone bill you and speak as you;
-the near.ai key is the identity the whole attested session hangs on. "Private"
-for a key means: it exists in the Keychain and in the memory of a request to
-**the provider it belongs to**, and nowhere else. A key reaching a log, a file
-outside the Keychain, the general pasteboard, a URL query string, an exported
-script, a screenshot-able surface the user did not open, or **any host other
-than its own provider** — a probe, a catalog fetch, a third-party service — is
-a finding. The one pre-publish key finding was exactly that last kind: a
-certificate-agnostic TLS probe carrying the Bearer token.
 
 Everywhere else, plaintext is a finding. Two kinds of path count, and the
 second is the one that has actually produced findings:
@@ -102,9 +104,10 @@ of scope. `#if os(macOS)` branches are not a shipped product. `#if DEBUG`
 blocks are compiled out of the App Store binary and are read only to confirm
 the fence is real.
 
-Highest priority, in order: **renderer and every other no-tap path →
-send-path gate and seal → alternate entry points → model-callable tools →
-at-rest store and sidecars → logs and diagnostics → pasteboard → keys →
+Highest priority, in order: **keys (every request that carries one, the
+shared URL cache, entry, storage, export) → renderer and every other no-tap
+path → send-path gate and seal → alternate entry points → model-callable
+tools → at-rest store and sidecars → logs and diagnostics → pasteboard →
 dependencies and build config**. The [audit surface](audit-surface.md) says
 *where* each of these has actually produced a finding.
 
@@ -123,16 +126,16 @@ CLIENT PLAINTEXT-EXFILTRATION AUDIT — teemoon iPhone client (teemoon-ios).
 Defensive review of public open-source code (AGPL-3.0) to verify a privacy claim.
 
 THE TWO QUESTIONS
-(1) PLAINTEXT. On the user's device, can anything move prompt text or model
-replies to a place the user did not intend: a log, an unprotected or
-un-backup-excluded file, the system pasteboard, or a network destination other
-than the send path the user aimed at (the sealed near.ai request, the
-home/cloud endpoint they configured, or the on-device model)?
-(2) KEYS. Can a provider API key reach anywhere but the Keychain and a request
+(1) KEYS. Can a provider API key reach anywhere but the Keychain and a request
 to the provider it belongs to: a log, a file, a URL query, the general
 pasteboard, an exported script or share sheet, an unmasked screen the user did
 not open, or ANY host other than its own provider (a probe, a catalog fetch, a
 third-party service)?
+(2) PLAINTEXT. On the user's device, can anything move prompt text or model
+replies to a place the user did not intend: a log, an unprotected or
+un-backup-excluded file, the system pasteboard, or a network destination other
+than the send path the user aimed at (the sealed near.ai request, the
+home/cloud endpoint they configured, or the on-device model)?
 For both: count paths that need NO user action and paths driven by
 ADVERSARY-CONTROLLED content (a hostile or prompt-injected model reply, a tool
 result, a search-grounding snippet, a pasted document). Assume the model and
@@ -155,38 +158,7 @@ disprove each suspected leak before reporting it. A finding sensitive before
 it is fixed gets file:line pointers, never a working exploit recipe.
 
 SURFACES (each gets an explicit answer, clean or not)
-1. SEND PATH & EGRESS — is send-authorization ONE definition that the composer,
-   any retry/re-ask path, and every alternate entry consult; does E2EE sealing
-   fail CLOSED (throws; a byte-identical body throws; an attested provider with
-   no peer is refused); does the request session persist cookies/cache; any
-   URLSession anywhere that fetches a content-influenced URL.
-2. CONTENT RENDERERS — does any renderer (markdown, HTML, image, link preview,
-   favicon, embed, web view) fetch a URL from model or user content ON RENDER,
-   no tap. Read the vendored renderer's attachment/image loader and confirm
-   the app disables it on every transcript hosting root, streaming included.
-3. AT REST — the conversation store and EVERY sidecar holding message text
-   (search index, -wal, -shm): data-protection class and backup exclusion,
-   applied and RE-APPLIED each launch. The provider config file: no key in it.
-4. ALTERNATE ENTRY POINTS — Siri/Shortcuts intents, widgets, share/notification
-   extensions, URL schemes, Spotlight, Handoff, a re-send after backgrounding.
-   Each must go through the gate in (1).
-5. MODEL-CALLABLE TOOLS — enumerate every Tool the engine can offer. For each:
-   what content the model can put in its arguments, which host(s) it reaches,
-   whether it is opt-in, whether it fetches URLs the model chose, whether it
-   reads plaintext beyond the current thread (history search) and what it
-   returns to the model.
-6. ON-DEVICE INFERENCE — the native runtime the wrapper links: what it can log,
-   where stderr goes, any file it writes, any network it has. State plainly
-   what is a binary and could not be read.
-7. LOGS & DIAGNOSTICS — every Logger/os_log/print: could an argument carry a
-   body, a prompt, a key; at what privacy level; any bounded preview helper and
-   its bound. Every diagnostic writer (hang reporter, traces, stderr capture):
-   is it #if DEBUG, env-gated, or live in Release; where does it write; what
-   does it capture. Crash/analytics reporters.
-8. PASTEBOARD — are secrets confined to a local/concealed/expiring pasteboard;
-   any general-pasteboard or Handoff write that is not a user tap on visible
-   content; the debug panel's redaction on COPY (not just on screen).
-9. KEYS — trace every key from entry to exit. Entry: the field type
+1. KEYS — trace every key from entry to exit. Entry: the field type
    (SecureField / reveal toggle), autofill classification. Storage: Keychain
    accessibility class, synchronizable flag, backup behaviour; confirm no key
    in the config JSON, UserDefaults, or any file. Exit: ENUMERATE EVERY request
@@ -199,6 +171,37 @@ SURFACES (each gets an explicit answer, clean or not)
    self-verify script, a share sheet): confirm the key is read from the
    environment, never embedded. Log lines that interpolate a key at any
    privacy level. UI-test seeding compiled out.
+2. SEND PATH & EGRESS — is send-authorization ONE definition that the composer,
+   any retry/re-ask path, and every alternate entry consult; does E2EE sealing
+   fail CLOSED (throws; a byte-identical body throws; an attested provider with
+   no peer is refused); does the request session persist cookies/cache; any
+   URLSession anywhere that fetches a content-influenced URL.
+3. CONTENT RENDERERS — does any renderer (markdown, HTML, image, link preview,
+   favicon, embed, web view) fetch a URL from model or user content ON RENDER,
+   no tap. Read the vendored renderer's attachment/image loader and confirm
+   the app disables it on every transcript hosting root, streaming included.
+4. AT REST — the conversation store and EVERY sidecar holding message text
+   (search index, -wal, -shm): data-protection class and backup exclusion,
+   applied and RE-APPLIED each launch. The provider config file: no key in it.
+5. ALTERNATE ENTRY POINTS — Siri/Shortcuts intents, widgets, share/notification
+   extensions, URL schemes, Spotlight, Handoff, a re-send after backgrounding.
+   Each must go through the gate in (2).
+6. MODEL-CALLABLE TOOLS — enumerate every Tool the engine can offer. For each:
+   what content the model can put in its arguments, which host(s) it reaches,
+   whether it is opt-in, whether it fetches URLs the model chose, whether it
+   reads plaintext beyond the current thread (history search) and what it
+   returns to the model.
+7. ON-DEVICE INFERENCE — the native runtime the wrapper links: what it can log,
+   where stderr goes, any file it writes, any network it has. State plainly
+   what is a binary and could not be read.
+8. LOGS & DIAGNOSTICS — every Logger/os_log/print: could an argument carry a
+   body, a prompt, a key; at what privacy level; any bounded preview helper and
+   its bound. Every diagnostic writer (hang reporter, traces, stderr capture):
+   is it #if DEBUG, env-gated, or live in Release; where does it write; what
+   does it capture. Crash/analytics reporters.
+9. PASTEBOARD — are secrets confined to a local/concealed/expiring pasteboard;
+   any general-pasteboard or Handoff write that is not a user tap on visible
+   content; the debug panel's redaction on COPY (not just on screen).
 10. DEPENDENCIES & BUILD CONFIG — Package.resolved and Vendor/: any
     telemetry/analytics/crash SDK, any component with its own network client.
     Info.plist and entitlements: background modes, file sharing, ATS
