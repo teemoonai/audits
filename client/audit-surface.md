@@ -39,8 +39,11 @@ a server page, and it currently always contains one item (§8).
       fetch through the default session is archived to
       `Library/Caches/<bundle>/Cache.db` with its headers if the server's
       cache headers allow — the near.ai key was found there nine times after
-      one session. Confirm `urlCache = nil` or an ephemeral configuration on
-      every session that carries a key, and a cache purge on key removal.
+      one session. Confirm the shared cache is zero-capacity before any
+      session exists (1.0.3, `Support/SharedURLCache.swift`), or
+      `urlCache = nil` / an ephemeral configuration on every session that
+      carries a key, plus a cache purge on key removal — then measure it:
+      parse `Cache.db` after a live session.
       Found by the runtime pass; invisible to a source read that does not
       ask what the default session does.
 - [ ] No URL query item ever carries a key; the copy path's

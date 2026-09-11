@@ -103,18 +103,18 @@ resting place and one direction of travel:
 Keychain — AfterFirstUnlock, not synced           Providers/Keychain.swift
     │       (the providers file holds only the id)
     ├──▶ request header, ONLY to the key's own provider   (twelve sites; the page lists them)
-    │        └──▶ and, uninvited, the shared URL cache on disk   ← MEDIUM, every release
+    │        └──▶ and, until 1.0.3, the shared URL cache on disk   ← MEDIUM 1.0–1.0.2, fixed and measured closed at 1.0.3
     ├──▶ copy: local-only, expiring pasteboard         Views/PlatformChrome.swift
     ├──▶ debug panel: verbatim on screen when you open it; redacted on copy; never persisted
     └──▶ self-verify script: reads the key from the environment, never embeds it
 ```
 
-| Hop (key present) | Must never happen | At `v1.0.2` |
+| Hop (key present) | Must never happen | At `v1.0.3` |
 |---|---|---|
 | Entry field | Passwords autofill capturing it | clean — classed as a one-time code; the reveal toggle is user-held |
-| Keychain | sync; a key anywhere else on disk | by design: restores with an encrypted backup, no iCloud sync. **MEDIUM:** also on disk in the URL cache |
+| Keychain | sync; a key anywhere else on disk | by design: restores with an encrypted backup, no iCloud sync. Was also on disk in the URL cache at 1.0–1.0.2 (**MEDIUM, fixed 1.0.3**) |
 | Request headers | a host that is not the key's provider | clean — all twelve sites; the certificate-agnostic TLS probe carries no key (fixed pre-1.0) |
-| Shared URL cache | any authenticated request archived | **MEDIUM, fixed in 1.0.3** — the attestation-report fetch is archived with its `Authorization` header, nine copies after one session; zero at 1.0.3 |
+| Shared URL cache | any authenticated request archived | clean at 1.0.3 — the cache is zero-capacity before any session exists; zero archived requests after live and offline sessions, and a 1.0.2 container's copies removed on first launch. At 1.0–1.0.2 the attestation-report fetch was archived with its `Authorization` header, nine copies after one session (**MEDIUM, fixed 1.0.3**) |
 | URL query strings | a key in a URL | clean |
 | Logs | a key at any privacy level | clean — the Keychain logs the account name, never the value |
 | Error and debug records | persisted or copied unredacted | clean — memory-only; verbatim on screen by design; redacted on every copy path |
@@ -125,21 +125,21 @@ Keychain — AfterFirstUnlock, not synced           Providers/Keychain.swift
 
 Messages, walked exit by exit as the keys were above.
 
-| Exit | Carries, by design | Must never carry | At `v1.0.2` |
+| Exit | Carries, by design | Must never carry | At `v1.0.3` |
 |---|---|---|---|
 | **near.ai** | your messages, sealed on the device to the attested model's key; your near.ai key as the request's identity | plaintext — sealing fails closed, never falls back | clean |
 | **An endpoint you chose** (home server, Grok, Fireworks, custom) | plaintext, because you sent it there; the key you paired with it | anything to a second host | clean — by-design residual: that endpoint reads it |
 | **On-device model** | nothing leaves the process | — | clean for the app's code; the native runtime is a binary, **not traced** as source. Added 2026-09-10: its shipped bytes were checked — no HTTP stack linked, and no code path in it reaches its socket layer; a dynamic capture on a phone is still to do |
 | **Brave Search** | a search query the model writes, only if you added a Brave key | a fetched result URL; anything without your key | clean — by-design residual: the model chooses the words |
 | **The app's own store** | every message, twice (store + search index) | an unprotected or backed-up copy | clean — `.completeUnlessOpen`, backup-excluded, re-applied each launch |
-| **Keychain** | provider keys | a key anywhere else on disk | **MEDIUM, fixed in 1.0.3** — the near.ai key is also written to the shared URL cache on disk by the attestation-report fetch; by-design residual: keys restore through an encrypted backup |
+| **Keychain** | provider keys | a key anywhere else on disk | clean at 1.0.3 — at 1.0–1.0.2 the near.ai key was also written to the shared URL cache on disk by the attestation-report fetch (**MEDIUM, fixed 1.0.3**, measured); by-design residual: keys restore through an encrypted backup |
 | **Logs** | counts, provider names, fixed strings | message text or a key at any privacy level | clean |
 | **Pasteboard** | what you tap copy on; keys only to a local, expiring pasteboard | anything without a tap | clean |
-| **Files** | model weights, download bookkeeping, the providers file, UserDefaults | message text, a key | **LOW** — the user-edited system prompt is in UserDefaults, inside backups; **MEDIUM** — the URL cache holds the near.ai key; one env-gated developer log capture ships in the binary, unreachable without developer tooling |
+| **Files** | model weights, download bookkeeping, the providers file, UserDefaults | message text, a key | **LOW** — the user-edited system prompt is in UserDefaults, inside backups; the URL cache no longer holds the near.ai key (MEDIUM at 1.0–1.0.2, fixed 1.0.3); one env-gated developer log capture ships in the binary, unreachable without developer tooling |
 | **Attestation & provenance services** (near.ai reports, Intel, NVIDIA, GitHub, Sigstore, this repo) | quotes, nonces, digests, a chat id | a message; a key to anyone but near.ai | clean |
 | **Renderer** | — (it draws; it must not fetch) | a URL from a reply, fetched with no tap | clean — the one HIGH in the client's history, fixed before 1.0 |
 
-Evidence for every cell is on the [release page](teemoon-ios/v1.0.2-21d534e.md).
+Evidence for every cell is on the [release page](teemoon-ios/v1.0.3-7edcb55.md).
 
 ---
 

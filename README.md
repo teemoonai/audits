@@ -40,7 +40,7 @@ places, the device first, and on the device it asks about the keys first.
   **runtime pass** (the app built from the tag and run, with its endpoints,
   logs, Keychain attributes and container inspected), because the one
   deployed finding so far — the near.ai key at rest in the URL cache, fixed in
-  1.0.3 — was invisible to two independent source reads and found only by
+  1.0.3 and measured closed there — was invisible to two independent source reads and found only by
   running the app. Not gated by `index.json`: a client build carries no
   attested digest for a link to key on, and the pages say what binds the
   binary to the commit (the developer's word, or your own build). A daily

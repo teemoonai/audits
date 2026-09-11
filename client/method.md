@@ -86,6 +86,7 @@ it.
 | 1.0 (25) | `v1.0.0` | `2d9e206c099a6cd85289bd7c5af8a385c441b2bd` | 2026-08-31 / 09-01 | [`v1.0.0-2d9e206.md`](teemoon-ios/v1.0.0-2d9e206.md) |
 | 1.0.1 (26) | `v1.0.1` | `0dfad8bb4733ea8ca8140c6b33acc2a67e66fa75` | 2026-09-10 | [`v1.0.1-0dfad8b.md`](teemoon-ios/v1.0.1-0dfad8b.md) |
 | 1.0.2 (33) | `v1.0.2` | `21d534e6e6f70e750f5654e4b27ffc41592c4101` | 2026-09-10 | [`v1.0.2-21d534e.md`](teemoon-ios/v1.0.2-21d534e.md) |
+| 1.0.3 (35) | `v1.0.3` | `7edcb553bf8c028b74153ec41d1dd0139fcd485f` | 2026-09-11 | [`v1.0.3-7edcb55.md`](teemoon-ios/v1.0.3-7edcb55.md) |
 
 What is in scope at every release, and its plaintext exposure:
 
@@ -256,7 +257,7 @@ the server side's manifest-only checks. Verify these directly:
 - **`project.pbxproj`**: exactly one application target plus test bundles — no
   extension, widget, or share target; `TARGETED_DEVICE_FAMILY = 1`.
 - **`Package.resolved`**: enumerate every dependency; none is a
-  telemetry/analytics/crash SDK. At `v1.0.2` the app graph is AnyLanguageModel,
+  telemetry/analytics/crash SDK. At `v1.0.2` and `v1.0.3` the app graph is AnyLanguageModel,
   dcap-qvl-swift, EventSource, JSONSchema, PartialJSONDecoder, swift-atomics,
   swift-collections, swift-concurrency-extras, swift-nio, swift-secp256k1,
   swift-syntax, swift-system, swiftui-math; the vendored renderer adds pointfree
@@ -328,7 +329,7 @@ Record both as skipped when they are.
 2. **The one thing the tag cannot give you.** Nothing binds the binary Apple
    delivered to your phone to that commit: there is no build attestation, no
    reproducible build, and the developer builds and uploads from a workstation.
-   The App Store listing's version and build number (`1.0.2 (33)`) match the
+   The App Store listing's version and build number (`1.0.3 (35)`) match the
    tag's `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.pbxproj`,
    and that is the developer's claim, not a proof. This is the client-side
    counterpart of "GitHub Actions as trusted builder" on the server side, and
