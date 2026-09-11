@@ -97,7 +97,7 @@ outside near.ai is yellow because it reads your plaintext by definition.
 | **On-device model** | nothing leaves the process | — | clean — the app's code opens nothing, and the runtime binary itself links no HTTP stack and no code path in it reaches its socket layer (static capability check on the shipped bytes; dynamic capture on a phone still to do) |
 | **Brave Search** | a search query the model writes, only if you added a Brave key | a fetched result URL; anything without your key | clean — by-design residual: the model chooses the words |
 | **The app's own store** | every message, twice (store + search index) | an unprotected or backed-up copy | clean — `.completeUnlessOpen`, backup-excluded, re-applied each launch |
-| **Keychain** | provider keys | a key anywhere else on disk | **MEDIUM** — the near.ai key is also written to the shared URL cache on disk by the attestation-report fetch; by-design residual: keys restore through an encrypted backup |
+| **Keychain** | provider keys | a key anywhere else on disk | **MEDIUM, fixed in 1.0.3** — the near.ai key is also written to the shared URL cache on disk by the attestation-report fetch; by-design residual: keys restore through an encrypted backup |
 | **Logs** | counts, provider names, fixed strings | message text or a key at any privacy level | clean |
 | **Pasteboard** | what you tap copy on; keys only to a local, expiring pasteboard | anything without a tap | clean |
 | **Files** | model weights, download bookkeeping, the providers file, UserDefaults | message text, a key | **LOW** — the user-edited system prompt is in UserDefaults, inside backups; **MEDIUM** — the URL cache holds the near.ai key; one env-gated developer log capture ships in the binary, unreachable without developer tooling |
@@ -138,7 +138,7 @@ Keychain — AfterFirstUnlock, not synced           Providers/Keychain.swift
 | Entry field | Passwords autofill capturing it | clean — classed as a one-time code; the reveal toggle is user-held |
 | Keychain | sync; a key anywhere else on disk | by design: restores with an encrypted backup, no iCloud sync. **MEDIUM:** also on disk in the URL cache |
 | Request headers | a host that is not the key's provider | clean — all twelve sites; the certificate-agnostic TLS probe carries no key (fixed pre-1.0) |
-| Shared URL cache | any authenticated request archived | **MEDIUM** — the attestation-report fetch is archived with its `Authorization` header, nine copies after one session |
+| Shared URL cache | any authenticated request archived | **MEDIUM, fixed in 1.0.3** — the attestation-report fetch is archived with its `Authorization` header, nine copies after one session; zero at 1.0.3 |
 | URL query strings | a key in a URL | clean |
 | Logs | a key at any privacy level | clean — the Keychain logs the account name, never the value |
 | Error and debug records | persisted or copied unredacted | clean — memory-only; verbatim on screen by design; redacted on every copy path |

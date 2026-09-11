@@ -33,9 +33,9 @@ and will get its own lineage when it ships.
 
 | App Store release | tag → commit | verdict | review |
 |---|---|---|---|
-| 1.0 (25) | [`v1.0.0` → `2d9e206`](teemoon-ios/v1.0.0-2d9e206.md) | QUALIFIED-PASS — messages private; one HIGH (no-tap markdown-image auto-fetch) fixed before publish; MEDIUM key-in-URL-cache and LOW system-prompt-in-UserDefaults found later by running 1.0.2, present here | full review 2026-08-31; findings back-applied 2026-09-10 |
+| 1.0 (25) | [`v1.0.0` → `2d9e206`](teemoon-ios/v1.0.0-2d9e206.md) | QUALIFIED-PASS — messages private; one HIGH (no-tap markdown-image auto-fetch) fixed before publish; MEDIUM key-in-URL-cache (fixed in 1.0.3) and LOW system-prompt-in-UserDefaults found later by running 1.0.2, present here | full review 2026-08-31; findings back-applied 2026-09-10 |
 | 1.0.1 (26) | [`v1.0.1` → `0dfad8b`](teemoon-ios/v1.0.1-0dfad8b.md) | QUALIFIED-PASS (carried) — zero app-code change from 1.0; the 1.0 findings carry | tree comparison 2026-09-10 |
-| 1.0.2 (33) | [`v1.0.2` → `21d534e`](teemoon-ios/v1.0.2-21d534e.md) | QUALIFIED-PASS — no new sink in the delta and a live session opened no endpoint the map does not name; **runtime pass found the near.ai key at rest in the URL cache (MEDIUM, since 1.0)** and the system prompt in UserDefaults (LOW) | delta 2026-09-10, two blinded reviewers + runtime pass |
+| 1.0.2 (33) | [`v1.0.2` → `21d534e`](teemoon-ios/v1.0.2-21d534e.md) | QUALIFIED-PASS — no new sink in the delta and a live session opened no endpoint the map does not name; **runtime pass found the near.ai key at rest in the URL cache (MEDIUM, since 1.0, fixed in 1.0.3)** and the system prompt in UserDefaults (LOW) | delta 2026-09-10, two blinded reviewers + runtime pass |
 
 A release not listed here has not been audited. The same fail-closed rule the
 server-side pages follow applies: no page, no claim.

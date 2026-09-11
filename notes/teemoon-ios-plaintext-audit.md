@@ -7,7 +7,7 @@
 
 # teemoon iPhone client — can anything exfiltrate your plaintext?
 
-## verdict: QUALIFIED-PASS — messages reach only the send path you chose and the protected store, at App Store 1.0.2 (`21d534e`) and every release since 1.0; keys leave the device only to their own provider, but running the app found the near.ai key at rest in cleartext in the shared URL cache on disk (MEDIUM, since 1.0) and the user-edited system prompt in UserDefaults inside backups (LOW); one HIGH fixed before the 1.0 publish; the on-device runtime is not traced
+## verdict: QUALIFIED-PASS — messages reach only the send path you chose and the protected store, at App Store 1.0.2 (`21d534e`) and every release since 1.0; keys leave the device only to their own provider, but running the app found the near.ai key at rest in cleartext in the shared URL cache on disk (MEDIUM, since 1.0, fixed in 1.0.3) and the user-edited system prompt in UserDefaults inside backups (LOW); one HIGH fixed before the 1.0 publish; the on-device runtime is not traced
 
 The rest of this repo audits near.ai's side of end-to-end encryption: given
 that plaintext exists in the model CVM, can any attested server component copy
@@ -29,9 +29,9 @@ can claim is the commit its release tag points at, and each page pins it.
 
 | App Store release | tag → commit | verdict | page |
 |---|---|---|---|
-| 1.0 (25) | `v1.0.0` → `2d9e206` | QUALIFIED-PASS — one HIGH fixed pre-publish; MEDIUM key-in-URL-cache and LOW system prompt found later, present here | [`v1.0.0-2d9e206.md`](/client/teemoon-ios/v1.0.0-2d9e206.md) |
+| 1.0 (25) | `v1.0.0` → `2d9e206` | QUALIFIED-PASS — one HIGH fixed pre-publish; MEDIUM key-in-URL-cache (fixed in 1.0.3) and LOW system prompt found later, present here | [`v1.0.0-2d9e206.md`](/client/teemoon-ios/v1.0.0-2d9e206.md) |
 | 1.0.1 (26) | `v1.0.1` → `0dfad8b` | QUALIFIED-PASS (carried) — zero app-code change from 1.0 | [`v1.0.1-0dfad8b.md`](/client/teemoon-ios/v1.0.1-0dfad8b.md) |
-| 1.0.2 (33) | `v1.0.2` → `21d534e` | QUALIFIED-PASS — no new sink in the delta; runtime pass: no unlisted endpoint, but the near.ai key sits in the URL cache on disk (MEDIUM) | [`v1.0.2-21d534e.md`](/client/teemoon-ios/v1.0.2-21d534e.md) |
+| 1.0.2 (33) | `v1.0.2` → `21d534e` | QUALIFIED-PASS — no new sink in the delta; runtime pass: no unlisted endpoint, but the near.ai key sits in the URL cache on disk (MEDIUM, fixed in 1.0.3) | [`v1.0.2-21d534e.md`](/client/teemoon-ios/v1.0.2-21d534e.md) |
 
 A release with no row has not been reviewed; the same fail-closed rule this
 repo applies to server images applies here. The lineage, with what each page
