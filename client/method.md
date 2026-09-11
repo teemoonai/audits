@@ -300,6 +300,14 @@ sends and receives messages:
    that holds prompt text is a finding. The 1.0.2 pass found the near.ai key
    in that cache after neither source read had.
 
+5. **Binary capability check** for any compiled component that receives
+   plaintext (the on-device runtime): `otool -L` for linked frameworks,
+   `nm -u` for socket and resolver imports, `strings` for embedded hosts,
+   then `otool -tv` and a walk from every `connect` / `getaddrinfo` call site
+   one hop up to see whether any code outside the language runtime reaches
+   it. Record the slice's sha256 and the package pin. This is static, but it
+   is the only measurement of a binary that a simulator cannot run.
+
 What the simulator cannot measure: iOS data-protection classes are not
 enforced there, so the store's `.completeUnlessOpen` claim stays a source and
 unit-test claim; and the shipped UI-test harness runs the app on an in-memory

@@ -99,8 +99,13 @@ the conversation somewhere.
 
 - [ ] `Packages/LiteRTLM` is source; `CLiteRTLM.xcframework` is not. What the
       wrapper passes in, whether verbose logging has a caller, and where the
-      process's stderr goes are readable. What the binary prints and writes is
-      not. Every page carries this under *Not traced* until someone reads it.
+      process's stderr goes are readable from source. The binary's **network
+      capability** is readable from the bytes: `otool -L` for linked
+      frameworks, `nm -u` for socket imports, then `otool -tv` and a walk one
+      hop above every `connect` / `getaddrinfo` call to see whether anything
+      outside the Rust standard library reaches them. At v0.14.0 nothing does.
+      Redo it on every bump; record the slice's sha256. What it *writes* is
+      still not traced.
 - [ ] `captureNativeLogIfAsked`: env-gated stderr capture to
       `Documents/native.log`, present in the Release binary (not DEBUG-fenced).
       Unreachable without developer tooling and file sharing is off; still,
