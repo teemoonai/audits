@@ -94,7 +94,7 @@ outside near.ai is yellow because it reads your plaintext by definition.
 |---|---|---|---|
 | **near.ai** | your messages, sealed on the device to the attested model's key; your near.ai key as the request's identity | plaintext — sealing fails closed, never falls back | clean |
 | **An endpoint you chose** (home server, Grok, Fireworks, custom) | plaintext, because you sent it there; the key you paired with it | anything to a second host | clean — by-design residual: that endpoint reads it |
-| **On-device model** | nothing leaves the process | — | clean — the app's code opens nothing, and the runtime binary itself links no HTTP stack and no code path in it reaches its socket layer (static capability check on the shipped bytes; dynamic capture on a phone still to do) |
+| **On-device model** | nothing leaves the process | — | clean for the app's code; the native runtime is a binary, **not traced** as source. Added 2026-09-10: its shipped bytes were checked — no HTTP stack linked, and no code path in it reaches its socket layer; a dynamic capture on a phone is still to do |
 | **Brave Search** | a search query the model writes, only if you added a Brave key | a fetched result URL; anything without your key | clean — by-design residual: the model chooses the words |
 | **The app's own store** | every message, twice (store + search index) | an unprotected or backed-up copy | clean — `.completeUnlessOpen`, backup-excluded, re-applied each launch |
 | **Keychain** | provider keys | a key anywhere else on disk | **MEDIUM, fixed in 1.0.3** — the near.ai key is also written to the shared URL cache on disk by the attestation-report fetch; by-design residual: keys restore through an encrypted backup |
@@ -153,11 +153,13 @@ Keychain — AfterFirstUnlock, not synced           Providers/Keychain.swift
 3. **New tools.** A model-callable tool is a way for a hostile model to send
    the conversation somewhere. One that fetches a URL it chose, or reads other
    threads, changes the verdict.
-4. **The native runtime.** Plaintext goes into a binary. Its shipped bytes
-   have been checked: no networking framework, and no code path reaches the
-   socket layer the Rust standard library brings along. Re-run that check on
-   every LiteRT-LM bump; a version that gains a caller of `TcpStream::connect`
-   changes the verdict.
+4. **The native runtime.** Plaintext goes into a binary. A live near.ai
+   session has now been observed opening no unlisted endpoint; an on-device
+   session has not. Added 2026-09-10: its shipped bytes have been checked —
+   no networking framework, and no code path reaches the socket layer the
+   Rust standard library brings along. Re-run that check on every LiteRT-LM
+   bump; a version that gains a caller of `TcpStream::connect` changes the
+   verdict.
 5. **The shared URL session.** Anything authenticated that goes through it
    can land on disk if the server allows caching. Found by running the app,
    not by reading it — the reason the method now requires a runtime pass.
