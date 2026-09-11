@@ -1,4 +1,5 @@
-> **teemoonai/audits** — the teemoon iPhone client, plaintext and key exfiltration review.
+> **teemoonai/audits** — the teemoon iPhone client, key and plaintext exfiltration review.
+> (The filename predates the key axis and is frozen because published pages link it.)
 > This path is the stable entry point linked from published pages; the client
 > side now has the same shape as the server side and lives under
 > [`/client/`](/client/README.md). Method: [`/client/method.md`](/client/method.md)

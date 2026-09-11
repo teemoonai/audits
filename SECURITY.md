@@ -1,8 +1,10 @@
 # Security and disclosure
 
-This repository publishes privacy verdicts about **near.ai's confidential
-inference stack**. We do not operate any of the systems reviewed here. Two
-different things can be wrong, and they go to different places.
+This repository publishes exfiltration verdicts about two things: **near.ai's
+confidential inference stack** (can it leak your plaintext?) and **the teemoon
+app on your device** (can it leak your provider keys, or your plaintext?). We
+operate the app but none of the near.ai systems. Three different things can be
+wrong, and they go to different places.
 
 ## An error in a published verdict
 
@@ -22,6 +24,18 @@ publish it before they see it. **Report it to near.ai** through their own
 security contact. If you want us to know as well — for example because a
 published page asserts the absence of exactly that path — use the private
 channel below and say whether near.ai has been notified.
+
+## A vulnerability in the teemoon app
+
+A defect in the client — a provider key reaching a log, a file outside the
+Keychain, the pasteboard, or any host but its own provider; plaintext reaching
+anywhere but the send path you chose — is ours to fix, and the client repository
+has its own private channel:
+[teemoonai/teemoon-ios security advisories](https://github.com/teemoonai/teemoon-ios/security/advisories/new).
+Report it there, not here, so the fix and the disclosure stay together. If a
+page in this repository asserts the absence of exactly that path, say so in the
+report and we will correct the page with a dated addendum once the fix ships —
+the way the 1.0.2 URL-cache finding was handled.
 
 ## Private channel
 

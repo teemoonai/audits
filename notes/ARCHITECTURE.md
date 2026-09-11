@@ -25,7 +25,7 @@ third party) *can* read.
 ```mermaid
 flowchart TB
     subgraph client["teemoon iOS client (your device)"]
-        APP["Chat UI · E2EE encrypt/decrypt · on-device attestation verify"]
+        APP["Chat UI · E2EE encrypt/decrypt · on-device attestation verify · holds your provider keys"]
     end
 
     subgraph gw["GATEWAY CVM (sealed TDX enclave)"]
@@ -90,7 +90,7 @@ is confined to your device and the two model-node containers *behind* that nginx
 
 | Location | Images / components | Sees your plaintext? |
 |---|---|---|
-| **Your device** | teemoon iOS app | Yes — it composes the prompt and decrypts the reply (structural, both ends of E2EE) |
+| **Your device** | teemoon iOS app | Yes — it composes the prompt and decrypts the reply (structural, both ends of E2EE); it is also the only place your provider keys live, which the [client audit](/client/README.md) asks about first |
 | **Gateway CVM** | `cvm-ingress`, `cloud-api`, `dstack-vpc-client` + service-mesh, datadog/otel sidecars | **E2EE path: no** (ciphertext only). Degraded path: yes, as pass-through |
 | **Model node CVM** | `compose-manager` (+ launcher), `vllm-proxy-rs`, inner `nginx`, **SGLang engine**, `dstack-vpc`, datadog/otel sidecars | `vllm-proxy-rs` decrypts → **SGLang** is where plaintext legitimately lives. `compose-manager` deploys code but never sees messages |
 | **Outside the TEE** | External Postgres, Datadog `us3`, `telemetry.infra.near.ai`, Brave, HuggingFace | Postgres: only `/v1/responses` (teemoon never calls it). Telemetry: metadata/logs, verified content-free. Brave: opt-in search query. HF: weights in |

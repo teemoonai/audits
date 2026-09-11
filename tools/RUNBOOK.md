@@ -202,3 +202,28 @@ upstream that moves weekly.
   endpoint, a missing `--revision` pin, an unpublished build attestation. Those
   are asks to near.ai, not work items here. Record them on the page and raise
   them separately.
+
+
+## 7. Client drift — when `client-drift` files an issue
+
+The client has no attested identity; `tools/client_drift.py` compares the App
+Store tags of `teemoonai/teemoon-ios` with the pages under `client/teemoon-ios/`
+and files an issue when a tag has no page or its page pins a commit the tag no
+longer points at. Closing it is a different procedure from §1–§4, because
+there is no `index.json` gate and there are two questions, keys first:
+
+1. Pin identity: `git checkout <tag> && git rev-parse HEAD`; the page carries
+   the full sha. If the sha is on no branch, compare trees before calling the
+   page stale (the public history was re-rooted once).
+2. Run the delta form of the prompt in `client/method.md` §3 from the last
+   pinned commit — two blinded reviewers for anything beyond a version bump —
+   and re-read every cited line yourself.
+3. Run the runtime pass, `client/method.md` §4b: build the tag, drive the
+   shipped offline and live sessions on a simulator, record endpoints, logs,
+   Keychain attributes and the container, and parse the URL cache's archived
+   requests for a key. The one deployed client finding came from this step,
+   not from either source read.
+4. Publish `client/teemoon-ios/<tag>-<short sha>.md` in the page format, add
+   the row to `client/README.md` and `notes/teemoon-ios-plaintext-audit.md`,
+   and re-run `tools/client_drift.py` — exit 0 closes the issue on the next
+   scheduled run.
