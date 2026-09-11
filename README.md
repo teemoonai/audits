@@ -1,11 +1,12 @@
 # teemoon audits
 
-Source-level reviews answering one question about near.ai's confidential
-inference stack — **can anything exfiltrate your plaintext?** — and two about
-the teemoon app on your device — **can anything exfiltrate your provider
-keys, or your plaintext?** Keyed to exact identities (attested digests on the
-server side, release tags and commits on the client side), so a review only
-ever claims to cover the bytes it covered.
+Source-level reviews answering two questions about the teemoon app on your
+device — **can anything exfiltrate your provider keys, or your plaintext?** —
+and one about near.ai's confidential inference stack — **can anything
+exfiltrate your plaintext?** The device comes first because every user has a
+key at stake, whichever model they talk to. Keyed to exact identities (release
+tags and commits on the client side, attested digests on the server side), so
+a review only ever claims to cover the bytes it covered.
 
 **The model: one page per audited build, named by its attested identity.**
 `sha256-<digest>.md` *is* the review — verdict first, full analysis beneath —
@@ -17,15 +18,10 @@ never overclaim.
 
 ## The two sides of the question
 
-Your plaintext exists in two places — near.ai's sealed enclave, and your own
-device. Your provider keys exist in one: the device. This repo reviews both
-places, and on the device it asks about the keys first.
+Your provider keys exist in one place: your device. Your plaintext exists in
+two — your device, and near.ai's sealed enclave. This repo reviews both
+places, the device first, and on the device it asks about the keys first.
 
-- **Server side — near.ai's confidential-inference stack.** Per attested
-  identity: [`images/`](images/) (each plaintext-handling image),
-  [`manifests/`](manifests/) (the configs that define them), and
-  [`os/`](os/) (the guest OS underneath). Mapped end to end by
-  [`notes/ARCHITECTURE.md`](notes/ARCHITECTURE.md).
 - **Client side — the teemoon app on your device.** Per release, named by
   tag and commit: [`client/`](client/README.md) (one page per App Store
   release), mapped by [`client/ARCHITECTURE.md`](client/ARCHITECTURE.md), with
@@ -51,6 +47,11 @@ places, and on the device it asks about the keys first.
   [drift check](tools/client_drift.py) files an issue when a release has no
   page. Source: [teemoonai/teemoon-ios](https://github.com/teemoonai/teemoon-ios),
   AGPL-3.0.
+- **Server side — near.ai's confidential-inference stack.** Per attested
+  identity: [`images/`](images/) (each plaintext-handling image),
+  [`manifests/`](manifests/) (the configs that define them), and
+  [`os/`](os/) (the guest OS underneath). Mapped end to end by
+  [`notes/ARCHITECTURE.md`](notes/ARCHITECTURE.md).
 
 ## Scope rule
 

@@ -1,8 +1,8 @@
 # Security and disclosure
 
-This repository publishes exfiltration verdicts about two things: **near.ai's
-confidential inference stack** (can it leak your plaintext?) and **the teemoon
-app on your device** (can it leak your provider keys, or your plaintext?). We
+This repository publishes exfiltration verdicts about two things: **the teemoon
+app on your device** (can it leak your provider keys, or your plaintext?) and
+**near.ai's confidential inference stack** (can it leak your plaintext?). We
 operate the app but none of the near.ai systems. Three different things can be
 wrong, and they go to different places.
 
@@ -16,15 +16,6 @@ and the correction is credited unless you ask otherwise. Every claim a page make
 is meant to be checkable by anyone from the cited sources; a report that it is
 not checkable is itself a finding.
 
-## A vulnerability in the audited stack
-
-A defect in near.ai's software (sglang, vLLM, inference-proxy, compose-manager,
-dstack, the guest OS) is near.ai's to fix, and disclosing it here first would
-publish it before they see it. **Report it to near.ai** through their own
-security contact. If you want us to know as well — for example because a
-published page asserts the absence of exactly that path — use the private
-channel below and say whether near.ai has been notified.
-
 ## A vulnerability in the teemoon app
 
 A defect in the client — a provider key reaching a log, a file outside the
@@ -36,6 +27,15 @@ Report it there, not here, so the fix and the disclosure stay together. If a
 page in this repository asserts the absence of exactly that path, say so in the
 report and we will correct the page with a dated addendum once the fix ships —
 the way the 1.0.2 URL-cache finding was handled.
+
+## A vulnerability in the audited stack
+
+A defect in near.ai's software (sglang, vLLM, inference-proxy, compose-manager,
+dstack, the guest OS) is near.ai's to fix, and disclosing it here first would
+publish it before they see it. **Report it to near.ai** through their own
+security contact. If you want us to know as well — for example because a
+published page asserts the absence of exactly that path — use the private
+channel below and say whether near.ai has been notified.
 
 ## Private channel
 
