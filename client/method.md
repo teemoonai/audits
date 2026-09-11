@@ -2,11 +2,12 @@
 > Companion to the server-side method in [`/notes/method.md`](/notes/method.md).
 > Architecture: [`ARCHITECTURE.md`](ARCHITECTURE.md) · Surface: [`audit-surface.md`](audit-surface.md) · Pages: [`README.md`](README.md).
 
-# Plaintext-Exfiltration Source Audit — teemoon Client
+# Plaintext and Key Exfiltration Source Audit — teemoon Client
 
 A **tool-independent** procedure for auditing whether the teemoon app on your
-phone can move your plaintext — prompt text, model replies, or your provider
-API keys — to a place you did not intend. Like the server-side method it pins
+phone can move either of the two things it holds for you — your plaintext
+(prompt text and model replies) and your provider API keys — to a place you
+did not intend. Like the server-side method it pins
 exact source commits so that anyone — a different LLM/agent, an independent
 reviewer, or you — can run the identical review and compare. Its credibility
 must not depend on trusting any one tool, including the ones that produced the

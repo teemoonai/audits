@@ -1,11 +1,11 @@
-> **teemoonai/audits** — the teemoon iPhone client, plaintext-exfiltration review.
+> **teemoonai/audits** — the teemoon iPhone client, plaintext and key exfiltration review.
 > This path is the stable entry point linked from published pages; the client
 > side now has the same shape as the server side and lives under
 > [`/client/`](/client/README.md). Method: [`/client/method.md`](/client/method.md)
 > · Map: [`/client/ARCHITECTURE.md`](/client/ARCHITECTURE.md) · Surface:
 > [`/client/audit-surface.md`](/client/audit-surface.md).
 
-# teemoon iPhone client — can anything exfiltrate your plaintext?
+# teemoon iPhone client — can anything exfiltrate your plaintext or your keys?
 
 ## verdict: QUALIFIED-PASS — messages reach only the send path you chose and the protected store, at App Store 1.0.2 (`21d534e`) and every release since 1.0; keys leave the device only to their own provider, but running the app found the near.ai key at rest in cleartext in the shared URL cache on disk (MEDIUM, since 1.0, fixed in 1.0.3) and the user-edited system prompt in UserDefaults inside backups (LOW); one HIGH fixed before the 1.0 publish; the on-device runtime is not traced
 
