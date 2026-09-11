@@ -2,14 +2,18 @@
 > map in [`/notes/ARCHITECTURE.md`](/notes/ARCHITECTURE.md). Method:
 > [`method.md`](method.md) · Pages: [`README.md`](README.md).
 
-# Client Architecture — The Device, and Every Way Out of the App
+# Client Architecture — The Device, and Every Way Out of It for Messages and Keys
 
 On the server the map shows which processes see plaintext, because only two
 do. On the device that question has a one-word answer: the app does. It
-composes every prompt, decrypts every reply, and holds every key. So the
-map shows the app's parts, and the question it serves is **the exits** —
-every way anything can leave the app — and what each one is allowed to carry,
-which the table beneath it answers.
+composes every prompt, decrypts every reply, and holds every provider key. So
+the map shows the app's parts, and the question it serves is **the exits** —
+every way anything can leave the app — asked twice for each one: what
+**messages** may cross it, and what **keys** may. The exits table beneath the
+diagram answers the first; the key path and key table further down answer
+the second, because a key has one legitimate resting place (the Keychain)
+and one legitimate direction of travel (a request to its own provider), and
+that is a different set of checks from where a message may go.
 
 ```mermaid
 flowchart TB
@@ -89,6 +93,9 @@ outside near.ai is yellow because it reads your plaintext by definition.
 ---
 
 ## The exits, and the answer at the current pin
+
+Messages first. The same exits are walked again for keys in the
+[key table](#keys--the-second-thing-on-the-device-worth-stealing) below.
 
 | Exit | Carries, by design | Must never carry | At `v1.0.2` |
 |---|---|---|---|
