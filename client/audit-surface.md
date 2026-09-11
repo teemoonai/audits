@@ -107,6 +107,13 @@ the conversation somewhere.
       `getaddrinfo` call to see whether anything outside the Rust standard
       library reaches them. At v0.14.0 nothing does. Redo it on every bump;
       record the slice's sha256.
+- [ ] Added 2026-09-10 — the upstream source at the pinned tag, as the
+      complement: `Cargo.lock` for HTTP/TLS crates, the `tokenizers` feature
+      flags, socket/URL call sites in the shipped languages, the logging
+      severity control and whether any log statement streams text, and the
+      cache paths the runtime writes. Name the prebuilt dylibs the tree ships
+      and the external LiteRT pin; check the tag still points where the
+      vendored wrapper says it does (it moved once).
 - [ ] `captureNativeLogIfAsked`: env-gated stderr capture to
       `Documents/native.log`, present in the Release binary (not DEBUG-fenced).
       Unreachable without developer tooling and file sharing is off; still,
