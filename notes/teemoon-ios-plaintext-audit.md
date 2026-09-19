@@ -8,7 +8,7 @@
 
 # teemoon iPhone client — can anything exfiltrate your keys or your plaintext?
 
-## verdict: QUALIFIED-PASS — keys: they leave the device only to their own provider; the one deployed finding — the near.ai key at rest in cleartext in the shared URL cache on disk (MEDIUM, 1.0 through 1.0.2, found by running the app) — is fixed at App Store 1.0.3 (`7edcb55`) and measured closed; messages: they reach only the send path you chose and the protected store, at every release since 1.0, with the user-edited system prompt in UserDefaults inside backups (LOW); one HIGH fixed before the 1.0 publish; the on-device runtime is shown unable to reach the network, its file writes are not traced
+## verdict: QUALIFIED-PASS — keys: they leave the device only to their own provider; the one deployed finding — the near.ai key at rest in cleartext in the shared URL cache on disk (MEDIUM, 1.0 through 1.0.2, found by running the app) — is fixed at App Store 1.0.3 (`7edcb55`) and measured closed again at 1.0.4 (`3abe3e2`), where the fix was rewritten and seventeen key-bearing request sites, five of them new, each reach only the key's own provider; one INFO at 1.0.4 — a truncated hash of a keyed provider's key outlives the key in a catalogue file; messages: they reach only the send path you chose and the protected store, at every release since 1.0, with two LOWs, both since 1.0: the user-edited system prompt in UserDefaults inside backups, and three unfenced log statements that carry reply text and tool arguments (found by the 1.0.4 runtime pass at debug log level; redacted and unpersisted on a phone by platform default); one HIGH fixed before the 1.0 publish; the on-device runtime is shown unable to reach the network, its file writes are not traced
 
 The rest of this repo audits near.ai's side of end-to-end encryption: given
 that plaintext exists in the model CVM, can any attested server component copy
@@ -35,6 +35,7 @@ can claim is the commit its release tag points at, and each page pins it.
 | 1.0.1 (26) | `v1.0.1` → `0dfad8b` | QUALIFIED-PASS (carried) — zero app-code change from 1.0 | [`v1.0.1-0dfad8b.md`](/client/teemoon-ios/v1.0.1-0dfad8b.md) |
 | 1.0.2 (33) | `v1.0.2` → `21d534e` | QUALIFIED-PASS — no new sink in the delta; runtime pass: no unlisted endpoint, but the near.ai key sits in the URL cache on disk (MEDIUM, fixed in 1.0.3) | [`v1.0.2-21d534e.md`](/client/teemoon-ios/v1.0.2-21d534e.md) |
 | 1.0.3 (35) | `v1.0.3` → `7edcb55` | QUALIFIED-PASS — MEDIUM closed: zero archived requests after live and offline sessions, a 1.0.2 container's copies removed on first launch; no plaintext-path change; LOW carries | [`v1.0.3-7edcb55.md`](/client/teemoon-ios/v1.0.3-7edcb55.md) |
+| 1.0.4 (38) | `v1.0.4` → `3abe3e2` | QUALIFIED-PASS — seventeen key-bearing sites (five new), each to its own provider and run live; rewritten cache fix measured over a 1.0.2 container; INFO key-hash in a catalogue file; LOW reply text in log statements, since 1.0, found at debug log level; system-prompt LOW carries | [`v1.0.4-3abe3e2.md`](/client/teemoon-ios/v1.0.4-3abe3e2.md) |
 
 A release with no row has not been reviewed; the same fail-closed rule this
 repo applies to server images applies here. The lineage, with what each page

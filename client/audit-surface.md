@@ -40,7 +40,8 @@ a server page, and it currently always contains one item (§8).
       `Library/Caches/<bundle>/Cache.db` with its headers if the server's
       cache headers allow — the near.ai key was found there nine times after
       one session. Confirm the shared cache is zero-capacity before any
-      session exists (1.0.3, `Support/SharedURLCache.swift`), or
+      session exists (1.0.3; rewritten at 1.0.4 to delete the store's files,
+      purge removed — `Support/SharedURLCache.swift`), or
       `urlCache = nil` / an ephemeral configuration on every session that
       carries a key, plus a cache purge on key removal — then measure it:
       parse `Cache.db` after a live session.
@@ -179,7 +180,13 @@ the conversation somewhere.
 - [ ] Every `Logger(subsystem: "ai.teemoon")` line whose interpolation could be
       a body, a prompt, a key, or a header block: privacy level, and whether a
       bounded preview helper (`previewForLog`, 2048 bytes, `.private`) is the
-      only way a body reaches a log.
+      only way a body reaches a log. **It is not** (LOW, since 1.0, found at
+      1.0.4): `Inference/ChatGeneration.swift:358` logs the first 120
+      characters of each reply, `Inference/GenerationEngine.swift:392` a tool
+      call's arguments, `:307` stripped reply fragments — unfenced, default
+      privacy. A delta review never reads them because no release touches
+      them; grep every `logger.` call in the tree, not the diff, and stream
+      the runtime pass's log at `--level debug`.
 - [ ] `DiagLog` (env-gated stderr): enumerate every call site; counts and
       literals only.
 - [ ] `Support/MainThreadHangReporter.swift` and `Views/Chat/ScrollTrace.swift`
