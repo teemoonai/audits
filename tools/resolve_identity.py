@@ -54,6 +54,9 @@ import urllib.request
 REPO_ALIASES = {"compose-manager-launcher": "compose-manager",
                 "vllm-proxy-rs": "inference-proxy"}
 
+# Where near.ai's own image-build workflows (and their Dockerfiles) live.
+BUILD_REPO = "nearai/cvm-compose-files"
+
 ACCEPT = ",".join([
     "application/vnd.oci.image.index.v1+json",
     "application/vnd.docker.distribution.manifest.list.v2+json",
@@ -118,10 +121,17 @@ def split_ref(ref):
 
 def rung_signed(image, digest):
     name = image.split("/")[-1]
-    repo = f"nearai/{REPO_ALIASES.get(name, name)}"
-    st, body = get(f"https://api.github.com/repos/{repo}/attestations/sha256:{digest}", gh_headers())
-    if st != 200:
-        return None, f"repo-level {repo}: HTTP {st}"
+    # near.ai's own engine builds (nearaidev/sglang since 2026-09) are published
+    # by workflows in the compose repo, so the attestation lives there, not under
+    # a repo named after the image. Ask the named repo first, then that one.
+    misses = []
+    for repo in dict.fromkeys([f"nearai/{REPO_ALIASES.get(name, name)}", BUILD_REPO]):
+        st, body = get(f"https://api.github.com/repos/{repo}/attestations/sha256:{digest}", gh_headers())
+        if st == 200:
+            break
+        misses.append(f"repo-level {repo}: HTTP {st}")
+    else:
+        return None, "; ".join(misses)
     try:
         atts = json.loads(body).get("attestations") or []
     except Exception:
@@ -134,7 +144,8 @@ def rung_signed(image, digest):
         try:
             p = json.loads(base64.b64decode(a["bundle"]["dsseEnvelope"]["payload"]))["predicate"]["buildDefinition"]
             seen.append((p["resolvedDependencies"][0]["digest"].get("gitCommit"),
-                         p["externalParameters"]["workflow"].get("ref", "?")))
+                         p["externalParameters"]["workflow"].get("ref", "?")
+                         + "  " + p["externalParameters"]["workflow"].get("path", "")))
         except Exception:
             continue
     if not seen:
@@ -151,6 +162,8 @@ def rung_signed(image, digest):
 def registry_for(image):
     """-> (registry_host, repo_path, token_url). nvcr.io uses a different token
     endpoint than Docker Hub; discovered the hard way."""
+    if image.startswith("docker.io/"):               # the hub's API host is not its name
+        image = image[len("docker.io/"):]
     parts = image.split("/")
     if parts[0].count(".") or ":" in parts[0]:
         host, repo = parts[0], "/".join(parts[1:])
@@ -176,7 +189,10 @@ def image_config(image, digest):
     st, b = get(f"{base}/sha256:{digest}", headers)
     if st != 200:
         return None, f"manifest HTTP {st}"
-    m = json.loads(b)
+    try:
+        m = json.loads(b)
+    except Exception:
+        return None, "manifest undecodable (registry returned a non-JSON body)"
     child = next((x["digest"] for x in m.get("manifests", [])
                   if (x.get("platform") or {}).get("architecture") == "amd64"), None) \
         or f"sha256:{digest}"
@@ -189,6 +205,15 @@ def image_config(image, digest):
     if st != 200:
         return None, f"config blob HTTP {st}"
     return json.loads(b), None
+
+
+BUILD_LABELS = ["nearai.build.recipe", "nearai.build.source_revision",
+                "org.opencontainers.image.base.name", "org.opencontainers.image.base.digest"]
+
+
+def build_labels(cfg):
+    labels = (cfg.get("config") or {}).get("Labels") or {}
+    return {k: labels[k] for k in BUILD_LABELS if labels.get(k)}
 
 
 # ---- rung 2: OCI build labels ---------------------------------------------
@@ -264,9 +289,18 @@ def main():
             print(f"        {c[:12]}  {ref}")
 
     cfg, err = image_config(image, digest)
+    build = {}
     if err:
         print(f"  [!] registry: {err}")
     else:
+        # A signed attestation names a workflow and a commit, and one workflow
+        # can build several recipes (a `variant` input). Which Dockerfile, and
+        # on top of which base image, is stated only by the image's own labels
+        # -- read them even on a rung-1 hit. Inferring the recipe directory
+        # from the workflow's name scoped one review to the wrong patch stack.
+        build = build_labels(cfg)
+        for k, v in build.items():
+            print(f"        label {k} = {v}")
         if not resolved:
             r, note = rung_labels(cfg)
             print(f"  [2] OCI build label     {'HIT' if r else 'miss'}  — {note}")
@@ -310,6 +344,21 @@ def main():
         if cls == "signed attestation":
             print("- Class note: this is the STRONGEST binding in the repo — a signed provenance "
                   "attestation, not a self-asserted label. Say so on the page.")
+        if cls == "signed attestation" and resolved.get("repo") == BUILD_REPO:
+            print("- This commit pins the BUILD RECIPE, not the engine source, and the workflow can build "
+                  "more than one recipe. The image's own labels (self-asserted; check them against the "
+                  "workflow's pinned hashes) say which:")
+            if build.get("nearai.build.recipe"):
+                print(f"  - recipe `{build['nearai.build.recipe']}` at `{build.get('nearai.build.source_revision', '?')}`")
+            else:
+                print("  - NO `nearai.build.recipe` label — the recipe directory is NOT established; "
+                      "do not infer it from the workflow name")
+            if build.get("org.opencontainers.image.base.digest"):
+                print(f"  - built FROM `{build.get('org.opencontainers.image.base.name', '?')}@"
+                      f"{build['org.opencontainers.image.base.digest']}` — if that base has no page, its "
+                      "patches are in scope too: follow the chain down to an audited digest")
+            print("  Read that Dockerfile for the upstream source repo and commit and every patch applied; "
+                  "the tree to review is the upstream source plus the whole patch stack.")
         print(f"- Read source at `https://raw.githubusercontent.com/{resolved.get('repo')}/"
               f"{resolved.get('commit')}/<path>`")
         print("- Walk `notes/audit-surface.md` and report anything you could not reach under "

@@ -20,10 +20,35 @@ what it returns without checking the load-bearing claims yourself.
 
 ---
 
-## 0. Read the issue
+## 0. Preflight, then read the issue
 
-It lists what is unaudited, and on which hosts. Sort by blast radius: an engine
-that sees plaintext on nine hosts outranks a telemetry sidecar on one.
+```
+python3 tools/prep_drift.py --samples 24 --out <dir>
+```
+
+The issue body is a snapshot, and reviewing is the expensive step — so
+everything that can be established without a model is established first, in
+about thirty seconds. The script re-runs the sweep and reports what moved since
+the issue was filed; samples each affected host enough times to find a second
+CVM behind one name; runs step 1 below for every image; and for each target
+writes a brief block and the evidence it names. For a recipe that is the file at
+its log-pinned commit, the patch against the newest audited revision (or the
+nearest audited sibling when the path is new), and — because near.ai deploys
+with service-scoped `compose up` — a table of which revision last created each
+running container, with a patch for each. For an image it is the source diff
+between the old pin and the new.
+
+The first run of it (2026-10-02, issue #8) is the argument for it: the issue
+named one recipe revision; by the time the session opened that revision was
+superseded and seven other identities were live and unaudited, one of which the
+three-sample sweep itself had missed.
+
+Exit 2 means stop: no network, or an integrity break. Exit 0 means the drift
+closed by itself.
+
+The targets come out sorted by blast radius: an engine that sees plaintext on
+nine hosts outranks a telemetry sidecar on one. Review images before the
+recipes that name them.
 
 Check the **KNOWN OPEN** section too. Those are recorded in
 [`acknowledged.json`](acknowledged.json) and are not new — they are a backlog,

@@ -36,6 +36,8 @@ time; `python3 tools/fleet_drift.py` says which hashes are live today.
 | [`341313aed433…`](sha256-341313aed4336a5fb592cef58004b3abc82f2ba751df32be69f3169eeba40c14.md) | gpu30 | glm-5-3-flash | no-Datadog, dstack 0.5.11, gateway off | QUALIFIED PASS at the manifest layer | 2026-09-01 |
 | [`c82b1a2eaf69…`](sha256-c82b1a2eaf6996154a5f39ae621643f034b082d5e51edd3d2ba6009273881d86.md) | gpu04 | glm-5-3-flash (second CVM) | no-Datadog, dstack 0.5.11, gateway off | QUALIFIED PASS at the manifest layer | 2026-09-02 |
 | [`533e43fd215d…`](sha256-533e43fd215d56ec6cd719adb5defe6615f7ba6ae0b018e832f7c8dadf2e25d4.md) | gpu02 | glm-5-3-flash (second CVM, replaced gpu30) | no-Datadog, dstack 0.5.11, gateway off | QUALIFIED PASS at the manifest layer | 2026-09-10 |
+| [`55db164f4f8c…`](sha256-55db164f4f8c6a837c2217c601c21bba4758f908536a6cd5b2978550205a9179.md) | gpu03 | glm-5-3-flash (one of two CVMs, beside gpu04) | no-Datadog, dstack 0.5.11, gateway off | QUALIFIED PASS at the manifest layer | 2026-10-02 |
+| [`945bcfade2ae…`](sha256-945bcfade2aec53a19da7638774a99caea11395ec03e572a13357a0c63b152b4.md) | gpu23 | glm-5-3-flash-long (one of two CVMs, beside gpu02) | no-Datadog, dstack 0.5.11, gateway off; exporter points at the **staging** telemetry host | QUALIFIED PASS at the manifest layer | 2026-10-02 |
 
 A hash not listed here has not been audited — the teemoon app shows no audit
 link for it (fail-closed by design).

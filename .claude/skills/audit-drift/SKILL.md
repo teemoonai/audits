@@ -13,23 +13,64 @@ review: establish identity, commission it, verify it, publish it.
 Read [`tools/RUNBOOK.md`](../../../tools/RUNBOOK.md) before starting. It has the
 reasoning; this file has the mechanics.
 
-## 1. Read the issue and triage
-
-`gh issue list --label fleet-drift` then read it. Sort targets by blast radius —
-an engine that sees plaintext on nine hosts outranks a telemetry sidecar on one.
-Ignore the **KNOWN OPEN** section; those are recorded in
-`acknowledged.json` and are backlog, not alarm.
-
-## 2. Resolve identity — before commissioning anything
+## 0. Preflight — one command, before you read anything else
 
 ```bash
-python3 tools/resolve_identity.py --brief <image>@sha256:<digest>
+python3 tools/prep_drift.py --samples 24 --out <scratch dir>/prep
 ```
 
-A review keyed to the wrong tree is worse than no review. Never let an agent go
+About 30 seconds, no model. It re-runs the sweep, says what moved since the
+issue was filed, samples every affected host deeply enough to find a second CVM
+behind one name, resolves every image, and writes one `brief-N-<kind>-<id>.txt`
+per target plus the evidence each names (the recipe at its pinned commit, the
+patch against the audited base, a patch per older revision still running, the
+source diff between an image's old and new pins, the measured compose).
+
+Its stdout is the triage. Act on it, not on the issue body:
+
+- **exit 2** — no network, or an integrity break. Stop. Commission nothing; a
+  reviewer that cannot reach the source can only write INCONCLUSIVE, at full price.
+- **exit 0** — the drift closed by itself. Nothing to do.
+- **"THE FLEET MOVED"** — the issue is stale. The target list is the script's.
+  A reviewer pointed at a superseded hash is the most expensive mistake available.
+- **DELTA / SIBLING / NEW** on each target decides the brief (step 3).
+
+Do not re-derive by hand anything a brief file states. Do spot-check one hash
+and one line of each patch before you send it — the script is evidence handed
+to a reviewer as given, and it is yours to vouch for.
+
+## 1. Triage
+
+Targets come out sorted by blast radius — an engine that sees plaintext on nine
+hosts outranks a telemetry sidecar on one. **KNOWN OPEN** items are recorded in
+`acknowledged.json` and are backlog, not alarm.
+
+Plan the waves before spawning anything:
+
+- **Images before the recipes that name them.** A recipe page defers per-image
+  behavior to the image page and checks the deployed flags against that page's
+  findings; it cannot do that against a page that does not exist yet.
+- **One reviewer per target**, except where the script reports near-twins (two
+  measured harnesses differing by an instance label): one reviewer, both pages.
+- **Never spawn for what is already covered.** Everything a brief file marks
+  `[audited]` is cited, not re-reviewed.
+
+## 2. Identity — given, never hunted
+
+The brief file carries `resolve_identity.py --brief` output for every image. A
+review keyed to the wrong tree is worse than no review; never let an agent go
 hunting for its own target — that is how budget evaporates with nothing to show.
 
-If it reports **UNRESOLVED**, skip to step 6.
+A signed attestation names a workflow and a commit, not a Dockerfile: one
+near.ai workflow builds several recipe variants. The recipe directory and the
+base image come from the image's own labels, which the brief file prints as a
+**build chain**. Every layer in that chain marked `NO PAGE` is in scope — the
+review covers the whole patch stack down to the first audited digest. Never
+infer the recipe from a workflow's name; that scoped one review to a single
+patch when the image carried eleven.
+
+If an image is **UNRESOLVED**, try the two hand routes the script names (ghcr
+anonymous pull token; upstream release digest) and only then go to step 6.
 
 ## 3. Commission the review
 
@@ -39,8 +80,32 @@ wider fan-out has hit the session limit twice, the second time losing seven
 agents' work.
 
 For a deployment config or recipe manifest, the target is a document rather than
-an image: skip step 2 and say so in the brief (`method.md` §4 is the method —
-no upstream source reading).
+an image: say so in the brief (`method.md` §4 is the method — no upstream
+source reading).
+
+### What goes in, by kind
+
+The brief names the target's `brief-N-….txt` and tells the reviewer to Read it
+first; do not retype it. Then, by what the preflight called the target:
+
+- **DELTA (same file, or same image ref)** — name the base page and the patch
+  file. The reviewer accounts for every hunk, states which base findings carry
+  and re-verifies each carried finding **at the new bytes** (line numbers
+  move). The whole-target sink sweep stays mandatory — the audit-surface walk
+  over the entire new file or tree, not only the changed hunks. A finding once
+  sat in untouched lines through three delta reviews.
+- **SIBLING (new file, nearest audited relative)** — the patch is orientation,
+  not scope. This is a full document review that may cite the sibling page for
+  blocks it proves byte-identical.
+- **NEW** — full review.
+- **Recipe, any kind** — the per-service table is part of the target: the
+  attested hash is the last file touched, and containers created from older
+  revisions are still running. The reviewer reads each `.running.patch` and says
+  what the running container differs by. An unaudited older revision that still
+  runs an engine is a finding-shaped fact, not a footnote.
+
+Model stays `fable` and the Rules section stays whole whatever the size of the
+delta. What a small delta buys is a shorter review, not a cheaper reviewer.
 
 ### Brief template
 
@@ -67,8 +132,12 @@ reaching a log, file, DB, cache, crash dump, telemetry exporter, or non-model
 network destination is a FINDING.
 
 ## Target — identity is GIVEN, do not re-derive
-<paste the block resolve_identity.py --brief printed, including the identity
-class and its caveat>
+Read <evidence dir>/brief-N-<kind>-<id>.txt FIRST. It was produced mechanically
+by tools/prep_drift.py and spot-checked by the orchestrator: identity (class
+and caveat included), page path, base page, patch files, per-service running
+revisions, and the audit status of every image named. Everything it lists is
+in <evidence dir>. If anything in it fails when you re-hash or re-read it,
+stop and say so — do not work around it.
 
 ## Where it runs
 <service name(s)> in <compose file>, on disk at <path>. READ IT and follow the
@@ -113,8 +182,11 @@ that is the dominant token cost. One Write per page.
 ## Output
 Write the page yourself with the Write tool to:
   <exact repo-relative path, from the frozen path spec>
-Write it AS SOON AS the findings exist and refine in place — an interrupted run
-loses only unwritten pages. Do NOT edit index.json; the orchestrator gates links
+Write a SKELETON page to that path BEFORE verifying anything — title, verdict
+line reading `## verdict: INCONCLUSIVE — review in progress`, the identity
+table, finding headings as you form them, TODO markers for unconfirmed line
+numbers — then refine in place. A partial page is recoverable; an unwritten
+one is not, and the session limit gives no warning. Do NOT edit index.json; the orchestrator gates links
 after verifying.
 
 Then return ONLY a compact summary (max 20 lines): the one-line verdict, finding
@@ -124,7 +196,10 @@ orchestrator to re-verify independently. Do NOT paste the page contents back.
 
 ## 4. Verify before publishing — do not skip
 
-The agent's summary is a claim, not evidence. Check, in priority order:
+The agent's summary is a claim, not evidence. You are not re-doing the review:
+a citation resolves to the claimed content or it does not — two to four
+commands a page, `grep -n` / `sed -n` against the evidence directory and the
+clone, never a second full read. Check, in priority order:
 
 1. the finding the verdict rests on
 2. anything the agent asked you to re-verify
@@ -146,7 +221,13 @@ python3 tools/index_page.py <page> --commit <repo>@<full-40-hex-sha>
 `--commit` only when identity is a real binding (signed attestation, OCI label,
 release tag). A bracketed range is not a pin.
 
-Then commit and push. The next scheduled run closes the issue.
+Run the indexer only when **no in-progress page is on disk** (`git status
+--short` first): it reads every page's verdict line, skeletons included.
+
+Add the row to the lineage README beside each page. Then commit and push, and
+re-run `python3 tools/prep_drift.py`. **Exit 0 is the finish line** — the fleet
+redeploys mid-session, and a new target after a publish is normal, not a
+mistake. The next scheduled run closes the issue.
 
 ## 6. When identity cannot be established
 
