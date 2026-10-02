@@ -149,8 +149,18 @@ def capture_cvms(domains, samples):
     return list(cvms.values())
 
 
-def service_names(text):
-    return [b.split("\n")[0].strip().rstrip(":") for b in fd.service_blocks(fd.compose_yaml(text))]
+def service_names(text, default_only=False):
+    """Service names in a compose file. `default_only` drops profile-gated
+    services: a project-wide `up` does not start them, and listing them as
+    running from that revision was wrong on the first run of this script."""
+    yaml = fd.compose_yaml(text)
+    anchors = fd.anchor_blocks(yaml)
+    out = []
+    for b in fd.service_blocks(yaml):
+        if default_only and re.search(r"^\s*profiles:", fd.expand(b, anchors), re.M):
+            continue
+        out.append(b.split("\n")[0].strip().rstrip(":"))
+    return out
 
 
 def service_table(actions, content_of):
@@ -168,7 +178,7 @@ def service_table(actions, content_of):
             continue
         if not svcs:
             body = content_of(a.get("commit"), a.get("file"))
-            svcs = service_names(body.decode("utf-8", "replace")) if body else []
+            svcs = service_names(body.decode("utf-8", "replace"), default_only=True) if body else []
             if not svcs:
                 svcs = [f"<all services of {a.get('file')} — file unavailable>"]
         for s in svcs:

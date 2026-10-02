@@ -19,6 +19,7 @@ verdict column is each page's own `## verdict:` line, truncated.
 | [`ce39ea4cfe0d…`](sha256-ce39ea4cfe0ddf4dc2e4fbb96b6c66ab9f72954444d5419b196d06940db5e297.md) | LEAKS — the FLUX diffusion service this file launches logs every user prompt at INFO and writes every… | 2026-08-21 |
 | [`cb9040a3e32a…`](sha256-cb9040a3e32a0e9157baf26b804d95a3ec55b91d9ae87383e0acd4300490078e.md) | LEAKS — the FLUX diffusion service this file launches logs every user prompt at INFO and writes every… | 2026-09-01 |
 | [`a03816ba0c73…`](sha256-a03816ba0c737f1ed438bd595bbd6fba6ed1657bff4283c02655e06f1729df60.md) | LEAKS — the FLUX diffusion service this file launches still logs every user prompt at INFO and writes every… | 2026-09-10 |
+| [`65724b385465…`](sha256-65724b385465af96a1062c2524cf78d791ebd54051d61e63008353a8f5416284.md) | LEAKS — the FLUX prompt log and image-to-disk carry; GLM-5.1 replaced by a GLM-5.3 Flash engine on the signed 47aff791 build, whose glm47 parser warning joins the unredacted export; every proxy on d61357da… | 2026-10-02 |
 
 A revision not listed here has not been audited — the teemoon app shows no audit
 link for it (fail-closed by design). `python3 tools/fleet_drift.py` reports which
