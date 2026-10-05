@@ -1279,6 +1279,20 @@
         "qualifier": "deployed: ON",
         "title": "identity: signed for repository, workflow and commit; recipe by label and pinned hashes; content verified from the layers",
         "anchor": "info-deployed-on--identity-signed-for-repository-workflow-and-commit-recipe-by-label-and-pinned-hashes-content-verified-from-the-layers"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON, one recipe",
+        "title": "the two mamba-state flags size and retype the linear-attention state pool; every line they can cause to be printed is configuration, no file, socket or exporter reads the flags or the state, and the one thing they enlarge is the batch the existing watchdog dump prints \u2014 sink: none (memory only)",
+        "anchor": "info-deployed-on-one-recipe--the-two-mamba-state-flags-size-and-retype-the-linear-attention-state-pool-every-line-they-can-cause-to-be-printed-is-configuration-no-file-socket-or-exporter-reads-the-flags-or-the-state-and-the-one-thing-they-enlarge-is-the-batch-the-existing-watchdog-dump-prints--sink-none-memory-only"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "the HiCache host tier holds recurrent linear-attention state as well as KV: checkpoints of finished conversations stay in GPU memory and in pinned host RAM until LRU eviction, freed slots are not zeroed, and the storage gates that keep KV off disk and network sit above this pool too \u2014 sink: none (memory only)",
+        "anchor": "info-deployed-on--the-hicache-host-tier-holds-recurrent-linear-attention-state-as-well-as-kv-checkpoints-of-finished-conversations-stay-in-gpu-memory-and-in-pinned-host-ram-until-lru-eviction-freed-slots-are-not-zeroed-and-the-storage-gates-that-keep-kv-off-disk-and-network-sit-above-this-pool-too--sink-none-memory-only"
       }
     ],
     "images/docker.io/nearaidev/sglang/sha256-5bc4bc0dfd3629af7e57168098b5e76b4206dcb02b8ed8a872aebfd153ff240b.md": [

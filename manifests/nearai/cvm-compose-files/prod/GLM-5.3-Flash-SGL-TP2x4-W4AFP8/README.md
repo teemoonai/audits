@@ -15,7 +15,7 @@ verdict column is each page's own `## verdict:` line, truncated.
 | file_sha256 | verdict | review |
 |---|---|---|
 | [`5745db6b0d3e…`](sha256-5745db6b0d3e4a4f1ff6872acbf90da254ef83ca834c0bfd4cffb86f540ff781.md) | LEAKS — narrowly: the glm47 parser warning on four replicas, shipped unscrubbed to telemetry.infra.near.ai; first audited revision, reviewed whole | 2026-10-02 |
-| [`e3c487c72189…`](sha256-e3c487c72189010f5afadc486c8c04ffb3a49a4d485827844e7c8fd105729359.md) | LEAKS — narrowly, unchanged in kind: delta against `5745db6b`; two mamba-state flags raise the running cap from 15 to 32 per replica (engine side not traced), so the armed watchdog dump can carry more; engines run this hash, sidecars the base | 2026-10-04 |
+| [`e3c487c72189…`](sha256-e3c487c72189010f5afadc486c8c04ffb3a49a4d485827844e7c8fd105729359.md) | LEAKS — narrowly, unchanged in kind: delta against `5745db6b`; two mamba-state flags raise the running cap from 15 to 32 per replica (engine side read in the 47aff791 page's addendum: no sink), so the armed watchdog dump can carry more; engines run this hash, sidecars the base | 2026-10-04 |
 
 A revision not listed here has not been audited — the teemoon app shows no audit
 link for it (fail-closed by design). `python3 tools/fleet_drift.py` reports which
