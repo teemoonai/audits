@@ -326,7 +326,7 @@ def brief_recipe(t, cvms, idx, clone, out, target_ids):
     # --- what is actually running: per-service revisions, per CVM
     for c in mine:
         table = service_table(c["actions"], content_of)
-        groups, firsts, gone, other = {}, {}, [], {}
+        groups, firsts, gone, other, same_bytes = {}, {}, [], {}, {}
         for svc, a in table.items():
             if a.get("file") != path:
                 if svc not in declared:     # same name = recreated from this file's lineage; else a stranger
@@ -336,6 +336,10 @@ def brief_recipe(t, cvms, idx, clone, out, target_ids):
             s = (a.get("file_sha256") or "?").lower()
             firsts.setdefault(s, (s, a.get("commit"), a.get("tag"), (a.get("timestamp") or "")[:16]))
             groups.setdefault(firsts[s], []).append(svc)
+            # one hash can be upped from several commits; the label must not pin them all to the first
+            cs = same_bytes.setdefault(s, [])
+            if a.get("commit") and a["commit"] not in cs:
+                cs.append(a["commit"])
         L.append("")
         L.append(f"running on {', '.join(sorted(c['hosts']))} — one CVM, measured harness {c['compose_hash'][:12]}, "
                  f"{len(c['actions'])}-entry action log:")
@@ -345,7 +349,9 @@ def brief_recipe(t, cvms, idx, clone, out, target_ids):
             mark = "THIS FILE" if s == sha else ("audited" if s in audited else "NOT audited")
             live = sorted(x for x in svcs if x in declared)
             stale = sorted(x for x in svcs if x not in declared)
-            line = f"  {s[:12]} @ {str(cm)[:8]} ({tg}, {ts[:10]}) [{mark}] — {', '.join(live) or '-'}"
+            also = [x[:8] for x in same_bytes.get(s, []) if x != cm]
+            line = (f"  {s[:12]} @ {str(cm)[:8]}{' and ' + ', '.join(also) + ' (same bytes)' if also else ''} "
+                    f"({tg}, {ts[:10]}) [{mark}] — {', '.join(live) or '-'}")
             if s != sha and live:
                 body = content_of(cm, path)
                 if body is not None:
