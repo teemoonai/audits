@@ -116,7 +116,14 @@ first; do not retype it. Then, by what the preflight called the target:
   runs an engine is a finding-shaped fact, not a footnote.
 
 Model stays `fable` and the Rules section stays whole whatever the size of the
-delta. What a small delta buys is a shorter review, not a cheaper reviewer.
+delta.
+
+**When the Fable quota is exhausted** (the agent fails with a 429 naming the
+Fable limit), garry's standing instruction is to relaunch on `model: "opus"`
+(Opus 5.5). Check first what the failed agent left on disk. The brief changes
+in one place only: the review line must name the model that wrote the review,
+`reviewed <date> (independent AI source review, Claude Opus 5.5 — method: …)`.
+A page signed Fable that Fable did not write is a false attribution. What a small delta buys is a shorter review, not a cheaper reviewer.
 
 ### Brief template
 
@@ -184,6 +191,20 @@ dump; confirm or refute at YOUR commit, do not assume they transfer>
   egress). The indexer machine-reads these into `findings`, which the app
   renders as the node's plaintext-egress list — a finding in prose under a
   differently-shaped heading is invisible to the app.
+- A LEAKS page carries one more machine-read line directly under the verdict:
+  `## exposure: <wholesale|conditional|metadata> — <one plain-text sentence:
+  what leaks and when>`. wholesale = every request's content reaches the sink;
+  conditional = only on a stated trigger, one bounded piece; metadata = no
+  message content. The indexer ships the sentence verbatim as the app's LEAKS
+  copy; without it the app can only say the worst case, which once overstated
+  a one-value finding as "copies what you type".
+- A sink line is a finding only if it can EXECUTE. Having confirmed that a
+  `logger.*` call names request or model content, read the whole enclosing
+  function: an `except` whose `try` body cannot raise (because a callee
+  swallows its own exception), a branch keyed on a type the schema never
+  produces, a flag parsed but never read. State the trigger as a reachable
+  path, not as a line. Five reviews confirmed the glm47 WARNING existed before
+  one asked whether its `except` could run.
 - Plain ASCII in fenced code blocks; no HTML entities.
 
 ## Efficiency

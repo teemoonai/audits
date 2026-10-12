@@ -123,6 +123,41 @@ def classify(verdict):
     return None
 
 
+# A LEAKS verdict says that plaintext reaches a sink; it does not say how much
+# or how often. The app used to render every LEAKS as "copies what you type",
+# which overstated a one-value-per-rare-trigger finding as wholesale logging.
+# A LEAKS page therefore carries one more machine-read line, directly under
+# the verdict:
+#
+#     ## exposure: <scope> — <one plain-text sentence: what leaks, and when>
+#
+# with <scope> one of:
+#   wholesale    every request's content (or every reply) reaches the sink
+#   conditional  content reaches the sink only on a stated trigger, and then
+#                one bounded piece of it (a value, a field, a truncated reply)
+#   metadata     no message content; identifiers, sizes, timings, labels
+#
+# The sentence after the dash is the page's own wording and is shipped
+# verbatim; nothing is synthesized here. A LEAKS page without the line is
+# warned about and omitted — the app falls back to neutral copy.
+EXPOSURE_SCOPES = ("wholesale", "conditional", "metadata")
+
+
+def exposure_of(path):
+    with open(os.path.join(REPO_ROOT, path)) as f:
+        m = re.search(r"^## exposure:\s*(.+)$", f.read(), re.M)
+    if not m:
+        return None, "no '## exposure:' line"
+    line = " ".join(m.group(1).split())
+    sm = re.match(r"(\w+)\s*[—-]\s*(.+)$", line)
+    if not sm or sm.group(1).lower() not in EXPOSURE_SCOPES:
+        return None, f"exposure line does not open with one of {EXPOSURE_SCOPES}: {line[:60]}"
+    entry = collections.OrderedDict()
+    entry["scope"] = sm.group(1).lower()
+    entry["summary"] = plain(sm.group(2))
+    return entry, None
+
+
 SEVERITIES = ("CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO")
 FINDING_RE = re.compile(
     r"^###\s+(CRITICAL|HIGH|MEDIUM|LOW|INFO)(?:-\d+)?\b(.*?)\s+—\s+(.+?)\s*$", re.M)
@@ -176,8 +211,9 @@ def refresh_verdicts(idx):
     own wording. Nothing synthesized here."""
     v = collections.OrderedDict()
     classes = collections.OrderedDict()
+    exposure = collections.OrderedDict()
     findings = collections.OrderedDict()
-    missing, unclassified = [], []
+    missing, unclassified, unscoped = [], [], []
     for pat in ["images/**/sha256-*.md", "images/**/tag-*.md",
                 "manifests/**/sha256-*.md", "os/sha256-*.md"]:
         for f in sorted(glob.glob(os.path.join(REPO_ROOT, pat), recursive=True)):
@@ -190,6 +226,11 @@ def refresh_verdicts(idx):
                     classes[rel] = cls
                 else:
                     unclassified.append(rel)
+                exp, why = exposure_of(rel)
+                if exp:
+                    exposure[rel] = exp
+                elif cls == "leaks":
+                    unscoped.append((rel, why))
             else:
                 missing.append(rel)
             page_findings = findings_of(rel)
@@ -197,11 +238,15 @@ def refresh_verdicts(idx):
                 findings[rel] = page_findings
     idx["verdicts"] = v
     idx["verdictClass"] = classes
+    idx["exposure"] = exposure
     idx["findings"] = findings
     for rel in unclassified:
         print(f"  WARN verdict line has no readable class (page omitted from "
               f"verdictClass; open the verdict with PRIVATE / LEAKS / COMPROMISABLE / "
               f"QUALIFIED PASS / INCONCLUSIVE): {rel}")
+    for rel, why in unscoped:
+        print(f"  WARN LEAKS page has no readable exposure scope (page omitted from "
+              f"exposure; the app falls back to neutral copy) — {why}: {rel}")
     return missing
 
 

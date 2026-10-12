@@ -149,6 +149,23 @@ request.py:91        ... which is prompt tokens plus generated tokens
 Each one held, so the finding held. Had the fourth failed, the whole thing
 collapses — and that is exactly the hop a summary would have glossed.
 
+### Verifying that a sink line can run
+
+Confirming that a cited `logger.*` call exists, at the cited line, with the
+cited content, is what the Rules demand — and it is not enough when that line
+sets the class. Reachability is a separate check. The glm47 number-fallback
+WARNING that made five GLM-5.3 engine builds and ten recipes LEAKS sat inside
+an `except (ValueError, AttributeError)` whose `try` body could not raise: the
+helper it called swallowed those same exceptions and returned the input
+string. Five reviews and five verifications confirmed the sink existed; none
+asked whether the `except` could execute. The check that settles it costs a
+minute: lift the enclosing function and its callees into a scratch file and
+run them under `python3 -I` with hostile inputs (empty, non-numeric, `None`,
+huge) while watching the logger. If no line is emitted, the finding is dead
+code at those bytes — and check every build in the family separately, because
+a fork can rewrite the helper (Phala's r8 parser tests the returned type, so
+there the same WARNING is live).
+
 ### Verifying a negative claim
 
 "No path allowlist exists", "no route is `ADMIN_FORCE`", "this dest is never

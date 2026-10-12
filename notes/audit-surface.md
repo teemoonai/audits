@@ -48,6 +48,17 @@ command, is the switch on, and what would flipping it emit?
 - [ ] Any content-logging call site **outside** the main gate. vLLM has a
       `logger.debug("Input prompt: %s", …)` in a multimodal error branch that
       never consults `request_logger`: one env var reaches it, no flag needed.
+- [ ] **Whether the call site can execute.** A sink line is a finding only if
+      a path reaches it at the deployed bytes. Read the enclosing function and
+      the callees inside its `try`: sglang's glm47 parser logs a model-emitted
+      argument value from an `except (ValueError, AttributeError)` whose `try`
+      body cannot raise, because the helper it calls catches those same
+      exceptions and returns the string. Five reviews confirmed the line
+      existed before one asked whether it could run. Lift the function into a
+      scratch file and execute it with hostile inputs; and re-check per build,
+      since a fork can rewrite the helper (Phala's r8 parser tests the returned
+      type, and there the same WARNING is live).
+      ([`a7b7136a`](/images/docker.io/nearaidev/sglang/sha256-a7b7136abcf5e07522289d96e96fec9b42a1a30f9dfda57e957f142680d2d67b.md), addendum of 2026-10-12)
 
 *Typical files:* `arg_utils.py`, `cli_args.py`, `server_args.py`,
 `entrypoints/logger.py`, `utils/request_logger.py`, the serving base's

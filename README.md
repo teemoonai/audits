@@ -137,6 +137,21 @@ every page its attestation keys into, each linking to its evidence via the
 anchor. Both fail soft: a page the extraction rules cannot read is omitted,
 and the client falls back to the neutral treatment above.
 
+**`exposure` (additive, optional): how much a LEAKS verdict means.** A class
+says plaintext reaches a sink; it does not say how much or how often, and a
+client that renders every LEAKS the same way ("its logs copy what you type")
+overstates a one-value-per-rare-trigger finding as wholesale logging — which
+happened. So a LEAKS page carries one more machine-read line directly under
+its verdict, `## exposure: <scope> — <sentence>`, and the indexer copies it to
+`exposure` as `{scope, summary}`. `scope` is one of `wholesale` (every
+request's content, or every reply, reaches the sink), `conditional` (content
+reaches the sink only on a stated trigger, and then one bounded piece of it)
+or `metadata` (no message content). `summary` is the reviewer's own
+one-sentence statement of what leaks and when, shipped verbatim. A client
+keys its LEAKS copy on `scope` and shows `summary`; a LEAKS page without a
+readable line is omitted and the client falls back to neutral copy, never to
+the worst case.
+
 **Tag-addressed pages (additive):** some attested manifests pin an image only
 by tag — no digest exists anywhere in the attestation chain, so a
 `sha256-*.md` page would claim a byte-identity the attestation doesn't

@@ -14,7 +14,7 @@ verdict column is each page's own `## verdict:` line, truncated.
 
 | file_sha256 | verdict | review |
 |---|---|---|
-| [`c7c1bf4d82e1…`](sha256-c7c1bf4d82e137b8d2e0788f41cd6637b38bd08fdc74f38e87b4571ce0c8562e.md) | LEAKS — narrowly, unchanged in kind from the plain file's `a49d9c15` page: gpu03 r4 runs the v8 build on the same candidate argv (glm47 parser, no admin key) and every container's stdout still ships unscrubbed to telemetry.infra.near.ai; the canary adds no finding in kind; the running collector still labels r4's metrics with the v7 image id | 2026-10-12 |
+| [`c7c1bf4d82e1…`](sha256-c7c1bf4d82e137b8d2e0788f41cd6637b38bd08fdc74f38e87b4571ce0c8562e.md) | QUALIFIED PASS — **corrected 2026-10-12**: the glm47 engine finding this class rested on is withdrawn as unreachable (its except clause cannot run); was LEAKS — narrowly, unchanged in kind from the plain file's `a49d9c15` page: gpu03 r4 runs the v8 build on the same candidate argv (glm47 parser, no admin key) and every container's stdout still ships unscrubbed to telemetry.infra.near.ai; the canary adds no finding in kind; the running collector still labels r4's metrics with the v7 image id | 2026-10-12 |
 
 A revision not listed here has not been audited — the teemoon app shows no audit
 link for it (fail-closed by design). `python3 tools/fleet_drift.py` reports which
