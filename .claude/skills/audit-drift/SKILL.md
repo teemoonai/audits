@@ -37,7 +37,18 @@ Its stdout is the triage. Act on it, not on the issue body:
 
 Do not re-derive by hand anything a brief file states. Do spot-check one hash
 and one line of each patch before you send it — the script is evidence handed
-to a reviewer as given, and it is yours to vouch for.
+to a reviewer as given, and it is yours to vouch for. The patches are difflib
+output, so their `+`/`-` lines never hash-match `git diff`; the check that
+works is `git show <base commit>:<path> > work.yaml; patch -p1 work.yaml <
+<patch>; shasum -a 256 work.yaml` equal to the deployed `file_sha256`.
+
+**"Running" means named by the attested document.** `fleet_drift.py` lists an
+image as UNAUDITED when the measured compose text names it, not when a
+container runs it. Before briefing an image, grep the `actions-<harness>.json`
+files for the services that name it: a `compose_down` with no later
+`compose_up` (2026-10-12: the v6 engine, down six days) means the page is still
+required but must say "declared, not running", and the recipe page's
+deployment table must not count it as serving.
 
 ## 1. Triage
 

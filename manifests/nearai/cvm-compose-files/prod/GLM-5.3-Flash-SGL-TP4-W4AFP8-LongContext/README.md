@@ -15,6 +15,7 @@ verdict column is each page's own `## verdict:` line, truncated.
 | file_sha256 | verdict | review |
 |---|---|---|
 | [`09cbbffd508d…`](sha256-09cbbffd508d7f0037f34fde22cbda57a45c950c1f91ac86ccff4e57cf7055fe.md) | LEAKS — narrowly: the glm47 parser warning on both replicas, shipped unscrubbed to telemetry.infra.near.ai; heavy patchwork — this hash created only nginx and the proxy on one CVM; first audited revision, reviewed whole | 2026-10-02 |
+| [`b4006c232e5d…`](sha256-b4006c232e5d5820ebcd73789f2a2afd684071c11e43cc92512182b618e0045d.md) | LEAKS — narrowly, unchanged in kind: delta against `09cbbffd`; four new TP2 replicas on the signed v7 build fa730e6e (FP8 KV, HiCache on at 325 GiB each, ghost prefix cache — LOW, preprocess pool, tool-schema caps) serve the tier, the TP4 pair is re-declared on the v6 build 9c6ddd43 but has been down since 2026-10-06; the running proxy is from an unaudited revision whose default backend pool names those two down engines and whose real pool is an unlogged env (MEDIUM) | 2026-10-12 |
 
 A revision not listed here has not been audited — the teemoon app shows no audit
 link for it (fail-closed by design). `python3 tools/fleet_drift.py` reports which
