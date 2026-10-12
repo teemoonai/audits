@@ -2623,6 +2623,13 @@
         "qualifier": "deployed: ON",
         "title": "a third-party layered patchwork with four non-public source commits and a bundled patched transformers; the python tree is registry-verified, the rest is builder-asserted",
         "anchor": "info-deployed-on--a-third-party-layered-patchwork-with-four-non-public-source-commits-and-a-bundled-patched-transformers-the-python-tree-is-registry-verified-the-rest-is-builder-asserted"
+      },
+      {
+        "severity": "low",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, level-gated",
+        "title": "a DEBUG log in the chat path writes up to 2,000 characters of model output when a required tool call is missing or fails to parse \u2014 sink: log (egress to near.ai, if the level is raised)",
+        "anchor": "low-deployed-off-level-gated--a-debug-log-in-the-chat-path-writes-up-to-2000-characters-of-model-output-when-a-required-tool-call-is-missing-or-fails-to-parse--sink-log-egress-to-nearai-if-the-level-is-raised"
       }
     ],
     "images/nvcr.io/nvidia/k8s/dcgm-exporter/sha256-613ab03c11d442fd960ff515f547e9921537454a712d08160bc8f677f89f1c35.md": [
@@ -4767,6 +4774,13 @@
       {
         "severity": "low",
         "deployed": "off",
+        "qualifier": "deployed: OFF, level-gated",
+        "title": "up to 2,000 characters of model output would be logged at DEBUG by the four engines when a required tool call is missing or unparsable; no command sets a log level, so it is off at start, the unauthenticated /configure_logging switch can raise it, and this file ships the line off-box when it fires (sink: log / telemetry, not active)",
+        "anchor": "low-deployed-off-level-gated--up-to-2000-characters-of-model-output-would-be-logged-at-debug-by-the-four-engines-when-a-required-tool-call-is-missing-or-unparsable-no-command-sets-a-log-level-so-it-is-off-at-start-the-unauthenticated-configurelogging-switch-can-raise-it-and-this-file-ships-the-line-off-box-when-it-fires-sink-log--telemetry-not-active"
+      },
+      {
+        "severity": "low",
+        "deployed": "off",
         "qualifier": "deployed: OFF, profile-gated",
         "title": "glm53-perception-check runs an sglang image with no page, unprivileged but on the shared bridge with unauthenticated reach to all four engines; never started from this hash (sink: log / telemetry; egress, by network position)",
         "anchor": "low-deployed-off-profile-gated--glm53-perception-check-runs-an-sglang-image-with-no-page-unprivileged-but-on-the-shared-bridge-with-unauthenticated-reach-to-all-four-engines-never-started-from-this-hash-sink-log--telemetry-egress-by-network-position"
@@ -5497,6 +5511,13 @@
         "qualifier": "deployed: ON",
         "title": "per the image pages, exception text, client-supplied grammar strings and worker-side error text from the engines, and the decrypted inner request path from the proxy, are logged at the deployed flags, and this file exports those lines (sink: log / telemetry)",
         "anchor": "low-deployed-on--per-the-image-pages-exception-text-client-supplied-grammar-strings-and-worker-side-error-text-from-the-engines-and-the-decrypted-inner-request-path-from-the-proxy-are-logged-at-the-deployed-flags-and-this-file-exports-those-lines-sink-log--telemetry"
+      },
+      {
+        "severity": "low",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, level-gated",
+        "title": "up to 2,000 characters of model output are logged at DEBUG by the engine when a required tool call is missing or unparsable; no command in this file raises the log level, but the same unauthenticated /configure_logging switch can, and this file ships the line off-box when it fires (sink: log / telemetry, not active)",
+        "anchor": "low-deployed-off-level-gated--up-to-2000-characters-of-model-output-are-logged-at-debug-by-the-engine-when-a-required-tool-call-is-missing-or-unparsable-no-command-in-this-file-raises-the-log-level-but-the-same-unauthenticated-configurelogging-switch-can-and-this-file-ships-the-line-off-box-when-it-fires-sink-log--telemetry-not-active"
       },
       {
         "severity": "low",
@@ -7433,6 +7454,13 @@
       },
       {
         "severity": "low",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, level-gated",
+        "title": "on both GLM-5.3 replicas, up to 2,000 characters of model output are logged at DEBUG when a required tool call is missing or unparsable; the unauthenticated /configure_logging log_level switch turns it on without a restart, and this file's collector would ship it (log + telemetry egress, not active)",
+        "anchor": "low-deployed-off-level-gated--on-both-glm-53-replicas-up-to-2000-characters-of-model-output-are-logged-at-debug-when-a-required-tool-call-is-missing-or-unparsable-the-unauthenticated-configurelogging-loglevel-switch-turns-it-on-without-a-restart-and-this-files-collector-would-ship-it-log--telemetry-egress-not-active"
+      },
+      {
+        "severity": "low",
         "deployed": "armed",
         "qualifier": "deployed: ARMED",
         "title": "three sglang LLM engines run the undisableable watchdog hang-dump at the engine's 300 s default \u2014 Qwen3.6 r1, Qwen3.8 r1 and r2 \u2014 while both GLM replicas pin 1800 s (log, feeding the telemetry egress)",
@@ -7500,6 +7528,13 @@
         "qualifier": "deployed: OFF",
         "title": "the privacy-filter is unchanged by this delta; its init-time stderr lines and request path are as on the base, and the running container still predates the 128k change (log)",
         "anchor": "info-deployed-off--the-privacy-filter-is-unchanged-by-this-delta-its-init-time-stderr-lines-and-request-path-are-as-on-the-base-and-the-running-container-still-predates-the-128k-change-log"
+      },
+      {
+        "severity": "info",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, exited one-shot",
+        "title": "kvq-readbench from the unreviewed KVShare-Qual file ran once on this CVM on 2026-10-07 with no later log entry: a read-only timing benchmark over a tmpfs of HiCache KV page files written by two qualification engines; it printed timings, never page contents (disk read, log metadata)",
+        "anchor": "info-deployed-off-exited-one-shot--kvq-readbench-from-the-unreviewed-kvshare-qual-file-ran-once-on-this-cvm-on-2026-10-07-with-no-later-log-entry-a-read-only-timing-benchmark-over-a-tmpfs-of-hicache-kv-page-files-written-by-two-qualification-engines-it-printed-timings-never-page-contents-disk-read-log-metadata"
       },
       {
         "severity": "info",
