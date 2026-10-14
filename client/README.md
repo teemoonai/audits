@@ -29,7 +29,7 @@ more.
 Source: [github.com/teemoonai/teemoon-ios](https://github.com/teemoonai/teemoon-ios),
 AGPL-3.0. iPhone-only (`TARGETED_DEVICE_FAMILY = 1`); the tree's `#if os(macOS)`
 branches are not a shipped product. The Android client is a separate codebase
-and will get its own lineage when it ships.
+with its own lineage below.
 
 ### audited releases
 
@@ -54,3 +54,19 @@ markdown renderer `Vendor/textual`, and the SPM dependencies pinned in
 `Package.resolved`. Test targets are not shipped and are outside every page's
 scope. [`ARCHITECTURE.md`](ARCHITECTURE.md) maps where plaintext lives in that
 tree and every sink each page has to clear.
+
+## teemoon-android (Android)
+
+Source: github.com/teemoonai/teemoon-android, AGPL-3.0 (private at the time of
+the first review). Release tags are `vX.Y.Z[-build]`, one per store release.
+A GitHub release whose notes record a **verified** reproducible build binds that
+APK to its tag — stronger than the iOS binding, and only for that APK: the Play
+build can come from a different commit (1.0.4 (3908) did).
+
+| release | tag → commit | verdict | review |
+|---|---|---|---|
+| Google Play 1.0.4 (3912) | [`v1.0.4-3912` → `7f504ca`](teemoon-android/v1.0.4-3912-7f504ca.md) | QUALIFIED-PASS — the public tree's code is the audited dev tree ab31bff (file by file, non-comment lines identical; 0 NEW sweep rows, native bytes the audited ones); keys only to their own provider, messages only on the chosen send path, measured live with seven keys and at idle launch; the 3910 MEDIUM, both LOWs and three INFOs closed and measured closed; nothing open; binary binding by the release-verify rebuild, not this page | a chain of ten working reviews (the 3910 full review and nine candidate deltas, not published), two blinded reviewers each (Claude Fable 5.1), runtime pass per candidate 2026-10-13/14 |
+
+The GitHub APK 1.0.4 (3910), Play production 1.0.4 (3908) and the tag `v1.0.4`
+have no public page: the 3910 review and the candidate reviews that led to 3912
+are the auditor's working pages, summarised in the 3912 page's lineage.
