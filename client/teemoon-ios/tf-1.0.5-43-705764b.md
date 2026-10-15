@@ -1,6 +1,6 @@
 # teemoonai/teemoon-ios @ tf/1.0.5-43 (705764b) — TestFlight candidate 1.0.5 (43), not yet submitted
 
-## verdict: QUALIFIED-PASS — keys: no new request site, no new host, no new file; the one new key-touching surface is a UI-test seeder that reads provider keys from files on the developer's Mac and is compiled out of the Release configuration (DEBUG is set only for Debug, the file's body is wholly inside #if DEBUG, every door also needs the --uitesting launch argument); the host-classification bug that let a public hostname wearing a private IPv4 prefix read as the user's own machine is fixed and pinned, and it never moved a key off its own endpoint; messages: the backgrounded on-device turn is re-asked through the same send gate to the same provider; the developer card's new on-device speed row is two numbers, a backend word and a boolean; a finished E2EE turn's card now carries the sealed body it had been dropping; the Brave search context gains a fixed citation sentence; the three findings of the v1.0.4 page — two LOWs and one INFO — are all still open at 8ab468a; at the page's commit 705764b (build 43, second addendum) the log LOW is CLOSED (counts and lengths replace the text in all three statements, pinned and measured), the system-prompt LOW stays open under the user's waiver as relayed, and the INFO carries: the commit titled "the 1.0.4 audit's three cheap findings" closes a product review's items, not this audit's; the on-device runtime binary is the same pin, not re-checked
+## verdict: QUALIFIED-PASS — keys: no new request site, no new host, no new file; the one new key-touching surface is a UI-test seeder that reads provider keys from files on the developer's Mac and is compiled out of the Release configuration (DEBUG is set only for Debug, the file's body is wholly inside #if DEBUG, every door also needs the --uitesting launch argument); the host-classification bug that let a public hostname wearing a private IPv4 prefix read as the user's own machine is fixed and pinned, and it never moved a key off its own endpoint; messages: the backgrounded on-device turn is re-asked through the same send gate to the same provider; the developer card's new on-device speed row is two numbers, a backend word and a boolean; a finished E2EE turn's card now carries the sealed body it had been dropping; the Brave search context gains a fixed citation sentence; the three findings of the v1.0.4 page — two LOWs and one INFO — are all still open at 8ab468a; at the page's commit 705764b (build 43, second addendum) the log LOW is CLOSED (counts and lengths replace the text in all three statements, pinned and measured), the system-prompt LOW stays open under the user's waiver (relayed, then confirmed by the user directly), and the INFO carries: the commit titled "the 1.0.4 audit's three cheap findings" closes a product review's items, not this audit's; the on-device runtime binary is the same pin, not re-checked
 
 | | |
 |---|---|
@@ -774,7 +774,10 @@ release coordinator session relayed the user's decision not to fix this item
 ("That's not user plain text"). The finding keeps its class on this page — the
 method counts the prompt the user edits as their text, and the storage is
 unchanged — and the waiver is recorded as a product decision taken outside
-this audit session, to be confirmed by the user to the auditor directly.
+this audit session; **confirmed by the user to the auditor directly on
+2026-10-15** ("Yes i confirm system prompt waiver"). The waiver is the
+user's product decision; the finding keeps its class and its remediation
+stands for whenever they choose to take it.
 
 ### INFO (deployed: yes — since 1.0.4, carried) — a truncated hash of a keyed provider's API key is written to a catalogue file and is never removed
 
@@ -868,7 +871,7 @@ the search tool's new suffix is a constant. Of the v1.0.4 page's two LOWs and IN
 open — the commit named for "the 1.0.4 audit's three cheap findings" closes
 a product review's items; at `705764b` (build 43) the log LOW is closed by
 counts-and-lengths logging, the system-prompt LOW stays open under the
-user's waiver as relayed, the INFO carries — and no new finding at any
+user's waiver (relayed, then confirmed directly), the INFO carries — and no new finding at any
 severity was found in any of the six commits since. The on-device runtime binary is the
 same pin as at 1.0.4 and was not re-checked; what it writes under its
 cache directory, and the app on a phone, remain unobserved. The runtime
