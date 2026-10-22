@@ -15,6 +15,7 @@ verdict column is each page's own `## verdict:` line, truncated.
 | file_sha256 | verdict | review |
 |---|---|---|
 | [`c7c1bf4d82e1…`](sha256-c7c1bf4d82e137b8d2e0788f41cd6637b38bd08fdc74f38e87b4571ce0c8562e.md) | QUALIFIED PASS — **corrected 2026-10-12**: the glm47 engine finding this class rested on is withdrawn as unreachable (its except clause cannot run); was LEAKS — narrowly, unchanged in kind from the plain file's `a49d9c15` page: gpu03 r4 runs the v8 build on the same candidate argv (glm47 parser, no admin key) and every container's stdout still ships unscrubbed to telemetry.infra.near.ai; the canary adds no finding in kind; the running collector still labels r4's metrics with the v7 image id | 2026-10-12 |
+| [`2a4865b227a6…`](sha256-2a4865b227a6908f5a50e20c3f5e7a4e8222c2c6da0d25359b11e78d86e9e1c0.md) | QUALIFIED PASS — one-line delta from c7c1bf4d: the E2EE terminator moves from `d61357da` to `295f16f8` (signed provenance; no new sink at this env, list mode refused under OHTTP); `6b8c3b19` (v0.0.501); first revision brought up whole-file on the gpu03 CVM (2026-10-21T22:14Z), so every service of this host's GLM-5.3 stack now comes from one hash and the base page's three-file patchwork is closed | 2026-10-22 |
 
 A revision not listed here has not been audited — the teemoon app shows no audit
 link for it (fail-closed by design). `python3 tools/fleet_drift.py` reports which

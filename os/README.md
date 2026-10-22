@@ -19,6 +19,12 @@ quote and surfaced in the [teemoon](https://teemoon.ai) app as a tier-1
 |---|---|---|---|
 | [`9b69bb1698ba...`](sha256-9b69bb1698bacbb6985409a2c272bcb892e09cdcea63d5399c6768b67d3ff677.md) | model (GLM-5.1 + shared fleet, live 2026-07-22) | PRIVATE at measured configuration | 2026-07-22 |
 | [`a6eafc5f007f...`](sha256-a6eafc5f007f642d8ea90c7fa8881f1e6715720ccb531941a28218f4f26d7b02.md) | `glm-5-3-flash` (gpu30) only, live 2026-09-01 — **upstream** `Dstack-TEE/meta-dstack` release `dstack-nvidia-0.5.11`, not near.ai's fork | QUALIFIED PASS at measured configuration (armed core-dump path, kernel without an LSM) | 2026-09-02 |
+| [`91fd5d69ccee...`](sha256-91fd5d69ccee3e5ea4f2aeb8c9b632c4358c4ecfc29ba1aa6fb1e402af209829.md) | **all eleven serving hosts**, live 2026-10-22 — **upstream** `Dstack-TEE/meta-dstack` release `dstack-nvidia-0.5.12` (security-maintenance release of the 0.5 line; ten hosts came off near.ai's v0.5.5 build, one off upstream v0.5.11) | QUALIFIED PASS at measured configuration (the armed core-dump path and the kernel without an LSM carry, now fleet-wide; the host-shared channel, decrypted env and app keys are hardened) | 2026-10-22 |
+
+**One build, one repo (2026-10-22).** Every serving host now boots the upstream Dstack-TEE
+`dstack-nvidia-0.5.12` release (`91fd5d69…`): the ten nodes that ran near.ai's own v0.5.5 build and the
+one that ran upstream v0.5.11 all moved together. The paragraph below describes the earlier split and
+is kept for the record.
 
 **Two builds, two repos (2026-09-02).** Every node but one boots near.ai's own
 `private-ml-sdk` v0.5.5 build below. The `glm-5-3-flash` node boots the
