@@ -359,6 +359,11 @@ def attribute_running(acts, out):
          whole with the engines renamed dp0..7; the r1/r2 containers of the older
          revision were removed as orphans, and no compose_down ever named them).
     Only whole-file entries need a fetch during the walk (their service names);
+    Rule 3: every up runs with --remove-orphans whether or not it names services,
+    so ANY up of F at revision R removes F's containers whose service is absent
+    from R; the newest up of F bounds what older entries of F can own (gpu13,
+    2026-11-04: the 320afade proxy up removed the GLM pair of the 10-27 revision,
+    whose service names the file no longer had; GPU capacity confirms it).
     the walk is never cut short — a service omitted because a fetch budget ran
     out would be the overclaim this repo exists to avoid (2026-11-06: an early
     cap hid the still-running rotate-token container). A whole-file entry whose
@@ -367,6 +372,7 @@ def attribute_running(acts, out):
     the rest read "not fetched". Cross-file eviction (two files sharing one
     project) is not derivable from the log and is NOT applied."""
     decided, texts, pairs, dead_files, unknown = {}, {}, [], set(), set()
+    newest_set = {}        # file -> service set of the NEWEST compose_up of that file seen so far (walking backwards)
     last_touch, newest_whole = {}, None      # per-file newest entry time; newest whole-file up on the CVM
     for a in reversed([a for a in acts if a.get("action") in ("compose_up", "compose_down")]):
         if a.get("file") and a.get("timestamp"):
@@ -378,6 +384,19 @@ def attribute_running(acts, out):
             continue
         svcs = a.get("services")
         is_up = a["action"] == "compose_up"
+        # Rule 3 (2026-11-06, found on gpu13): EVERY `up` runs with --remove-orphans,
+        # scoped or not, so any up of file F at revision R removes F's containers
+        # whose service name is not in R. Walking backwards, the newest up of F
+        # seen so far bounds what any older entry of F can still own.
+        if is_up and (commit, path) not in texts:
+            st, yb = fetch_recipe(commit, path)
+            if st == 200:
+                texts[(commit, path)] = yb.decode("utf-8", "replace")
+        bound = newest_set.get(path)
+        if is_up and path not in newest_set:
+            newest_set[path] = set(service_names(texts[(commit, path)])) if (commit, path) in texts else None
+        if svcs is not None and bound is not None:
+            svcs = [x for x in svcs if x in bound]          # orphan-removed by the newer up of this file
         if svcs is None:                                   # whole-file entry
             if (commit, path) not in texts:
                 st, yb = fetch_recipe(commit, path)
@@ -385,6 +404,8 @@ def attribute_running(acts, out):
                     texts[(commit, path)] = yb.decode("utf-8", "replace")
             if (commit, path) in texts:
                 svcs = service_names(texts[(commit, path)])
+                if bound is not None:
+                    svcs = [x for x in svcs if x in bound]
             else:
                 svcs = []
                 if is_up:
