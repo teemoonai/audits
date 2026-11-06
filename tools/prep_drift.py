@@ -265,7 +265,7 @@ def brief_recipe(t, cvms, idx, clone, out, target_ids):
         return cache[(commit, p)]
 
     mine = [c for c in cvms if any(a.get("action") == "compose_up" and (a.get("file_sha256") or "").lower() == sha
-                                   for a in c["actions"][-40:])]
+                                   for a in c["actions"])]
     if not mine:
         L.append("!! no sampled CVM attests this hash any more — the fleet moved during the run; re-run")
         return L
