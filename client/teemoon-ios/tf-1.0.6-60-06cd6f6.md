@@ -1,6 +1,6 @@
 # teemoonai/teemoon-ios @ tf/1.0.6-60 (06cd6f6) — App Store 1.0.6 (60); public tag `v1.0.6` → `ab64f15`, the same code
 
-## verdict: QUALIFIED-PASS — keys: no new host; every provider key still leaves only in a request to the endpoint it was saved with (the 1.0.5 sites re-read at their new lines, none added, none removed; the near.ai signature fetch keeps its gateway host and key; the two new NVIDIA attestation calls and the first-send probe to the user's own self-hosted server carry no key; the attestation, key-check and search requests move off the default session onto an ephemeral session with no cache); one new non-secret header, a per-chat routing id (an HMAC of the thread id under a per-Keychain secret — AfterFirstUnlock, not synchronizable, so it restores with an encrypted backup — that never leaves the Keychain) to Fireworks, xAI and OpenRouter only, never near.ai, NVIDIA or a home server; messages: the send gate is still one definition and also governs Think Harder and the effort-refusal retry, which is rebuilt and re-sealed from plaintext with fresh per-field envelopes under the same session client key and keeps nothing from the 400 body; reasoning_effort and, on Think Harder, max_tokens are plaintext fields beside the sealed messages on near.ai, by protocol and disclosed; the replaced reply never reaches the model; a stop now cancels the request and a late reply is neither drawn nor saved; the request-body sort touches the plaintext nowhere new; on-device thought reaches neither the store, the card nor a log; the kept on-device conversation is memory only, released on background, memory warning, dead engine, chat delete and the next on-device turn, not on a thread or cloud switch; deleted chats are scrubbed from the store at the next launch and from the index at delete time, on the two chat-delete paths only (replaced and retried replies are not, inside the protected files, a note); the Confidential tree's signature verifier is fixed as the SDK comparison asked (kind branch and signing_algo, model prefix, ed25519 against the quote-bound key, rotation path deleted, gateway signer never verified), NRAS tokens are signature-, issuer-, window- and nonce-checked, the TCB allow-list is the SDK's, the TLS probe quote is DCAP-verified, a pending verdict refuses the send; still open there and stated in ATTESTATION.md: the model compose and os_image_hash unbound, only the first model report verified, no OHTTP, no x-no-aliasing, the debug bit resting on a binary; one new INFO, a verification label not a sink (the key-binding properties behind the model-signer verdict never read whether their quote verified; the DCAP gate blocks a send before any reply is labelled; no test covers it), nothing new above INFO; the system-prompt LOW carries under the user's waiver, the catalogue INFO carries, the log LOW stays CLOSED; the on-device runtime binary is the same pin as at 1.0.4, not re-checked; runtime pass and binary binding are the orchestrator's
+## verdict: QUALIFIED-PASS — keys: no new host; every provider key still leaves only in a request to the endpoint it was saved with (the 1.0.5 sites re-read at their new lines, none added, none removed; the near.ai signature fetch keeps its gateway host and key; the two new NVIDIA attestation calls and the first-send probe to the user's own self-hosted server carry no key; the attestation, key-check and search requests move off the default session onto an ephemeral session with no cache); one new non-secret header, a per-chat routing id (an HMAC of the thread id under a per-Keychain secret — AfterFirstUnlock, not synchronizable, so it restores with an encrypted backup — that never leaves the Keychain) to Fireworks, xAI and OpenRouter only, never near.ai, NVIDIA or a home server; messages: the send gate is still one definition and also governs Think Harder and the effort-refusal retry, which is rebuilt and re-sealed from plaintext with fresh per-field envelopes under the same session client key and keeps nothing from the 400 body; reasoning_effort and, on Think Harder, max_tokens are plaintext fields beside the sealed messages on near.ai, by protocol and disclosed; the replaced reply never reaches the model; a stop now cancels the request and a late reply is neither drawn nor saved; the request-body sort touches the plaintext nowhere new; on-device thought reaches neither the store, the card nor a log; the kept on-device conversation is memory only, released on background, memory warning, dead engine, chat delete and the next on-device turn, not on a thread or cloud switch; deleted chats are scrubbed from the store at the next launch and from the index at delete time, on the two chat-delete paths only (replaced and retried replies are not, inside the protected files, a note); the Confidential tree's signature verifier is fixed as the SDK comparison asked (kind branch and signing_algo, model prefix, ed25519 against the quote-bound key, rotation path deleted, gateway signer never verified), NRAS tokens are signature-, issuer-, window- and nonce-checked, the TCB allow-list is the SDK's, the TLS probe quote is DCAP-verified, a pending verdict refuses the send; still open there and stated in ATTESTATION.md: the model compose and os_image_hash unbound, only the first model report verified, no OHTTP, no x-no-aliasing, the debug bit resting on a binary; one new INFO, a verification label not a sink (the key-binding properties behind the model-signer verdict never read whether their quote verified; the DCAP gate blocks a send before any reply is labelled; no test covers it), nothing new above INFO; the system-prompt LOW carries under the user's waiver, the catalogue INFO carries, the log LOW stays CLOSED; the on-device runtime binary is the same pin as at 1.0.4, not re-checked; runtime pass and binary binding are the orchestrator's; addendum 2026-11-06: one MEDIUM (ARMED) gate finding — the hard block for a recipe-hash mismatch is inert whenever an image is unpublished-only, which every near.ai session is, so such a send goes out with no ask while the chip says blocked, still sealed to the attested key; fix in 1.1.0 — and two LOW display-honesty findings
 
 | | |
 |---|---|
@@ -1260,15 +1260,82 @@ record identity) it was computed for and leave provenance pending on a
 mismatch; pin it with a two-record fixture whose second sweep returns
 `.incomplete` with only transient failures and expect `imageProvenance == nil`.
 
-Not re-read for this addendum: builds before 1.0.6 (both lines predate the
-1.0.6 delta; the page's rows at `:71`/`:79`/`:84` and `:25` are unchanged
-lines), and the Android port, whose chip predicate the Android 1.1.0 page
-will read on its own.
+**MEDIUM (deployed: ARMED — fires on a recipe-hash mismatch under the unpublished-only provenance every near.ai session has had since 2026-10-22; sends stay sealed) — the send gate's hard block is inert when an image is unpublished-only: a recipe-hash mismatch is sent with no ask while the chip reads "verification failed — sending blocked".**
+Reported 2026-11-06 by the developer's 1.1.0 TLA+ model of the gate, confirmed
+by the developer from code, and re-read by the orchestrator at `ab64f15` (the
+three files hash identical at `tf/1.0.6-60`). The canonical gate is one
+expression (`TrustVerdict.swift:87-90`): `guard requiresConfirmation else {
+return .allow }`, then `.block` or `.confirm` by `hardFailure`. So the hard
+block exists only where `requiresE2EEConfirmation` is true, and that property
+returns `false` early whenever `unpublishedOnlyButE2EEIntact`
+(`Confidential/ConfidentialSession+Verdict.swift:265`), before it reads
+`attestationState == .degraded` (`:266`). `unpublishedOnlyButE2EEIntact` is
+`imageProvenance?.isUnpublishedOnly == true && e2eeBindingIntact` (`:188-189`),
+and `e2eeBindingIntact` (`:197-209`) checks the DCAP hard failure, code
+identity, nonce, key length, model-quote verification, key binding, GPU and
+TLS — **not** `modelComposeIntegrityFailed` (`ConfidentialSession.swift:96`,
+the comparison of the running recipe against the signed action log's
+`file_sha256`, which the same file calls "the trust seam's load-bearing
+check" at `:51-56`) and **not** `lastRequestUsedE2EE == false`
+(`ConfidentialSession.swift:68`, `:297`). With `modelLayerVerification ==
+.hashMismatch` and an unpublished-only sweep: `attestationState` is
+`.degraded` (`:56`), `degradeIsHardFailure` is true (`:223`), `chipMode` is
+`.hardBlock` (`TrustVerdict.swift:93`) and the chip caption is "verification
+failed — sending blocked" (`:111`); `sendPolicy` is `.allow`. Every entry
+point reads that one policy — the composer (`Views/Chat/ChatView.swift:794`
+→ `ChatViewModel.prepareSend` `:63-67`, `.allow` → `.ready`), both retry
+paths (`:891`; `:854` re-checks `requiresE2EEConfirmation`, also false) and
+Siri (`App/RequestLLMIntent.swift:76-80`) — so the message is sent with no
+alert. The hero reads neither "sending blocked" nor "paused" (`heroTitle`
+keys on `requiresConfirmation`, `TrustVerdict.swift:143`) while the chip
+beside it says blocked, and the ladder's `isPaused` reads false
+(`Views/Chat/TrustLadderView.swift:147`). **What is and is not at stake:**
+the request is still sealed to the Ed25519 key that the verified model quote
+bound (`e2eeBindingIntact` requires it; `HTTPTransport.swift:115-120`
+seals or throws, never falls back), so no plaintext leaves the phone unsealed.
+What the gate was built to refuse — and here allows silently — is a send
+into a model enclave whose launched recipe, the document that names the proxy
+that decrypts the message and the engine that reads it, is not the one the
+signed log pinned. **Precondition is the fleet's normal state:** the
+unpublished-only sweep is not an edge case; this page's own runtime pass on
+2026-10-22 logged `unpublished (GitHub 404) — sealed send still allowed`
+(Runtime, above) because the measured harnesses pin the launcher by its
+platform-manifest digest `079a14b4…`, for which GitHub holds no attestation
+([launcher page](/images/docker.io/nearaidev/compose-manager-launcher/sha256-079a14b41deb11e0e27f9b69648e8b3d89bd6fb9ccf6071643b8f447fa415085.md)),
+so every near.ai session reads unpublished-only and the hard block is inert
+for all of them. The activating condition, a recipe-hash mismatch, has not
+been observed on the fleet (every log-pinned recipe the audits fetched
+re-hashed to its `file_sha256`); it is the adversarial or operational case the
+check exists for. The second unchecked flag, `lastRequestUsedE2EE == false`,
+is set only by a completed request built without a codec
+(`HTTPTransport.swift:115-121`, `ConfidentialSession.swift:297`); for an
+attested provider the composer and Siri refuse before that
+(`ChatViewModel.swift:321`, `RequestLLMIntent.swift:76-80`) and a refusal
+resets the flag (`abandonTurn` `:268-270`), so that branch is not shown
+reachable in this tree. **Test gap:** `hardFailure_blocks`
+(`teemoonTests/E2EESecurityExploitTests.swift:399-405`) sets `.hashMismatch`
+with provenance unset and expects `.block`; no test sets `.hashMismatch`
+beside an unpublished-only `imageProvenance`, which is the deployed
+combination. **Remediation (garry, 2026-11-06: fix in 1.1.0, no 1.0.7):**
+make `e2eeBindingIntact` (or `unpublishedOnlyButE2EEIntact`) false when
+`modelComposeIntegrityFailed` or `lastRequestUsedE2EE == false`, so the
+unpublished-only exemption never outranks a hard failure; or evaluate
+`degradeIsHardFailure` before the exemption in `requiresE2EEConfirmation`;
+pin it with the deployed combination (`.hashMismatch` + `.incomplete` whose
+only failures are `.fetchFailed`) expecting `.block`, and with the chip and
+`sendPolicy` asserted together so they cannot diverge. The 1.1.0 page
+verifies the fix against the F1 pair vectors of `sendgate.json` 0.5.11.
+
+Not re-read for this addendum: builds before 1.0.6 (all three lines predate
+the 1.0.6 delta; the page's rows at `:71`/`:79`/`:84`, `:25` and `:265` are
+unchanged lines), and the Android port, whose chip predicate and gate the
+Android 1.0.6 addendum and 1.1.0 page read on their own.
 
 ### Findings
 
-The 2026-11-06 addendum above adds two LOW display-honesty findings; the
-record of the review as published follows.
+The 2026-11-06 addendum above adds two LOW display-honesty findings and one
+MEDIUM gate finding (ARMED: the hard block is inert under unpublished-only
+provenance; sends stay sealed); the record of the review as published follows.
 
 One finding new at this release, an INFO on a verification label (below the
 carried three); nothing new above INFO. The three findings of the 1.0.4 page
