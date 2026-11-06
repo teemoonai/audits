@@ -12,5 +12,33 @@
     "",
     "This file is NOT part of the frozen path spec and no client reads it."
   ],
-  "acknowledged": []
+  "acknowledged": [
+    {
+      "id": "prod/GLM-5.3-Flash-SGL-TP4-W4AFP8.yaml bcd313cf7117b82f0f850f9b93da06a4129a3073ae4a58c017a3723eb30a7255",
+      "kind": "recipe",
+      "since": "2026-11-06",
+      "reason": "Liveness undecidable from the signed log: the entry is a superseded revision on the glm-5-3-flash gpu03 CVM whose containers a later up of another file either removed as orphans (shared compose project) or left in place (per-model project); the log records no project. What it declares cannot be serving: the V12Q8 replicas that answer today reserve the same GPUs. Decided by garry 2026-11-06 ('acknowledge gpu03') after the nine comparable gpu23/four-CVM leftovers were reviewed to the same 'superseded, not running since' outcome. log-pinned up on gpu03 2026-09-23; superseded by the TP2x4 W4AFP8 lineage (V12Q8 904054f5 serving since 2026-10-29)",
+      "page": null,
+      "gated_in_index": false,
+      "closes_when": "near.ai records the compose project (and an env-overlay hash) in the compose_up/compose_down action, or exposes the live container list, so liveness becomes derivable; or the revision is reviewed"
+    },
+    {
+      "id": "prod/GLM-5.2-W4AFP8-SGL-2xTP4.yaml 71d005a45c5be89ab60b1b8f6142903b9a504e3ad67e80db3db8b737db7c9651",
+      "kind": "recipe",
+      "since": "2026-11-06",
+      "reason": "Liveness undecidable from the signed log: the entry is a superseded revision on the glm-5-3-flash gpu03 CVM whose containers a later up of another file either removed as orphans (shared compose project) or left in place (per-model project); the log records no project. What it declares cannot be serving: the V12Q8 replicas that answer today reserve the same GPUs. Decided by garry 2026-11-06 ('acknowledge gpu03') after the nine comparable gpu23/four-CVM leftovers were reviewed to the same 'superseded, not running since' outcome. log-pinned up on gpu03 2026-10-02; glm-5.2 was retired from /v1/models on 2026-09-11 and the model is not advertised",
+      "page": null,
+      "gated_in_index": false,
+      "closes_when": "near.ai records the compose project (and an env-overlay hash) in the compose_up/compose_down action, or exposes the live container list, so liveness becomes derivable; or the revision is reviewed"
+    },
+    {
+      "id": "docker.io/nearaidev/sglang@sha256:8bce6a7cc872a80faded3bd1ef0a64873a1d7abae34c94e5358775ca21f133cc",
+      "kind": "image",
+      "since": "2026-11-06",
+      "reason": "Liveness undecidable from the signed log: the entry is a superseded revision on the glm-5-3-flash gpu03 CVM whose containers a later up of another file either removed as orphans (shared compose project) or left in place (per-model project); the log records no project. What it declares cannot be serving: the V12Q8 replicas that answer today reserve the same GPUs. Decided by garry 2026-11-06 ('acknowledge gpu03') after the nine comparable gpu23/four-CVM leftovers were reviewed to the same 'superseded, not running since' outcome. named by the acknowledged superseded gpu03 revisions only; no attributed container of a serving revision runs it",
+      "page": null,
+      "gated_in_index": false,
+      "closes_when": "near.ai records the compose project (and an env-overlay hash) in the compose_up/compose_down action, or exposes the live container list, so liveness becomes derivable; or the revision is reviewed"
+    }
+  ]
 }

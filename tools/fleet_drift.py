@@ -703,7 +703,8 @@ def main():
     for (path, sha), hosts in live_recipes.items():
         key = f"{COMPOSE_REPO}/{path}"
         if sha not in (idx.get("manifests") or {}).get(key, []):
-            unaudited.append({"kind": "recipe", "id": f"{path} {sha}", "role": "model-layer recipe", "hosts": sorted(hosts)})
+            (known if f"{path} {sha}" in ack else unaudited).append(
+                {"kind": "recipe", "id": f"{path} {sha}", "role": "model-layer recipe", "hosts": sorted(hosts)})
 
     live_img_ids = {i for i, _ in live_images}
     for ref, digests in (idx.get("images") or {}).items():
@@ -758,6 +759,11 @@ def main():
     lo = [(("image", i, r), h) for (i, r), h in sorted(leftover_images.items()) if not audited_image(idx, i)]
     lo += [(("recipe", f"{p} {s}", "model-layer recipe"), h) for (p, s), h in sorted(leftover_recipes.items())
            if s not in (idx.get("manifests") or {}).get(f"{COMPOSE_REPO}/{p}", [])]
+    # An acknowledged leftover (garry's word, acknowledged.json) is a known-open
+    # backlog entry, listed under KNOWN OPEN rather than re-reported every run.
+    for (kind, ident, role), hosts in [(x, h) for x, h in lo if x[1] in ack]:
+        known.append({"kind": kind, "id": ident, "role": role, "hosts": sorted(hosts), "liveness": "undecidable"})
+    lo = [(x, h) for x, h in lo if x[1] not in ack]
     if lo:
         print(f"\nLEFTOVER — attributed by the log, no page, liveness UNDECIDABLE  ({len(lo)})")
         print("  (a later up of ANOTHER file does not define the name; the per-deploy compose project is")
