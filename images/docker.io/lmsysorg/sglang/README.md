@@ -12,6 +12,7 @@ The inference engine - runs the model on decrypted text; sees plaintext by role.
 | [`sha256:5027e95bf6ec...`](sha256-5027e95bf6ec536856b1b52a91d1f35ff5c564ab83e8a94758a169ff09bb8df3.md) | **`v0.5.14`** (`49e384ce`) — `z-ai/glm-5.2` (2 × TP4) | private at deployed flags; **CRITICAL + HIGH residuals live** | 2026-08-03 |
 | [`sha256:984699c298a9...`](sha256-984699c298a95b73c469b2191403ddc85fd780506e13c39c4afff3845e27bc6c.md) | **`v0.5.16-cu129`** (`fdebc938`) — Qwen3.6-27B & -35B-A3B (now multimodal) | PRIVATE at deployed flags; **CRITICAL + HIGH residuals live**; watchdog default now 300 s | 2026-08-17 |
 | [`sha256:febfb971c735...`](sha256-febfb971c7352570fc445c466ebd6ffc9d896024958e544a60f2137fd85856b1.md) | nightly (`c4271c3f`) — Qwen3.8-27B (multimodal) | PRIVATE at deployed flags; **CRITICAL + HIGH residuals live** | 2026-08-17 |
+| [`sha256:d6e7288627be...`](sha256-d6e7288627be8b02be88e4bba38e73f6d50e2826869f753c13a4c4385ab3eda9.md) | `v0.5.19` (`0bcd8223`) — gpu23 bench, **probe runtime only; the engine tree is not reviewed** | QUALIFIED PASS — scope-limited: no attributed container runs this digest as an inference server, and the engine tree at v0.5.19 is NOT reviewed by this page; the one deployed use is a one-shot root probe on GPU… | 2026-11-06 |
 
 All four carry the same CRITICAL residual — the unauthenticated `/configure_logging` runtime switch — which is OFF at deployed flags.
 
