@@ -341,7 +341,16 @@ def in_scope_images(doc, only=None):
 
 # --------------------------------------------------------------- the sweep
 
-def attribute_running(acts, out):
+def services_declaring_model(doc, model):
+    """Service names whose block (anchors expanded) sets MODEL_NAME=<model> — the
+    proxy that answered an attestation report naming that model."""
+    yaml = compose_yaml(doc)
+    anchors = anchor_blocks(yaml)
+    pat = re.compile(r"^\s*-\s*MODEL_NAME=[\"']?" + re.escape(model) + r"[\"']?\s*$", re.M)
+    return [raw.split("\n")[0].strip().rstrip(":") for raw in service_blocks(yaml) if pat.search(expand(raw, anchors))]
+
+
+def attribute_running(acts, out, alive=()):
     """Which (file, commit, sha) pair created each container that is running now,
     from the signed log alone, newest entry first. Returns (pairs newest-first,
     {(commit, path): yaml text} for the pairs that were fetched); integrity and
@@ -373,16 +382,27 @@ def attribute_running(acts, out):
     cap hid the still-running rotate-token container). A whole-file entry whose
     file cannot be fetched still kills older entries of its file and is reported
     with services unknown. Reporting then hash-checks up to RUNNING_CAP pairs;
-    the rest read "not fetched". Cross-file eviction (two files sharing one
-    project) is not derivable from the log and is NOT applied."""
+    the rest read "not fetched". Cross-file eviction is undecidable from the
+    log and is reported, not applied: whether two files share one compose
+    project is unrecorded, so a container of file F's service S is, under the
+    default-project reading, removed as an orphan by the FIRST later up of ANY
+    other file whose revision does not define the name S (scoped or whole-file:
+    rule 3), and under the per-model-project reading it persists. Such a
+    service is LEFTOVER / liveness undecidable (2026-11-06, the rotate-token
+    reviewer: the bound is the next up of any other file, not only a
+    whole-file one; a name the other file also defines is not an orphan).
+    `alive`: service names observed alive at sampling time (the proxy that
+    answered the attestation report). A later up of another file G whose
+    revision lacks an alive service's name demonstrably did NOT evict it, so
+    the two files do not share a project: (F_alive, G) is a REFUTED eviction
+    and G's ups never count against F_alive's services (gpu13, 2026-11-04:
+    sage-pull.yaml was upped whole at 15:30 after the 03:03 small-models
+    proxies, which still answered on 11-06 — under the default-project reading
+    the whole serving stack would have been "undecidable")."""
     decided, texts, pairs, dead_files, unknown = {}, {}, [], set(), set()
+    decided_at = {}        # service -> timestamp of the entry that decided it
     newest_set = {}        # file -> INTERSECTION of the service sets of every newer compose_up of that file (walking backwards)
-    last_touch, newest_whole = {}, None      # per-file newest entry time; newest whole-file up on the CVM
     for a in reversed([a for a in acts if a.get("action") in ("compose_up", "compose_down")]):
-        if a.get("file") and a.get("timestamp"):
-            last_touch.setdefault(a["file"], a["timestamp"])
-            if a.get("services") is None and a["action"] == "compose_up" and newest_whole is None:
-                newest_whole = a["timestamp"]
         path, commit, want = a.get("file"), a.get("commit"), (a.get("file_sha256") or "").lower()
         if not path or not commit or path in dead_files:
             continue
@@ -433,6 +453,7 @@ def attribute_running(acts, out):
             if svc in decided:
                 continue
             decided[svc] = (path, commit, want) if is_up else None
+            decided_at[svc] = a.get("timestamp") or ""
             if is_up and (path, commit, want) not in pairs:
                 pairs.append((path, commit, want))
     # Reporting: hash-check the attributed pairs, newest first, up to the cap.
@@ -455,20 +476,54 @@ def attribute_running(acts, out):
         if want and got != want:
             out["integrity"].append(
                 f"{path}@{commit[:12]} hashes {got[:12]} but the action log pins {want[:12]} — INTEGRITY BREAK")
-    svcs_of = {}
+    # LEFTOVER / liveness undecidable, per service: the container of service S
+    # (created by the entry that decided it) is, under the default-project
+    # reading, removed as an orphan by the first LATER up of a DIFFERENT file
+    # whose revision does not define S (every up runs --remove-orphans); under
+    # the per-model-project reading it persists. The log records no project, so
+    # the tool cannot pick (every 10-30 measured page states both readings):
+    # such services are reported apart from drift, not silently dropped. A name
+    # the other file also defines is not an orphan and stays attributed. An up
+    # whose revision could not be fetched counts as evicting (fail closed).
+    ups_chrono = [a for a in acts if a.get("action") == "compose_up" and a.get("file") and a.get("commit") and a.get("timestamp")]
+    refuted, alive_evidence = set(), {}
+    for svc in alive:
+        pair = decided.get(svc)
+        if not pair:
+            continue
+        alive_evidence[svc] = f"{pair[0]}@{pair[1][:12]} ({decided_at.get(svc, '')[:19]})"
+        for a in ups_chrono:
+            if a["file"] == pair[0] or a["timestamp"] <= decided_at.get(svc, ""):
+                continue
+            txt = texts.get((a["commit"], a["file"]))
+            if txt is not None and svc not in set(service_names(txt)):
+                refuted.add((pair[0], a["file"]))
+    out["alive_evidence"] = alive_evidence
+    out["refuted_evictions"] = sorted(f"{f} <- {g}" for f, g in refuted)
+    svcs_of, undec_of, evicted_by = {}, {}, {}
     for svc, pair in decided.items():
-        if pair:
+        if not pair:
+            continue
+        t0, f0 = decided_at.get(svc, ""), pair[0]
+        hit = None
+        for a in ups_chrono:
+            if a["file"] == f0 or a["timestamp"] <= t0 or (f0, a["file"]) in refuted:
+                continue
+            txt = texts.get((a["commit"], a["file"]))
+            if txt is None or svc not in set(service_names(txt)):
+                hit = {"file": a["file"], "commit": a["commit"], "timestamp": a["timestamp"],
+                       "why": "revision unfetched" if txt is None else "name not defined in that revision"}
+                break
+        if hit:
+            undec_of.setdefault(pair, set()).add(svc)
+            evicted_by[svc] = hit
+        else:
             svcs_of.setdefault(pair, set()).add(svc)
-    # LEFTOVER: a file nothing has touched since another file's whole-file up on
-    # this CVM. If the two files share a compose project (per model, unrecorded),
-    # that up evicted these containers as orphans; if not, they persist. The log
-    # cannot say which (every 10-30 measured page states both readings), so such
-    # pairs are reported apart from drift, not silently dropped.
-    leftover = {pr for pr in pairs if newest_whole and last_touch.get(pr[0], "") < newest_whole
-                and not any(a.get("file") == pr[0] and a.get("services") is None and a["action"] == "compose_up" and a["timestamp"] >= newest_whole
-                            for a in acts if a.get("action") == "compose_up")}
+    leftover = {pr for pr in undec_of if pr not in svcs_of}       # every attributed service undecidable
     out["leftover"] = sorted(leftover)
     out["services_of"] = {f"{p}@{c}": sorted(v) for (p, c, w), v in svcs_of.items()}
+    out["undecidable_of"] = {f"{p}@{c}": {s: evicted_by[s] for s in sorted(v)} for (p, c, w), v in undec_of.items()}
+    out["_undec_pairs"] = undec_of
     return pairs, texts, svcs_of
 
 
@@ -516,15 +571,35 @@ def sample_host(domain):
         return out
 
     # Per-service running table, newest entry first (see RUNNING, NOT NAMED).
+    # Live evidence: the proxy that answered this report is alive now. Find it
+    # by MODEL_NAME in the newest attributed revisions (first pass), then
+    # attribute again with that knowledge (second pass refutes evictions).
     pairs, texts, svcs_of = attribute_running(acts, out)
+    undec1 = out.pop("_undec_pairs", None) or {}
+    alive = []
+    for path, commit, want in pairs:                       # newest first; attributed = running or (first-pass) undecidable
+        attributed = set(svcs_of.get((path, commit, want)) or ()) | set(undec1.get((path, commit, want)) or ())
+        if (commit, path) in texts and out.get("model"):
+            alive += [s for s in services_declaring_model(texts[(commit, path)], out["model"]) if s in attributed]
+        if alive:
+            break
+    if not alive:
+        out["warnings"].append("serving proxy not identified by MODEL_NAME in the attributed revisions — "
+                               "no cross-file eviction is refuted on this CVM")
+    out["warnings"], out["integrity"] = list(out["warnings"]), list(out["integrity"])
+    pairs, texts, svcs_of = attribute_running(acts, out, alive=alive)
     leftover = set(out.get("leftover") or [])
+    undec = out.pop("_undec_pairs", None) or {}            # pair -> undecidable services (tuple keys: never serialized)
     for pr in pairs:
         path, commit, want = pr
         if (commit, path) not in texts:
             continue                                       # past the cap or unfetchable: no image claims
-        imgs, warns = in_scope_images(texts[(commit, path)], only=svcs_of.get(pr))
+        imgs, warns = in_scope_images(texts[(commit, path)], only=svcs_of.get(pr) or set())
         target = out["leftover_images"] if pr in leftover else out["images"]
         target.update(imgs)
+        if undec.get(pr):                                  # undecidable services of a pair that also has running ones
+            limgs, _ = in_scope_images(texts[(commit, path)], only=undec[pr])
+            out["leftover_images"].update({k: v for k, v in limgs.items() if k not in out["images"]})
         out["integrity"] += [f"recipe {path}@{commit[:12]}: {w}" for w in warns]
     out["recipes"] = [(path, want) for path, commit, want in pairs if (path, commit, want) not in leftover]
     out["leftover_recipes"] = [(path, want) for path, commit, want in pairs if (path, commit, want) in leftover]
@@ -685,8 +760,8 @@ def main():
            if s not in (idx.get("manifests") or {}).get(f"{COMPOSE_REPO}/{p}", [])]
     if lo:
         print(f"\nLEFTOVER — attributed by the log, no page, liveness UNDECIDABLE  ({len(lo)})")
-        print("  (nothing touched the file since another file's whole-file up on the CVM; the per-deploy compose")
-        print("   project is unrecorded, so that up either evicted these containers as orphans or left them)")
+        print("  (a later up of ANOTHER file does not define the name; the per-deploy compose project is")
+        print("   unrecorded, so that up either evicted the container as an orphan or left it running)")
         for (kind, ident, role), hosts in lo:
             print(f"  [{kind:<8}] {role:<26} {ident[:64]}")
             print(f"{'':14}on {len(hosts)} host(s): {', '.join(sorted(hosts)[:6])}")
