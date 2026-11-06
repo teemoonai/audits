@@ -287,8 +287,8 @@ def parse_looks_degenerate(yaml, blocks):
     return images > 0 and len(blocks) < images / 2
 
 
-def in_scope_images(doc):
-    """-> ({verbatim image ref: role}, [parse warnings])"""
+def in_scope_images(doc, only=None):
+    """-> ({verbatim image ref: role}, [parse warnings]); `only` restricts to those service names"""
     yaml = compose_yaml(doc)
     anchors = anchor_blocks(yaml)
     backends = backend_service_names(yaml, anchors)
@@ -301,11 +301,13 @@ def in_scope_images(doc):
             f"in-scope images may be MISSING from this run")
     out = {}
     for raw in blocks:
+        name = raw.split("\n")[0].strip().rstrip(":")
+        if only is not None and name not in only:
+            continue                      # named by the file, but not by a running container
         b = expand(raw, anchors)
         img = block_image(b)
         if not img:
             continue
-        name = raw.split("\n")[0].strip().rstrip(":")
         cname = re.search(r"^\s*container_name:\s*[\"']?([^\s\"']+)", b, re.M)
         is_backend = name in backends or (cname and cname.group(1) in backends)
         if sig_terminator(b):
@@ -365,7 +367,12 @@ def attribute_running(acts, out):
     the rest read "not fetched". Cross-file eviction (two files sharing one
     project) is not derivable from the log and is NOT applied."""
     decided, texts, pairs, dead_files, unknown = {}, {}, [], set(), set()
+    last_touch, newest_whole = {}, None      # per-file newest entry time; newest whole-file up on the CVM
     for a in reversed([a for a in acts if a.get("action") in ("compose_up", "compose_down")]):
+        if a.get("file") and a.get("timestamp"):
+            last_touch.setdefault(a["file"], a["timestamp"])
+            if a.get("services") is None and a["action"] == "compose_up" and newest_whole is None:
+                newest_whole = a["timestamp"]
         path, commit, want = a.get("file"), a.get("commit"), (a.get("file_sha256") or "").lower()
         if not path or not commit or path in dead_files:
             continue
@@ -413,7 +420,21 @@ def attribute_running(acts, out):
         if want and got != want:
             out["integrity"].append(
                 f"{path}@{commit[:12]} hashes {got[:12]} but the action log pins {want[:12]} — INTEGRITY BREAK")
-    return pairs, texts
+    svcs_of = {}
+    for svc, pair in decided.items():
+        if pair:
+            svcs_of.setdefault(pair, set()).add(svc)
+    # LEFTOVER: a file nothing has touched since another file's whole-file up on
+    # this CVM. If the two files share a compose project (per model, unrecorded),
+    # that up evicted these containers as orphans; if not, they persist. The log
+    # cannot say which (every 10-30 measured page states both readings), so such
+    # pairs are reported apart from drift, not silently dropped.
+    leftover = {pr for pr in pairs if newest_whole and last_touch.get(pr[0], "") < newest_whole
+                and not any(a.get("file") == pr[0] and a.get("services") is None and a["action"] == "compose_up" and a["timestamp"] >= newest_whole
+                            for a in acts if a.get("action") == "compose_up")}
+    out["leftover"] = sorted(leftover)
+    out["services_of"] = {f"{p}@{c}": sorted(v) for (p, c, w), v in svcs_of.items()}
+    return pairs, texts, svcs_of
 
 
 def sample_host(domain):
@@ -430,7 +451,8 @@ def sample_host(domain):
     tcb = info.get("tcb_info") or {}
     out = {"host": domain, "model": rep.get("model_name"), "images": {},
            "compose_hash": info.get("compose_hash"), "os": info.get("os_image_hash"),
-           "recipe": None, "recipes": [], "manager": None, "integrity": [], "warnings": []}
+           "recipe": None, "recipes": [], "manager": None, "integrity": [], "warnings": [],
+           "leftover_images": {}, "leftover_recipes": [], "leftover": []}
 
     outer = tcb.get("app_compose") or ""
     if not outer:
@@ -459,14 +481,18 @@ def sample_host(domain):
         return out
 
     # Per-service running table, newest entry first (see RUNNING, NOT NAMED).
-    pairs, texts = attribute_running(acts, out)
-    for path, commit, want in pairs:
+    pairs, texts, svcs_of = attribute_running(acts, out)
+    leftover = set(out.get("leftover") or [])
+    for pr in pairs:
+        path, commit, want = pr
         if (commit, path) not in texts:
             continue                                       # past the cap or unfetchable: no image claims
-        imgs, warns = in_scope_images(texts[(commit, path)])
-        out["images"].update(imgs)
+        imgs, warns = in_scope_images(texts[(commit, path)], only=svcs_of.get(pr))
+        target = out["leftover_images"] if pr in leftover else out["images"]
+        target.update(imgs)
         out["integrity"] += [f"recipe {path}@{commit[:12]}: {w}" for w in warns]
-    out["recipes"] = [(path, want) for path, commit, want in pairs]
+    out["recipes"] = [(path, want) for path, commit, want in pairs if (path, commit, want) not in leftover]
+    out["leftover_recipes"] = [(path, want) for path, commit, want in pairs if (path, commit, want) in leftover]
     up = ups[-1]
     out["recipe"] = (up.get("file"), (up.get("file_sha256") or "").lower())   # the latest up, as before
     return out
@@ -523,6 +549,7 @@ def main():
 
     live_images, live_measured, live_os, live_recipes = defaultdict(set), defaultdict(set), defaultdict(set), defaultdict(set)
     unreachable, integrity, warnings, swaps = defaultdict(set), [], [], {}
+    leftover_recipes, leftover_images = defaultdict(set), defaultdict(set)
     for r in results:
         host = r["host"].split(".")[0]
         if r.get("error"):
@@ -537,6 +564,10 @@ def main():
             swaps.setdefault(json.dumps(r["manager"], sort_keys=True), set()).add(host)
         for pr in r.get("recipes") or []:
             live_recipes[tuple(pr)].add(host)
+        for pr in r.get("leftover_recipes") or []:
+            leftover_recipes[tuple(pr)].add(host)
+        for img, role in (r.get("leftover_images") or {}).items():
+            leftover_images[(img, role)].add(host)
         for img, role in r["images"].items():
             live_images[(img, role)].add(host)
         if r["compose_hash"]:
@@ -614,6 +645,16 @@ def main():
         print("\nWARN (coverage, not drift):")
         for h, note in warnings:
             print(f"  {h}: {note}")
+    lo = [(("image", i, r), h) for (i, r), h in sorted(leftover_images.items()) if not audited_image(idx, i)]
+    lo += [(("recipe", f"{p} {s}", "model-layer recipe"), h) for (p, s), h in sorted(leftover_recipes.items())
+           if s not in (idx.get("manifests") or {}).get(f"{COMPOSE_REPO}/{p}", [])]
+    if lo:
+        print(f"\nLEFTOVER — attributed by the log, no page, liveness UNDECIDABLE  ({len(lo)})")
+        print("  (nothing touched the file since another file's whole-file up on the CVM; the per-deploy compose")
+        print("   project is unrecorded, so that up either evicted these containers as orphans or left them)")
+        for (kind, ident, role), hosts in lo:
+            print(f"  [{kind:<8}] {role:<26} {ident[:64]}")
+            print(f"{'':14}on {len(hosts)} host(s): {', '.join(sorted(hosts)[:6])}")
     print(f"\nUNAUDITED — in scope, running, no page  ({len(unaudited)})")
     for u in unaudited or [None]:
         if u is None:
@@ -642,6 +683,7 @@ def main():
                        "integrity": [{"host": h, "note": n} for h, n in integrity],
                        "warnings": [{"host": h, "note": n} for h, n in warnings],
                        "manager_swaps": [dict(json.loads(k), hosts=sorted(v)) for k, v in sorted(swaps.items())],
+                       "leftover": [{"kind": k, "id": i, "role": r, "hosts": sorted(h)} for (k, i, r), h in lo],
                        "unaudited": unaudited, "known_open": known,
                        "unobserved": sorted(unobserved),
                        "broken": broken}, f, indent=2)
