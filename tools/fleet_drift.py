@@ -339,6 +339,65 @@ def in_scope_images(doc):
 
 # --------------------------------------------------------------- the sweep
 
+def attribute_running(acts, out):
+    """Which (file, commit, sha) pair created each container that is running now,
+    from the signed log alone, newest entry first. Returns (pairs newest-first,
+    {(commit, path): yaml text}); integrity/warning notes go to `out`.
+
+    Rules, in order of precedence while walking backwards:
+      1. an entry naming a service decides that service (up -> attributed to the
+         entry's revision; down -> gone) unless a newer entry already decided it;
+      2. an entry without a service list is a WHOLE-FILE `compose up` (or down)
+         of that file: compose-manager runs `up -d --remove-orphans`, so every
+         container of that file whose service name is not in the new revision
+         is removed by it, and every service in it is re-created from it. Hence,
+         once a whole-file entry for file F has been seen, every OLDER entry for
+         F is dead (2026-10-31, gpu02: DEP4x2 re-upped whole with the engines
+         renamed dp0..7; the r1/r2 containers of the older revision were removed
+         as orphans, and no compose_down ever named them — the old rule showed
+         sixteen ranks on eight GPUs).
+    Cross-file eviction (a whole-file up under compose's default project removes
+    OTHER files' containers too) depends on the per-deploy compose project, which
+    the attested log does not record; it is NOT applied here, so leftovers from
+    other files are reported as the log attributes them, as the pages do."""
+    decided, fetched, texts, pairs, dead_files = {}, 0, {}, [], set()
+    for a in reversed([a for a in acts if a.get("action") in ("compose_up", "compose_down")]):
+        path, commit, want = a.get("file"), a.get("commit"), (a.get("file_sha256") or "").lower()
+        if not path or not commit or path in dead_files:
+            continue
+        svcs = a.get("services")
+        is_up = a["action"] == "compose_up"
+        whole_file = svcs is None
+        if whole_file or (is_up and (commit, path) not in texts):
+            if (commit, path) not in texts:
+                if fetched >= RUNNING_CAP:
+                    out["warnings"].append(f"running table capped at {RUNNING_CAP} fetched pairs; "
+                                           f"{a['timestamp'][:10]} {path}@{commit[:12]} and older unresolved")
+                    break
+                fetched += 1
+                st, yb = fetch_recipe(commit, path)
+                if st != 200:
+                    out["integrity"].append(f"could not fetch {path}@{commit[:12]} (HTTP {st}) — model layer UNCHECKED")
+                    return pairs, texts
+                if is_up and want and hashlib.sha256(yb).hexdigest() != want:
+                    out["integrity"].append(
+                        f"{path}@{commit[:12]} hashes {hashlib.sha256(yb).hexdigest()[:12]} but the action log pins "
+                        f"{want[:12]} — INTEGRITY BREAK")
+                    return pairs, texts
+                texts[(commit, path)] = yb.decode("utf-8", "replace")
+            if whole_file:
+                svcs = service_names(texts[(commit, path)])
+        for svc in svcs:
+            if svc in decided:
+                continue
+            decided[svc] = (path, commit, want) if is_up else None
+            if is_up and (path, commit, want) not in pairs:
+                pairs.append((path, commit, want))
+        if whole_file:
+            dead_files.add(path)          # rule 2: older entries of this file are dead
+    return pairs, texts
+
+
 def sample_host(domain):
     nonce = hashlib.sha256(os.urandom(32)).hexdigest()
     st, body = get(f"https://{domain}/v1/attestation/report?nonce={nonce}&signing_algo=ecdsa")
@@ -382,42 +441,7 @@ def sample_host(domain):
         return out
 
     # Per-service running table, newest entry first (see RUNNING, NOT NAMED).
-    decided, fetched, texts, pairs = {}, 0, {}, []
-    for a in reversed([a for a in acts if a.get("action") in ("compose_up", "compose_down")]):
-        path, commit, want = a.get("file"), a.get("commit"), (a.get("file_sha256") or "").lower()
-        if not path or not commit:
-            continue
-        svcs = a.get("services")
-        is_up = a["action"] == "compose_up"
-        if svcs is None or (is_up and (commit, path) not in texts):
-            if (commit, path) not in texts:
-                if fetched >= RUNNING_CAP:
-                    out["warnings"].append(f"running table capped at {RUNNING_CAP} fetched pairs; "
-                                           f"{a['timestamp'][:10]} {path}@{commit[:12]} and older unresolved")
-                    break
-                fetched += 1
-                st, yb = fetch_recipe(commit, path)
-                if st != 200:
-                    out["integrity"].append(f"could not fetch {path}@{commit[:12]} (HTTP {st}) — model layer UNCHECKED")
-                    return out
-                if is_up and want and hashlib.sha256(yb).hexdigest() != want:
-                    out["integrity"].append(
-                        f"{path}@{commit[:12]} hashes {hashlib.sha256(yb).hexdigest()[:12]} but the action log pins "
-                        f"{want[:12]} — INTEGRITY BREAK")
-                    return out
-                texts[(commit, path)] = yb.decode("utf-8", "replace")
-            if svcs is None:
-                svcs = service_names(texts[(commit, path)])
-        for svc in svcs:
-            if svc in decided:
-                continue
-            decided[svc] = (path, commit, want) if is_up else None
-            if is_up and (path, commit, want) not in pairs:
-                pairs.append((path, commit, want))
-    for path, commit, want in pairs:
-        imgs, warns = in_scope_images(texts[(commit, path)])
-        out["images"].update(imgs)
-        out["integrity"] += [f"recipe {path}@{commit[:12]}: {w}" for w in warns]
+    pairs, texts = attribute_running(acts, out)
     out["recipes"] = [(path, want) for path, commit, want in pairs]
     up = ups[-1]
     out["recipe"] = (up.get("file"), (up.get("file_sha256") or "").lower())   # the latest up, as before
