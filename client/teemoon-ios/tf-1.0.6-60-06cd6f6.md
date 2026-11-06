@@ -1202,7 +1202,73 @@ differ from `378f8ba` by this file — to be stated at re-identification.
 Developer note 1 of the runtime pass (the xAI regression) is therefore
 **CLOSED at 59**; the near.ai launcher note stands.
 
+### Addendum — 2026-11-06: two display defects reported by the developer, read at `ab64f15` (orchestrator)
+
+The iOS developer's state-machine sweep for 1.1.0 found two defects that
+are also in the shipped 1.0.6 tree and asked whether this page should carry
+them. The orchestrator exported the public `v1.0.6` tree (`ab64f15`, the
+code this page covers) and read both against the send gate. **Neither moves
+a key or a message, and neither changes what the gate does; the verdict
+stands.** Both are recorded here as LOW display-honesty findings, deployed
+in 1.0.6, because the screen claims more than the app has checked at that
+moment. Fix commits land on the 1.1.0 branch and are recorded on the 1.1.0
+page.
+
+**LOW (deployed: yes; display only) — the trust chip reads "verified" while the DCAP, GPU and TLS verdicts are still in flight.**
+`attestationState` treats a `nil` verdict as passing at
+`Confidential/ConfidentialSession+Verdict.swift:71` (DCAP), `:79` (GPU) and
+`:84` (TLS) and returns `.ok` at `:108`; only the provenance sweep has a
+`.verifying` branch (`:107`). `TrustVerdict.chipMode` maps `.ok` to
+`.verified` (`TrustVerdict.swift:99`) and the hero reads "encrypted to … —
+only it can read this" (`:158`), so for the seconds a verifier takes the
+chip, the hero, the `VerificationRun` rollup and the attestation sheet's
+pillar all read green on verdicts that have not answered. **The gate does not
+read that state for pending verdicts** — the row "checks in flight do not
+block the send" in the Confidential table above already records the
+mechanism: `prepareTurn` settles the verifiers (`ConfidentialSession.swift:207-219`,
+`verdictsPending` `:246-253`, `settleVerifiers` `:256-261`), `postPrepareRefusal`
+refuses while any is pending even under `.allow` (`ChatViewModel.swift:101-115`,
+called `:306`), Siri refuses the same way (`App/RequestLLMIntent.swift:87-90`),
+every retry path reaches the same generate function (`Views/Chat/ChatView.swift:840`,
+`:886` → `ChatViewModel.retry` `:198` → `prepareTurn` at `:298`), and `adopt`
+launches the verifiers in the same actor turn as the record
+(`ConfidentialSession+Refresh.swift:145-151`). What this page did not say is
+that the display and the gate use different predicates, so the chip is green
+early. **Test gap:** no test pins the chip to `.verifying` while
+`verdictsPending` is true. **Remediation:** return `.verifying` from
+`attestationState` whenever `verdictsPending` is true, so chip and gate read
+one predicate; pin it with a test that leaves `dcapVerification` nil under a
+launched `dcapTask` and expects `chipMode == .verifying`.
+
+**LOW (deployed: yes; display only) — a previous record's provenance verdict is shown for a new record when the new sweep is inconclusive.**
+`verifyImageProvenance` saves `previous = imageProvenance` before sweeping a
+newly adopted record (`Confidential/ConfidentialSession+Verifiers.swift:25`)
+and restores it when the new sweep ends inconclusive — rate limit or network
+only, no negative evidence (`:115-121`) — without checking that the saved
+verdict was computed for the same manifests. After a node-lottery refresh to
+a different CVM whose sweep is rate-limited, the sheet names the previous
+node's image digests as verified for the node now answering, and the chip
+reads green for it. **The gate is unchanged:** a `nil` or pending provenance
+never degrades (`ConfidentialSession+Verdict.swift:57-64`, `:107`) and only
+`.incomplete` with negative evidence degrades, to a soft `.confirm`; with or
+without the restore the inconclusive case allows the send, so the send
+outcome is identical. The defect is the sheet's honesty — digests shown as
+checked for this node were checked for another. **Test gap:** no test
+adopts a second record with different manifests under an inconclusive
+sweep. **Remediation:** key the saved verdict to the manifests (or the
+record identity) it was computed for and leave provenance pending on a
+mismatch; pin it with a two-record fixture whose second sweep returns
+`.incomplete` with only transient failures and expect `imageProvenance == nil`.
+
+Not re-read for this addendum: builds before 1.0.6 (both lines predate the
+1.0.6 delta; the page's rows at `:71`/`:79`/`:84` and `:25` are unchanged
+lines), and the Android port, whose chip predicate the Android 1.1.0 page
+will read on its own.
+
 ### Findings
+
+The 2026-11-06 addendum above adds two LOW display-honesty findings; the
+record of the review as published follows.
 
 One finding new at this release, an INFO on a verification label (below the
 carried three); nothing new above INFO. The three findings of the 1.0.4 page
