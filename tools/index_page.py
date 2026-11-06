@@ -192,12 +192,28 @@ def classify(verdict):
 # The sentence after the dash is the page's own wording and is shipped
 # verbatim; nothing is synthesized here. A LEAKS page without the line is
 # warned about and omitted — the app falls back to neutral copy.
+#
+# A recipe page also names the compose services that carry the leak, on the
+# line directly under it, so a client can tell a leak on the chat's own path
+# from a sibling service in the same file (the FLUX engine beside the Qwen
+# and GLM replicas in small-models, 2026-11-06):
+#
+#     ## exposure-services: <service>[, <service>...]
+#
+# copied to `exposure[page].services`, with `scope_kind: "recipe"`. An image
+# page's scope is the image itself (`scope_kind: "image"`, no services): its
+# leak is on the path when a path service runs that image. The client computes
+# the path from the ingress config, the proxy's backend list and the running
+# table (README, "exposure"); a gated LEAKS recipe page without a readable
+# services line fails --validate.
 EXPOSURE_SCOPES = ("wholesale", "conditional", "metadata")
+SERVICE_NAME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")
 
 
 def exposure_of(path):
     with open(os.path.join(REPO_ROOT, path)) as f:
-        m = re.search(r"^## exposure:\s*(.+)$", f.read(), re.M)
+        text = f.read()
+    m = re.search(r"^## exposure:\s*(.+)$", text, re.M)
     if not m:
         return None, "no '## exposure:' line"
     line = " ".join(m.group(1).split())
@@ -207,6 +223,15 @@ def exposure_of(path):
     entry = collections.OrderedDict()
     entry["scope"] = sm.group(1).lower()
     entry["summary"] = plain(sm.group(2))
+    entry["scope_kind"] = "recipe" if path.startswith("manifests/") else "image"
+    if entry["scope_kind"] == "recipe":
+        sv = re.search(r"^## exposure-services:\s*(.+)$", text, re.M)
+        if sv:
+            names = [n.strip() for n in sv.group(1).split(",") if n.strip()]
+            if not names or any(not SERVICE_NAME_RE.fullmatch(n) for n in names):
+                return None, ("exposure-services line is not a comma-separated list of compose "
+                              f"service names: {sv.group(1)[:60]}")
+            entry["services"] = names
     return entry, None
 
 
@@ -390,6 +415,10 @@ def validate(idx):
         if classes.get(b) == "leaks" and b not in (idx.get("exposure") or {}):
             problems.append(f"gated LEAKS page has no readable '## exposure:' line — the app would fall back "
                             f"to generic copy that understates a leak: {b}")
+        elif classes.get(b) == "leaks" and b.startswith("manifests/") and \
+                not (idx.get("exposure") or {}).get(b, {}).get("services"):
+            problems.append(f"gated LEAKS recipe page has no readable '## exposure-services:' line — the app "
+                            f"cannot tell a leak on the chat's path from a sibling service: {b}")
         for fnd in findings.get(b, []):
             if fnd["severity"] in ("critical", "high", "medium") and fnd["deployed"] is None:
                 problems.append(f"{fnd['severity'].upper()} finding without a readable deployed: "

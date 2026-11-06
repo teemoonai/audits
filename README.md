@@ -152,6 +152,36 @@ keys its LEAKS copy on `scope` and shows `summary`; a LEAKS page without a
 readable line is omitted and the client falls back to neutral copy, never to
 the worst case.
 
+**`exposure[page].services` and `scope_kind` (additive, 2026-11-06): which
+chat a LEAKS verdict is about.** A recipe file runs many services, and a leak
+in one of them (the FLUX engine in `small-models`) is not a leak of a chat
+that never passes through it (a Qwen3.8 chat on the same CVM). So a LEAKS
+recipe page carries `## exposure-services: <service>[, <service>…]` directly
+under its exposure line — the compose service names, as written in the
+recipe, whose request path carries the leak — and the indexer copies them to
+`services` with `scope_kind: "recipe"`; `--validate` fails a gated LEAKS
+recipe page without a readable list. An image page's scope is the image
+itself (`scope_kind: "image"`, no list): its leak is on the path when a path
+service runs that image. A client computes the chat's path per CVM from
+evidence it already holds, by host name, never by model id (on gpu04 both
+GLM proxies declare the same `MODEL_NAME`): (1) ingress — the running
+service with published `ports:` whose nginx config has a `server` block whose
+`server_name` matches the host it connected to; that block's `location /`
+`proxy_pass` target, or the `set $var http://<service>:<port>` it references
+in the same location, names the proxy service; (2) the proxy's
+`VLLM_BACKEND_URLS` (comma-separated `http://<service>:<port>`), else
+`VLLM_BASE_URL`, names the engine services (the literal default of a
+`${VAR:-default}` counts; an override is unrecorded); (3) the path is the
+ingress, the proxy and those engines, each attributed to the recipe revision
+that created it by the per-service running table, plus the image each runs
+(a `build:` service resolves to its `FROM` digest). A LEAKS page counts for
+the chat when it is a recipe page with a `services` entry on the path, or an
+image page whose digest a path service runs. Where the path cannot be
+derived — no `server_name` match, an unresolvable `proxy_pass`, a non-literal
+backend list, a path service with no attributed revision — the client counts
+every LEAKS page on the CVM. The near-attestation fixture carries one case of
+each kind.
+
 **Tag-addressed pages (additive):** some attested manifests pin an image only
 by tag — no digest exists anywhere in the attestation chain, so a
 `sha256-*.md` page would claim a byte-identity the attestation doesn't
