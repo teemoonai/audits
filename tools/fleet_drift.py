@@ -361,7 +361,11 @@ def attribute_running(acts, out):
     Only whole-file entries need a fetch during the walk (their service names);
     Rule 3: every up runs with --remove-orphans whether or not it names services,
     so ANY up of F at revision R removes F's containers whose service is absent
-    from R; the newest up of F bounds what older entries of F can own (gpu13,
+    from R; the INTERSECTION of the service sets of every newer up of F bounds what
+    older entries of F can own (a middle revision that dropped S removed S then,
+    even if a later revision re-adds the name without re-creating it), and a
+    name filtered out is marked retired so no older entry of another file can
+    claim it (gpu13,
     2026-11-04: the 320afade proxy up removed the GLM pair of the 10-27 revision,
     whose service names the file no longer had; GPU capacity confirms it).
     the walk is never cut short — a service omitted because a fetch budget ran
@@ -372,7 +376,7 @@ def attribute_running(acts, out):
     the rest read "not fetched". Cross-file eviction (two files sharing one
     project) is not derivable from the log and is NOT applied."""
     decided, texts, pairs, dead_files, unknown = {}, {}, [], set(), set()
-    newest_set = {}        # file -> service set of the NEWEST compose_up of that file seen so far (walking backwards)
+    newest_set = {}        # file -> INTERSECTION of the service sets of every newer compose_up of that file (walking backwards)
     last_touch, newest_whole = {}, None      # per-file newest entry time; newest whole-file up on the CVM
     for a in reversed([a for a in acts if a.get("action") in ("compose_up", "compose_down")]):
         if a.get("file") and a.get("timestamp"):
@@ -393,10 +397,17 @@ def attribute_running(acts, out):
             if st == 200:
                 texts[(commit, path)] = yb.decode("utf-8", "replace")
         bound = newest_set.get(path)
-        if is_up and path not in newest_set:
-            newest_set[path] = set(service_names(texts[(commit, path)])) if (commit, path) in texts else None
+        if is_up:
+            this_set = set(service_names(texts[(commit, path)])) if (commit, path) in texts else None
+            if path not in newest_set:
+                newest_set[path] = this_set
+            elif newest_set[path] is not None and this_set is not None:
+                newest_set[path] = newest_set[path] & this_set   # every newer up removed its own orphans
         if svcs is not None and bound is not None:
-            svcs = [x for x in svcs if x in bound]          # orphan-removed by the newer up of this file
+            for x in svcs:
+                if x not in bound and x not in decided:
+                    decided[x] = None                      # removed as an orphan by a newer up of this file: retired, not free for an older entry of another file
+            svcs = [x for x in svcs if x in bound]
         if svcs is None:                                   # whole-file entry
             if (commit, path) not in texts:
                 st, yb = fetch_recipe(commit, path)
@@ -405,6 +416,9 @@ def attribute_running(acts, out):
             if (commit, path) in texts:
                 svcs = service_names(texts[(commit, path)])
                 if bound is not None:
+                    for x in svcs:
+                        if x not in bound and x not in decided:
+                            decided[x] = None
                     svcs = [x for x in svcs if x in bound]
             else:
                 svcs = []

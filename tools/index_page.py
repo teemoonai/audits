@@ -387,6 +387,9 @@ def validate(idx):
             if bc and b in classes and bc != classes[b]:
                 problems.append(f"heading class {classes[b]} but the body's ## Verdict opens "
                                 f"{bc.upper()}: {b}")
+        if classes.get(b) == "leaks" and b not in (idx.get("exposure") or {}):
+            problems.append(f"gated LEAKS page has no readable '## exposure:' line — the app would fall back "
+                            f"to generic copy that understates a leak: {b}")
         for fnd in findings.get(b, []):
             if fnd["severity"] in ("critical", "high", "medium") and fnd["deployed"] is None:
                 problems.append(f"{fnd['severity'].upper()} finding without a readable deployed: "
