@@ -1,6 +1,6 @@
 # nvcr.io/nvidia/k8s/dcgm-exporter : 4.5.2-4.8.1-distroless
 
-## verdict: telemetry-not-content at audited config — but GPU-privileged, and the tag can drift
+## verdict: QUALIFIED PASS — telemetry-not-content at audited config; GPU-privileged, and the tag can drift
 
 | | |
 |---|---|

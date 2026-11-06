@@ -40,8 +40,22 @@ reported as an integrity break, never silently skipped.
 EXIT CODES
   0  no drift: everything in-scope and live has a page, and the index is intact
   1  drift: at least one in-scope identity is running unaudited
-  2  inconclusive: hosts unreachable, an integrity check failed, or the index is
-     internally broken — nothing may be concluded about coverage
+  2  inconclusive: every host unreachable (any host, with --strict-unreachable),
+     an integrity check failed, or the index is internally broken — nothing may
+     be concluded about coverage
+
+RUNNING, NOT NAMED. near.ai deploys with service-scoped `compose up`, so the
+last compose_up names neither every running container nor the file each one
+came from. The model layer is therefore tabulated per service from the signed
+log, newest entry first (an up or down naming a service decides it; an entry
+without a service list is resolved by fetching that file's service names at
+its commit), and every (commit, file) pair still attributed to a running
+service is reported — up to RUNNING_CAP fetched pairs per CVM, after which the
+rest is said to be unresolved. The compose-manager actually running is read
+from the last compose_manager_started entry and compared with the measured
+default; a swap is reported, and counts as drift when the running image has
+no page (2026-10-29: a320bb48 started by boot-path override on three CVMs
+while the measurement still said 6e035c8f — invisible to the old ups[-1] read).
 
 Usage:
   python3 tools/fleet_drift.py                 # human-readable report
@@ -55,6 +69,7 @@ import json
 import os
 import re
 import sys
+import threading
 import urllib.error
 import urllib.request
 from collections import defaultdict
@@ -63,6 +78,26 @@ from concurrent.futures import ThreadPoolExecutor
 ENDPOINTS = "https://completions.near.ai/endpoints"
 COMPOSE_REPO = "nearai/cvm-compose-files"
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+RUNNING_CAP = 10                      # fetched (commit, file) pairs per CVM
+_RECIPE_CACHE, _RECIPE_LOCK = {}, threading.Lock()
+
+
+def fetch_recipe(commit, path):
+    """-> (status, bytes), cached across hosts and samples by (commit, path)."""
+    key = (commit, path)
+    with _RECIPE_LOCK:
+        if key in _RECIPE_CACHE:
+            return _RECIPE_CACHE[key]
+    got = get(f"https://raw.githubusercontent.com/{COMPOSE_REPO}/{commit}/{path}")
+    with _RECIPE_LOCK:
+        _RECIPE_CACHE.setdefault(key, got)
+    return got
+
+
+def service_names(doc):
+    return [raw.split("\n")[0].strip().rstrip(":") for raw in service_blocks(compose_yaml(doc))]
 
 
 def get(url, timeout=60):
@@ -318,7 +353,7 @@ def sample_host(domain):
     tcb = info.get("tcb_info") or {}
     out = {"host": domain, "model": rep.get("model_name"), "images": {},
            "compose_hash": info.get("compose_hash"), "os": info.get("os_image_hash"),
-           "recipe": None, "integrity": []}
+           "recipe": None, "recipes": [], "manager": None, "integrity": [], "warnings": []}
 
     outer = tcb.get("app_compose") or ""
     if not outer:
@@ -331,25 +366,61 @@ def sample_host(domain):
         out["integrity"] += [f"outer compose: {w}" for w in warns]
 
     acts = ((rep.get("compose_manager_attestation") or {}).get("actions")) or []
+
+    # The manager that is running vs the one the measurement defaults to.
+    started = [a for a in acts if a.get("action") == "compose_manager_started" and a.get("image")]
+    default = next((i for i in out["images"] if "compose-manager@" in i and "launcher" not in i), None)
+    if started and default:
+        running, since = started[-1]["image"], started[-1].get("timestamp", "")
+        if running.split("@")[-1] != default.split("@")[-1]:
+            out["manager"] = {"measured_default": default, "running": running, "since": since}
+            out["images"][running] = "compose-manager (running by boot-path override, not the measured default)"
+
     ups = [a for a in acts if a.get("action") == "compose_up"]
     if not ups:
         out["integrity"].append("no compose_up in the signed action log — model layer UNCHECKED")
         return out
+
+    # Per-service running table, newest entry first (see RUNNING, NOT NAMED).
+    decided, fetched, texts, pairs = {}, 0, {}, []
+    for a in reversed([a for a in acts if a.get("action") in ("compose_up", "compose_down")]):
+        path, commit, want = a.get("file"), a.get("commit"), (a.get("file_sha256") or "").lower()
+        if not path or not commit:
+            continue
+        svcs = a.get("services")
+        is_up = a["action"] == "compose_up"
+        if svcs is None or (is_up and (commit, path) not in texts):
+            if (commit, path) not in texts:
+                if fetched >= RUNNING_CAP:
+                    out["warnings"].append(f"running table capped at {RUNNING_CAP} fetched pairs; "
+                                           f"{a['timestamp'][:10]} {path}@{commit[:12]} and older unresolved")
+                    break
+                fetched += 1
+                st, yb = fetch_recipe(commit, path)
+                if st != 200:
+                    out["integrity"].append(f"could not fetch {path}@{commit[:12]} (HTTP {st}) — model layer UNCHECKED")
+                    return out
+                if is_up and want and hashlib.sha256(yb).hexdigest() != want:
+                    out["integrity"].append(
+                        f"{path}@{commit[:12]} hashes {hashlib.sha256(yb).hexdigest()[:12]} but the action log pins "
+                        f"{want[:12]} — INTEGRITY BREAK")
+                    return out
+                texts[(commit, path)] = yb.decode("utf-8", "replace")
+            if svcs is None:
+                svcs = service_names(texts[(commit, path)])
+        for svc in svcs:
+            if svc in decided:
+                continue
+            decided[svc] = (path, commit, want) if is_up else None
+            if is_up and (path, commit, want) not in pairs:
+                pairs.append((path, commit, want))
+    for path, commit, want in pairs:
+        imgs, warns = in_scope_images(texts[(commit, path)])
+        out["images"].update(imgs)
+        out["integrity"] += [f"recipe {path}@{commit[:12]}: {w}" for w in warns]
+    out["recipes"] = [(path, want) for path, commit, want in pairs]
     up = ups[-1]
-    path, commit, want = up.get("file"), up.get("commit"), (up.get("file_sha256") or "").lower()
-    st, yb = get(f"https://raw.githubusercontent.com/{COMPOSE_REPO}/{commit}/{path}")
-    if st != 200:
-        out["integrity"].append(f"could not fetch {path}@{commit[:12]} (HTTP {st}) — model layer UNCHECKED")
-        return out
-    got = hashlib.sha256(yb).hexdigest()
-    if got != want:
-        out["integrity"].append(
-            f"{path}@{commit[:12]} hashes {got[:12]} but the action log pins {want[:12]} — INTEGRITY BREAK")
-        return out
-    out["recipe"] = (path, want)
-    imgs, warns = in_scope_images(yb.decode("utf-8", "replace"))
-    out["images"].update(imgs)
-    out["integrity"] += [f"recipe {path}: {w}" for w in warns]
+    out["recipe"] = (up.get("file"), (up.get("file_sha256") or "").lower())   # the latest up, as before
     return out
 
 
@@ -385,6 +456,8 @@ def main():
     ap.add_argument("--samples", type=int, default=3,
                     help="requests per host; load-balanced hosts serve different CVMs (default 3)")
     ap.add_argument("--json", metavar="PATH", help="also write a machine-readable report")
+    ap.add_argument("--strict-unreachable", action="store_true",
+                    help="exit 2 when ANY advertised host is unreachable, not only when all are")
     args = ap.parse_args()
 
     idx = load_index()
@@ -401,7 +474,7 @@ def main():
         results = list(ex.map(sample_host, jobs))
 
     live_images, live_measured, live_os, live_recipes = defaultdict(set), defaultdict(set), defaultdict(set), defaultdict(set)
-    unreachable, integrity = defaultdict(set), []
+    unreachable, integrity, warnings, swaps = defaultdict(set), [], [], {}
     for r in results:
         host = r["host"].split(".")[0]
         if r.get("error"):
@@ -409,13 +482,20 @@ def main():
             continue
         for note in r["integrity"]:
             integrity.append((host, note))
+        for note in r.get("warnings") or []:
+            if (host, note) not in warnings:      # one line per host, not per sample
+                warnings.append((host, note))
+        if r.get("manager"):
+            swaps.setdefault(json.dumps(r["manager"], sort_keys=True), set()).add(host)
+        for pr in r.get("recipes") or []:
+            live_recipes[tuple(pr)].add(host)
         for img, role in r["images"].items():
             live_images[(img, role)].add(host)
         if r["compose_hash"]:
             live_measured[r["compose_hash"]].add(host)
         if r["os"]:
             live_os[r["os"]].add(host)
-        if r["recipe"]:
+        if r["recipe"] and not r.get("recipes"):
             live_recipes[r["recipe"]].add(host)
 
     ack = load_acknowledged()
@@ -476,6 +556,16 @@ def main():
         print("\n!! INTEGRITY — nothing may be concluded about these hosts:")
         for h, note in integrity:
             print(f"  {h}: {note}")
+    if swaps:
+        print("\nRUNNING COMPOSE-MANAGER IS NOT THE MEASURED DEFAULT (boot-path override):")
+        for key, hosts in sorted(swaps.items()):
+            m = json.loads(key)
+            print(f"  {m['running'].split('@')[-1][7:19]} running since {m['since'][:19]}Z, measured default "
+                  f"{m['measured_default'].split('@')[-1][7:19]} — on {', '.join(sorted(hosts))}")
+    if warnings:
+        print("\nWARN (coverage, not drift):")
+        for h, note in warnings:
+            print(f"  {h}: {note}")
     print(f"\nUNAUDITED — in scope, running, no page  ({len(unaudited)})")
     for u in unaudited or [None]:
         if u is None:
@@ -502,11 +592,15 @@ def main():
             json.dump({"hosts": len(domains), "samples": args.samples,
                        "unreachable": {k: sorted(v) for k, v in unreachable.items()},
                        "integrity": [{"host": h, "note": n} for h, n in integrity],
+                       "warnings": [{"host": h, "note": n} for h, n in warnings],
+                       "manager_swaps": [dict(json.loads(k), hosts=sorted(v)) for k, v in sorted(swaps.items())],
                        "unaudited": unaudited, "known_open": known,
                        "unobserved": sorted(unobserved),
                        "broken": broken}, f, indent=2)
 
     if integrity or broken or len(unreachable) == len(domains):
+        return 2
+    if unreachable and args.strict_unreachable:
         return 2
     return 1 if unaudited else 0
 

@@ -40,6 +40,7 @@ Usage:
 """
 
 import argparse
+import subprocess
 import collections
 import glob
 import datetime
@@ -87,10 +88,61 @@ def save(idx):
         f.write("\n")
 
 
+def strip_fences(text):
+    return re.sub(r"^```.*?^```\s*$", "", text, flags=re.M | re.S)
+
+
 def verdict_of(path):
     with open(os.path.join(REPO_ROOT, path)) as f:
-        m = re.search(r"^## verdict:\s*(.+)$", f.read(), re.M)
+        m = re.search(r"^## verdict:\s*(.+)$", strip_fences(f.read()), re.M)
     return " ".join(m.group(1).split()) if m else None
+
+
+# A reviewer's skeleton page carries a verdict line that is a promise, not a
+# claim. The indexer once shipped one of those as a verdict (2026-10, see the
+# RUNBOOK). A line that reads like a placeholder is refused outright.
+PLACEHOLDER_RE = re.compile(r"\b(TBD|TODO|placeholder|skeleton|pending review|in progress|to be written)\b", re.I)
+
+
+def body_verdict_of(path):
+    """The first bold token of the page's `## Verdict` section, or None when the
+    page has no such section or it does not open with one. The heading line is
+    what the app reads; the body is what a reader sees first. They must agree."""
+    with open(os.path.join(REPO_ROOT, path)) as f:
+        text = strip_fences(f.read())
+    m = re.search(r"^## Verdict\s*$", text, re.M)
+    if not m:
+        return None
+    for line in text[m.end():].split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("#"):
+            return None
+        b = re.search(r"\*\*(.+?)\*\*", line)
+        return b.group(1) if b else None
+    return None
+
+
+def checked_of(path):
+    """Date the page's text last changed, from git — the evidence date a client
+    can show beside `updated` (which is only the index body's change date).
+    None when git cannot answer (no repo, or a shallow CI clone whose history
+    would attribute every page to HEAD's date)."""
+    try:
+        shallow = subprocess.run(["git", "rev-parse", "--is-shallow-repository"], cwd=REPO_ROOT,
+                                 capture_output=True, text=True).stdout.strip()
+        if shallow != "false":
+            return None
+        dirty = subprocess.run(["git", "status", "--porcelain", "--", path], cwd=REPO_ROOT,
+                               capture_output=True, text=True).stdout.strip()
+        if dirty:
+            return datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+        out = subprocess.run(["git", "log", "-1", "--format=%cs", "--", path], cwd=REPO_ROOT,
+                             capture_output=True, text=True).stdout.strip()
+        return out or None
+    except OSError:
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -107,11 +159,11 @@ CLASS_RULES = [
     (r"^inconclusive\b", "inconclusive"),
     (r"^qualified pass\b", "qualified-pass"),
     (r"^private\b", "private"),
-    # older pages whose verdict lines open with scope wording instead of a
-    # class token; all state "no content exposure at the audited config"
-    (r"^(clean|core request path clean)\b", "private"),
-    (r"^(metadata-only|telemetry-not-content|management-logs only)\b", "private"),
-    (r"^management-only\b", "qualified-pass"),
+    # No prose fallbacks. Until 2026-11-06 "clean", "metadata-only",
+    # "telemetry-not-content" and "management-logs only" mapped to `private`,
+    # which badged a page with an ARMED token-ID leak and a page with a
+    # CRITICAL/HIGH pair as PRIVATE in the app. A verdict line that does not
+    # open with its class token is now a validation failure, not a guess.
 ]
 
 
@@ -240,6 +292,16 @@ def refresh_verdicts(idx):
     idx["verdictClass"] = classes
     idx["exposure"] = exposure
     idx["findings"] = findings
+    checked = collections.OrderedDict()
+    for rel in v:
+        d = checked_of(rel)
+        if d:
+            checked[rel] = d
+    if checked:
+        idx["checked"] = checked          # page path -> YYYY-MM-DD, same keys as `verdicts`
+    elif v:
+        print("  WARN git history unavailable (shallow clone?) — `checked` left as loaded")
+    derive_projects(idx)
     for rel in unclassified:
         print(f"  WARN verdict line has no readable class (page omitted from "
               f"verdictClass; open the verdict with PRIVATE / LEAKS / COMPROMISABLE / "
@@ -248,6 +310,27 @@ def refresh_verdicts(idx):
         print(f"  WARN LEAKS page has no readable exposure scope (page omitted from "
               f"exposure; the app falls back to neutral copy) — {why}: {rel}")
     return missing
+
+
+def derive_projects(idx):
+    """`projects.status` used to be hand-written and said "pinned by tag · can
+    drift" about a project with two digest-gated pages. The pinning facts are
+    in the gates; derive them, and keep the hand-written sentence under `note`
+    so it is visibly a human claim, not a mechanical one."""
+    for ref, proj in (idx.get("projects") or {}).items():
+        digests = (idx.get("images") or {}).get(ref, [])
+        tags = (idx.get("tagAudits") or {}).get(ref, [])
+        parts = []
+        if digests:
+            parts.append(f"{len(digests)} build(s) reviewed by digest")
+        if tags:
+            parts.append(f"tag page(s) {', '.join(tags)} — a tag can drift")
+        if not parts:
+            parts.append("no gated page")
+        old = proj.get("status")
+        if old and "note" not in proj and old != "; ".join(parts):
+            proj["note"] = old
+        proj["status"] = "; ".join(parts)
 
 
 def gate_for(page):
@@ -281,11 +364,33 @@ def validate(idx):
     built += [f"manifests/measured/sha256-{m}.md" for m in (idx.get("measured") or [])]
     built += [f"os/sha256-{o}.md" for o in (idx.get("os") or [])]
     verdicts = idx.get("verdicts") or {}
+    classes = idx.get("verdictClass") or {}
+    findings = idx.get("findings") or {}
     for b in built:
         if not os.path.exists(os.path.join(REPO_ROOT, b)):
             problems.append(f"gated link has no page on disk: {b}")
-        elif b not in verdicts:
+            continue
+        if b not in verdicts:
             problems.append(f"gated page has no verdict: {b}")
+            continue
+        note = verdicts[b]
+        if b not in classes:
+            problems.append(f"gated page's verdict line opens with no class token "
+                            f"(PRIVATE / LEAKS / COMPROMISABLE / QUALIFIED PASS): {b}: {note[:60]}")
+        elif classes[b] == "inconclusive":
+            problems.append(f"gated page is INCONCLUSIVE — revoke the gate (--no-gate): {b}")
+        if PLACEHOLDER_RE.search(note):
+            problems.append(f"gated page's verdict line reads like a placeholder: {b}: {note[:60]}")
+        body = body_verdict_of(b)
+        if body is not None:
+            bc = classify(body)
+            if bc and b in classes and bc != classes[b]:
+                problems.append(f"heading class {classes[b]} but the body's ## Verdict opens "
+                                f"{bc.upper()}: {b}")
+        for fnd in findings.get(b, []):
+            if fnd["severity"] in ("critical", "high", "medium") and fnd["deployed"] is None:
+                problems.append(f"{fnd['severity'].upper()} finding without a readable deployed: "
+                                f"field (ON/OFF/ARMED): {b} — {fnd['title'][:50]}")
     on_disk = {os.path.relpath(f, REPO_ROOT)
                for pat in ["images/**/sha256-*.md", "images/**/tag-*.md",
                            "manifests/**/sha256-*.md", "os/sha256-*.md"]
@@ -358,11 +463,20 @@ def main():
                 idx["sources"][key][val] = {"repo": repo, "commit": sha}
                 print(f"sources : {key} {val[:12]} -> {repo}@{sha[:12]}")
 
+    before = json.dumps({k: v for k, v in idx.items() if k != "updated"}, sort_keys=True)
     missing = refresh_verdicts(idx)
     for m in missing:
         print(f"  WARN page has no '## verdict:' heading: {m}")
     problems, n = validate(idx)
-    save(idx)
+    if a.validate:
+        # Read-only: report, never write. A page edited without re-running the
+        # indexer (an addendum that moved a heading) shows up here as a stale
+        # index — the 2026-11-06 case the app would otherwise never see.
+        after = json.dumps({k: v for k, v in idx.items() if k != "updated"}, sort_keys=True)
+        if before != after:
+            problems.append("index.json is stale against the pages on disk — run the indexer and commit")
+    else:
+        save(idx)
 
     print(f"\nindex.json: {n} gated link(s), {len(idx.get('verdicts') or {})} verdict(s)")
     if problems:

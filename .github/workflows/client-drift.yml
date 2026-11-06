@@ -27,6 +27,11 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # index_page.py --validate derives `checked` from page history
+
+      - name: Validate index.json against the pages (read-only)
+        run: python3 tools/index_page.py --validate
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -48,6 +53,12 @@ jobs:
           TITLE="client drift: a teemoon-ios release has no page"
           EXISTING=$(gh issue list --state open --label client-drift \
                        --json number --jq '.[0].number // empty' || true)
+          # A filed-but-unlabelled issue (the label edit failed) must still be
+          # found, or the next run files a duplicate. Fall back to the title.
+          if [ -z "${EXISTING}" ]; then
+            EXISTING=$(gh issue list --state open --search "in:title \"${TITLE}\"" \
+                         --json number --jq '.[0].number // empty' || true)
+          fi
           if [ "${EXIT}" = "0" ]; then
             if [ -n "${EXISTING}" ]; then
               gh issue comment "${EXISTING}" --body "Cleared as of \`${GITHUB_SHA:0:12}\` ($(date -u +%Y-%m-%dT%H:%MZ)): every App Store tag has a page pinning the commit it points at. Closing."
@@ -75,7 +86,8 @@ jobs:
           else
             gh label create client-drift --color d93f0b \
               --description "A teemoon-ios release has no audit page" --force >/dev/null 2>&1 || true
-            URL=$(gh issue create --title "${TITLE}" --body-file body.md)
-            gh issue edit "${URL}" --add-label client-drift --add-assignee "${GITHUB_REPOSITORY_OWNER}" || \
-              echo "::warning::issue ${URL} filed but could not be labelled or assigned"
+            URL=$(gh issue create --title "${TITLE}" --body-file body.md \
+                    --label client-drift --assignee "${GITHUB_REPOSITORY_OWNER}") || \
+            { URL=$(gh issue create --title "${TITLE}" --body-file body.md);
+              echo "::warning::issue ${URL} filed but could not be labelled or assigned"; }
           fi
