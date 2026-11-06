@@ -181,6 +181,12 @@ def service_table(actions, content_of):
             svcs = service_names(body.decode("utf-8", "replace"), default_only=True) if body else []
             if not svcs:
                 svcs = [f"<all services of {a.get('file')} — file unavailable>"]
+            # A whole-file `up -d --remove-orphans` (compose-manager's invariant,
+            # per-model project) removes every container of this file whose
+            # service is no longer in the revision: renamed services never get a
+            # compose_down (gpu02 2026-10-31, r1/r2 -> dp0..7). Retire them here.
+            for s_old in [k for k, v in live.items() if v.get("file") == a.get("file") and k not in svcs]:
+                live.pop(s_old, None)
         for s in svcs:
             live[s] = a
     return live
