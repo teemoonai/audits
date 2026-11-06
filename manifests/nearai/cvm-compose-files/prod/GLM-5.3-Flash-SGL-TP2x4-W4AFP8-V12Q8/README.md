@@ -27,6 +27,7 @@ verdict column is each page's own `## verdict:` line, truncated.
 | file_sha256 | verdict | review |
 |---|---|---|
 | [`904054f502cc…`](sha256-904054f502ccdb2f913d6b80f156ea658b8bc5cb6f8af06082723581d62a45c0.md) | QUALIFIED PASS — sibling review of `a49d9c15` (`7ee4a4c7`, v0.0.521): the four replicas and the sidecar move to the signed v12 engine `da8d4e4b`, `--dsa-prefill-backend flashmla_sparse_q8` on the HiCache-off candidate argv, the proxy to `e4a42b32`; nothing else in 1861 lines differs; the sibling's CRITICAL (`/configure_logging` on the shared bridge; web search ARMED), HIGHs (fusion ARMED, 1800 s watchdog dump, unscrubbed export) and MEDIUMs carry; gpu04 runs r1-r3 from this file and r4 from a pageless canary with the same resolved block, gpu03 runs r1-r4 from this file under a proxy from an unaudited canary revision with an identical block; both aggregators are v7 leftovers; two readings stated for every beside-recipe container | 2026-10-30 |
+| [`309c07af98ff…`](sha256-309c07af98ff96349716dde078158ee021cf0eed33cd8690aa638f2e61546dd1.md) | QUALIFIED PASS — a one-line delta from the 904054f5 page: the E2EE terminator's image moves from vllm-proxy-rs e4a42b32 to the signed 0be4ee8f build (line 134), fourteen commits later, whose page finds no new content sink at the e… | 2026-11-06 |
 
 A revision not listed here has not been audited — the teemoon app shows no audit
 link for it (fail-closed by design). `python3 tools/fleet_drift.py` reports which
