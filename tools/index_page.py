@@ -347,9 +347,10 @@ def derive_projects(idx):
         tags = (idx.get("tagAudits") or {}).get(ref, [])
         parts = []
         if digests:
-            parts.append(f"{len(digests)} build(s) reviewed by digest")
+            n = len(digests)
+            parts.append(f"{n} build{'' if n == 1 else 's'} reviewed by digest")
         if tags:
-            parts.append(f"tag page(s) {', '.join(tags)} — a tag can drift")
+            parts.append(f"tag page{'' if len(tags) == 1 else 's'} {', '.join(tags)} — a tag can drift")
         if not parts:
             parts.append("no gated page")
         old = proj.get("status")

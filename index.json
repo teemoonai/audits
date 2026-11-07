@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-11-06",
+  "updated": "2026-11-07",
   "images": {
     "docker.io/nearaidev/vllm-proxy-rs": [
       "b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36",
@@ -270,19 +270,19 @@
     "docker.io/otel/opentelemetry-collector-contrib": {
       "name": "OpenTelemetry Collector Contrib",
       "repo": "open-telemetry/opentelemetry-collector-contrib",
-      "status": "1 build(s) reviewed by digest",
+      "status": "1 build reviewed by digest",
       "note": "open source \u00b7 shipped build not source-audited"
     },
     "docker.io/datadog/agent": {
       "name": "Datadog Agent",
       "repo": "DataDog/datadog-agent",
-      "status": "1 build(s) reviewed by digest",
+      "status": "1 build reviewed by digest",
       "note": "proprietary \u00b7 shipped build not source-audited"
     },
     "nvcr.io/nvidia/k8s/dcgm-exporter": {
       "name": "NVIDIA DCGM Exporter",
       "repo": "NVIDIA/dcgm-exporter",
-      "status": "2 build(s) reviewed by digest; tag page(s) 4.5.2-4.8.1-distroless \u2014 a tag can drift",
+      "status": "2 builds reviewed by digest; tag page 4.5.2-4.8.1-distroless \u2014 a tag can drift",
       "note": "pinned by tag \u00b7 can drift \u00b7 not source-audited"
     }
   },
