@@ -518,6 +518,7 @@
   ],
   "verdicts": {
     "images/docker.io/datadog/agent/sha256-5556fb80b952832719a76b016f905616c76ee0989a239c4680c6220148e865d6.md": "QUALIFIED PASS \u2014 metadata-only exposure at audited config; configuration-level review, the shipped build is not source-reviewed",
+    "images/docker.io/levantolabs/sage2-hopper-pod/sha256-b5268f0a1bddf96895baf7b38f28cf814eaecc79d832d5660f4155584506009e.md": "INCONCLUSIVE \u2014 the image could not be obtained and was not read: Docker Hub refuses an anonymous pull, no build attestation and no public source were found, so this page makes no privacy claim about what the image does; it records only the configuration the container runs under on the small-models CVM, including that it can obtain hardware quotes for that CVM with report data of its own choosing",
     "images/docker.io/library/docker/sha256-851f91d241214e7c6db86513b270d58776379aacc5eb9c4a87e5b47115e3065c.md": "QUALIFIED PASS \u2014 at its one deployed invocation this image contributes no behaviour of its own: the recipe replaces its entrypoint with sh -c and runs a script this run read in full, whose only use of the image is the docker binary for two docker exec calls into compose-manager-launcher; the image sees no message plaintext, has no network under the recipe, and its git, ssh client, compose and buildx plugins are inert there; the qualifier is identity and provenance \u2014 the digest was re-fetched and re-hashed, the config matches the orchestrator's capture, and the buildkit provenance attached to the index names the upstream Dockerfile commit, but that provenance is the builder's own statement, not a signature, the docker binary inside is Docker Inc.'s static release downloaded by the Dockerfile without a checksum, and the CLI's own source was not reviewed; the class that matters is the recipe page's, which this image only executes",
     "images/docker.io/lmsysorg/sglang/sha256-1c64fde976bdf0d56474a30bccbcfc19667e5b3ab34c826a534c9d6aaca41212.md": "private at the deployed flags \u2014 with the repo's two standing live paths present and unmitigated: an unauthenticated `/configure_logging`, and an undisableable hang-time prompt dump whose blast radius is the largest in the fleet",
     "images/docker.io/lmsysorg/sglang/sha256-5027e95bf6ec536856b1b52a91d1f35ff5c564ab83e8a94758a169ff09bb8df3.md": "private at the deployed flags \u2014 but not \"cannot happen\": one unauthenticated runtime logging switch and one unconditional hang-time prompt dump remain live",
@@ -706,6 +707,7 @@
   },
   "verdictClass": {
     "images/docker.io/datadog/agent/sha256-5556fb80b952832719a76b016f905616c76ee0989a239c4680c6220148e865d6.md": "qualified-pass",
+    "images/docker.io/levantolabs/sage2-hopper-pod/sha256-b5268f0a1bddf96895baf7b38f28cf814eaecc79d832d5660f4155584506009e.md": "inconclusive",
     "images/docker.io/library/docker/sha256-851f91d241214e7c6db86513b270d58776379aacc5eb9c4a87e5b47115e3065c.md": "qualified-pass",
     "images/docker.io/lmsysorg/sglang/sha256-1c64fde976bdf0d56474a30bccbcfc19667e5b3ab34c826a534c9d6aaca41212.md": "private",
     "images/docker.io/lmsysorg/sglang/sha256-5027e95bf6ec536856b1b52a91d1f35ff5c564ab83e8a94758a169ff09bb8df3.md": "private",
@@ -893,6 +895,50 @@
     "os/sha256-a6eafc5f007f642d8ea90c7fa8881f1e6715720ccb531941a28218f4f26d7b02.md": "qualified-pass"
   },
   "findings": {
+    "images/docker.io/levantolabs/sage2-hopper-pod/sha256-b5268f0a1bddf96895baf7b38f28cf814eaecc79d832d5660f4155584506009e.md": [
+      {
+        "severity": "high",
+        "deployed": "on",
+        "qualifier": "deployed: ON, unaudited image",
+        "title": "sage: an unread third-party container with internet access and its own log credential runs inside the CVM that serves nine model hosts; what it sends out is unknown (egress to a third party, unverified)",
+        "anchor": "high-deployed-on-unaudited-image--sage-an-unread-third-party-container-with-internet-access-and-its-own-log-credential-runs-inside-the-cvm-that-serves-nine-model-hosts-what-it-sends-out-is-unknown-egress-to-a-third-party-unverified"
+      },
+      {
+        "severity": "medium",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED, quote access is ON and the rest needs traffic routed to Sage",
+        "title": "sage: GET /GetQuote through the socket filter returns a quote for this CVM over caller-chosen report data, in the same key-then-nonce layout the near.ai model attestation uses, so a quote cannot show which container holds an attested key (attestation, no sink)",
+        "anchor": "medium-deployed-armed-quote-access-is-on-and-the-rest-needs-traffic-routed-to-sage--sage-get-getquote-through-the-socket-filter-returns-a-quote-for-this-cvm-over-caller-chosen-report-data-in-the-same-key-then-nonce-layout-the-nearai-model-attestation-uses-so-a-quote-cannot-show-which-container-holds-an-attested-key-attestation-no-sink"
+      },
+      {
+        "severity": "high",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED, unaudited image, armed by unattested env",
+        "title": "sage: BRAVE_API_KEY from SAGE_SEARCH_API_KEY arms a search egress from the unread container; the file cannot show whether the key is set (egress to a third party, unverified)",
+        "anchor": "high-deployed-armed-unaudited-image-armed-by-unattested-env--sage-braveapikey-from-sagesearchapikey-arms-a-search-egress-from-the-unread-container-the-file-cannot-show-whether-the-key-is-set-egress-to-a-third-party-unverified"
+      },
+      {
+        "severity": "medium",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED",
+        "title": "sage: nine SAGE_ values, among them the log destination credential, the HMAC secret and the admin token, come from the deploy call's env, which is neither measured nor logged (config channel)",
+        "anchor": "medium-deployed-armed--sage-nine-sage-values-among-them-the-log-destination-credential-the-hmac-secret-and-the-admin-token-come-from-the-deploy-calls-env-which-is-neither-measured-nor-logged-config-channel"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "sage-dstack: the filter's access log writes each request line, query string included, to its own container log; for GetQuote that is the report data the caller chose (log, local disk)",
+        "anchor": "info-deployed-on--sage-dstack-the-filters-access-log-writes-each-request-line-query-string-included-to-its-own-container-log-for-getquote-that-is-the-report-data-the-caller-chose-log-local-disk"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "sage: quote requests through the filter are not rate-limited and share the one quote lock of the whole CVM (availability, no sink)",
+        "anchor": "info-deployed-on--sage-quote-requests-through-the-filter-are-not-rate-limited-and-share-the-one-quote-lock-of-the-whole-cvm-availability-no-sink"
+      }
+    ],
     "images/docker.io/library/docker/sha256-851f91d241214e7c6db86513b270d58776379aacc5eb9c4a87e5b47115e3065c.md": [
       {
         "severity": "info",
@@ -21435,6 +21481,7 @@
   },
   "checked": {
     "images/docker.io/datadog/agent/sha256-5556fb80b952832719a76b016f905616c76ee0989a239c4680c6220148e865d6.md": "2026-11-06",
+    "images/docker.io/levantolabs/sage2-hopper-pod/sha256-b5268f0a1bddf96895baf7b38f28cf814eaecc79d832d5660f4155584506009e.md": "2026-11-19",
     "images/docker.io/library/docker/sha256-851f91d241214e7c6db86513b270d58776379aacc5eb9c4a87e5b47115e3065c.md": "2026-11-06",
     "images/docker.io/lmsysorg/sglang/sha256-1c64fde976bdf0d56474a30bccbcfc19667e5b3ab34c826a534c9d6aaca41212.md": "2026-08-04",
     "images/docker.io/lmsysorg/sglang/sha256-5027e95bf6ec536856b1b52a91d1f35ff5c564ab83e8a94758a169ff09bb8df3.md": "2026-08-04",
