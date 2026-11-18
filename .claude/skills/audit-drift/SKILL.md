@@ -119,7 +119,7 @@ Model stays `fable` and the Rules section stays whole whatever the size of the
 delta.
 
 **When the Fable quota is exhausted** (the agent fails with a 429 naming the
-Fable limit), garry's standing instruction is to relaunch on `model: "opus"`
+Fable limit), the maintainer's standing instruction is to relaunch on `model: "opus"`
 (Opus 5.5). Check first what the failed agent left on disk. The brief changes
 in one place only: the review line must name the model that wrote the review,
 `reviewed <date> (independent AI source review, Claude Opus 5.5 — method: …)`.
