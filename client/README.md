@@ -2,7 +2,7 @@
 
 > **teemoonai/audits** — the client side of the one question. Method:
 > [`method.md`](method.md) · Architecture: [`ARCHITECTURE.md`](ARCHITECTURE.md) ·
-> Surface: [`audit-surface.md`](audit-surface.md) · Server side: [`/README.md`](/README.md).
+> Surface: [`audit-surface.md`](audit-surface.md) · Page layout: [`PAGE_TEMPLATE.md`](PAGE_TEMPLATE.md) · Server side: [`/README.md`](/README.md).
 
 The other end of the end-to-end encryption. The app composes every prompt and
 decrypts every reply, so it holds your plaintext unconditionally — that is
