@@ -39,6 +39,15 @@
       "page": null,
       "gated_in_index": false,
       "closes_when": "near.ai records the compose project (and an env-overlay hash) in the compose_up/compose_down action, or exposes the live container list, so liveness becomes derivable; or the revision is reviewed"
+    },
+    {
+      "id": "docker.io/levantolabs/sage2-hopper-pod@sha256:b5268f0a1bddf96895baf7b38f28cf814eaecc79d832d5660f4155584506009e",
+      "kind": "image",
+      "since": "2026-11-19",
+      "reason": "Third-party private image (Levanto Labs Sage 2) running inside the small-models CVM (cm-gpu13, measured e8416a02). Docker Hub refuses an anonymous pull, no build attestation and no public source exist (positive control in the same run resolved), so its contents cannot be reviewed. The page is INCONCLUSIVE on the image and records the configuration it runs under: own network, no Docker socket, a socket filter that allows only Info and GetQuote. Decided by the maintainer 2026-11-19 ('do the Sage page').",
+      "page": "images/docker.io/levantolabs/sage2-hopper-pod/sha256-b5268f0a1bddf96895baf7b38f28cf814eaecc79d832d5660f4155584506009e.md",
+      "gated_in_index": false,
+      "closes_when": "near.ai or Levanto publishes the image's source or a build attestation that lets it be reviewed; or the container no longer runs on a CVM that serves teemoon-reachable models; or the digest stops being named by a running recipe revision."
     }
   ]
 }
