@@ -1331,6 +1331,10 @@ the 1.0.6 delta; the page's rows at `:71`/`:79`/`:84`, `:25` and `:265` are
 unchanged lines), and the Android port, whose chip predicate and gate the
 Android 1.0.6 addendum and 1.1.0 page read on their own.
 
+### Addendum — 2026-11-19: only the first listed model enclave is verified, and the enclaves share one key (orchestrator)
+
+**MEDIUM (deployed: ON).** Reported by the iOS developer session on 2026-11-18 and confirmed by the orchestrator. At the public tree `ab64f15`, `Confidential/AttestationService+Reports.swift:226` and its four siblings read the top-level fields or the first element of `all_attestations` / `model_attestations`; no later element is read. On 2026-11-18 near.ai's gateway listed three model enclaves for `z-ai/glm-5.3-flash` and two for each DeepSeek-V4.1-Flash-1017 model, with different compose hashes under one `app_id` and one signing key per model; the key service derives the application key from the app id alone. So a sealed message can be opened by enclaves this release did not verify, the reply-signature check cannot tell them apart, and the send gate's checks describe one enclave. The message still goes only to near.ai, sealed, and every holder observed is a TDX enclave with a valid quote. The trust screen's sentences that only the model can open the message and that the key lives inside the model's sealed chip are not accurate as written. The full finding, the evidence and what a fix can and cannot close are on the [1.1.0 page](v1.1.0-6c5f7a2.md), under Findings. A fix is proposed for 1.1.1; none is planned for this release. The class stays QUALIFIED-PASS.
+
 ### Findings
 
 The 2026-11-06 addendum above adds two LOW display-honesty findings and one
