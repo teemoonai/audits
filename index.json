@@ -21280,7 +21280,7 @@
     },
     "images/docker.io/nearaidev/sglang/sha256-6de632a5e9422be4b6e84e32cf475679c0f29c4bb6d58984d873ff9f7ba92a65.md": {
       "scope": "conditional",
-      "summary": "On the two Qwen services, one tool-call argument value written by the model is printed verbatim to the engine log and shipped to near.ai's telemetry gateway each time it does not parse as the type its tool schema declares; on the FLUX service every generated image is also saved to the container's disk and kept.",
+      "summary": "Qwen models: when the model uses a tool and writes one of the tool's values in the wrong format (for example words where a number is expected), that value is copied into a server log that near.ai's telemetry collects. FLUX: each generated image is also kept on the server's disk.",
       "scope_kind": "image"
     },
     "images/ghcr.io/phala-network/sglang/sha256-2488ca13aee77ffd24ba2181b1b05dcf5e1c76e6477002c7b2f074b44fa49193.md": {
@@ -21308,7 +21308,7 @@
     },
     "manifests/nearai/cvm-compose-files/prod/pack-small-models/sha256-4f4c6c18ad2b9f877dc5144c67a61a403314a219b10b357db81fb7688cd61140.md": {
       "scope": "conditional",
-      "summary": "On the two Qwen chat services this file declares, one tool-call argument value written by the model is printed verbatim to the engine log and shipped to near.ai's telemetry backend each time it does not parse as the type its tool schema declares; on the FLUX image service every generated image is also saved to the container's disk and kept; requests to the other models in this file do not pass through those services.",
+      "summary": "Qwen models: when the model writes a tool-call value that does not fit the type the tool expects (for example text where a number belongs), that value is copied into a server log that is sent to near.ai's telemetry. FLUX: each generated image is also kept on the server's disk.",
       "scope_kind": "recipe",
       "services": [
         "model-sg-qwen36-35b-a3b-fp8-tp1-r1",
@@ -21318,7 +21318,7 @@
     },
     "manifests/nearai/cvm-compose-files/prod/pack-small-models/sha256-bbc809427267b2efa784a2e51c65ac8f4f3d1efdd6ff28ca2a43c15dcff91118.md": {
       "scope": "conditional",
-      "summary": "On the two Qwen chat services this file declares, one tool-call argument value written by the model is printed verbatim to the engine log and shipped to near.ai's telemetry backend each time it does not parse as the type its tool schema declares; on the FLUX image service every generated image is also saved to the container's disk and kept; requests to the other models in this file do not pass through those services.",
+      "summary": "Qwen models: when the model writes a tool-call value that does not fit the type the tool expects (for example text where a number belongs), that value is copied into a server log that is sent to near.ai's telemetry. FLUX: each generated image is also kept on the server's disk.",
       "scope_kind": "recipe",
       "services": [
         "model-sg-qwen36-35b-a3b-fp8-tp1-r1",
@@ -21432,7 +21432,7 @@
     },
     "manifests/nearai/cvm-compose-files/prod/small-models/sha256-c9bcfb9f090a984ec722aed2769f02c26eac54890388b16c784d3282c047d320.md": {
       "scope": "conditional",
-      "summary": "On the Qwen3.8 service this revision still runs, one tool-call argument value written by the model is printed verbatim to the engine log and shipped to near.ai's telemetry backend each time it does not parse as the type its tool schema declares; requests to the other models do not pass through that engine.",
+      "summary": "When the model writes a tool-call value that does not fit the type the tool expects (for example text where a number belongs), that value is copied into a server log that is sent to near.ai's telemetry.",
       "scope_kind": "recipe",
       "services": [
         "model-sg-qwen38-27b-fp8-tp1-coloc"
