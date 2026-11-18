@@ -52,6 +52,7 @@ import urllib.request
 
 # Images whose attestations are published by a repo the image name does not name.
 REPO_ALIASES = {"compose-manager-launcher": "compose-manager",
+                "compose-manager-otelcol": "compose-manager",   # built by compose-manager's build.yml (2026-11-19: asking a repo named after the image gave a false 404)
                 "vllm-proxy-rs": "inference-proxy"}
 
 # Where near.ai's own image-build workflows (and their Dockerfiles) live.
@@ -129,6 +130,12 @@ def rung_signed(image, digest):
         st, body = get(f"https://api.github.com/repos/{repo}/attestations/sha256:{digest}", gh_headers())
         if st == 200:
             break
+        if st != 404:
+            # Only a 404 says "no attestation here". A 403 or 429 is GitHub's rate
+            # limit, and falling through to the label rung on it would report a
+            # weaker identity than the one that exists (seen 2026-11-19).
+            sys.exit(f"attestation lookup for {repo} returned HTTP {st}, not 200 or 404: "
+                     "cannot tell present from absent. Set GITHUB_TOKEN and re-run.")
         misses.append(f"repo-level {repo}: HTTP {st}")
     else:
         return None, "; ".join(misses)
