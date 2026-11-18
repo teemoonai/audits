@@ -81,7 +81,8 @@
       "5eaa0d4637080c10958b6cd8a371ae2ebb749b7a1e19c85bcb1abb89ee2540e4",
       "8353a657f8edbc68637e30371ffacb94713d4e844faf3f73a77d820d5dfdfaae",
       "0956859f52d262fa17084d61320c5b1ea22845825c7aab57d49ed8064cc8a396",
-      "2fe2385152c450c971ff1ac9262298d9f3ed1a09decd4c65b048a6465c1796ea"
+      "2fe2385152c450c971ff1ac9262298d9f3ed1a09decd4c65b048a6465c1796ea",
+      "0e1f95eddd2247bf1c8ab024876319c2f80aead5d0e4a28dfffc9563e370a253"
     ],
     "ghcr.io/astral-sh/uv": [
       "4f5d923c9dcea037f57bda425dd209f3ec643da2f0b74227f68d09dab0b3bb36"
@@ -294,6 +295,10 @@
       "2fe2385152c450c971ff1ac9262298d9f3ed1a09decd4c65b048a6465c1796ea": {
         "repo": "nearai/cvm-compose-files",
         "commit": "494e2854a811ae563c29058c811250b7cc756f8a"
+      },
+      "0e1f95eddd2247bf1c8ab024876319c2f80aead5d0e4a28dfffc9563e370a253": {
+        "repo": "nearai/cvm-compose-files",
+        "commit": "cbe1dd569bd7ba31c569bd72b5c0142e2b9cbfcd"
       }
     },
     "ghcr.io/astral-sh/uv": {
@@ -568,6 +573,7 @@
     "images/docker.io/nearaidev/vllm-proxy-rs/sha256-e4a42b327523e304c0fc389f656ba7a02fd7b3d4a38cdc822f9288fd193a525a.md": "QUALIFIED PASS \u2014 exactly one commit after the 295f16f8 build (PR 311: an optional per-request count, 0 to 20, on the web_context_search tool); every line of it reviewed \u2014 the only new sink is a debug line carrying a tool name and a tool-call id, and the only change to what leaves the CVM is that the client's bounded integer replaces the fixed 20 in the search API's count parameters; otherwise identical to the 295f16f8 page, whose whole-tree sweeps and deployed-env analysis carry; web search and fusion remain client-opt-in plaintext egress armed by unattested host env on glm-5-3-flash-long; replica-state publishing is armed the same way and carries load figures only; on this host the engine pool itself is named by an unattested host-env value",
     "images/docker.io/nearaidev/vllm-proxy-rs/sha256-e665ebb9998fcf333a1611ecb4c49bd209b90aa9e09547ed792bd0436b132f30.md": "QUALIFIED PASS \u2014 core request path clean at this commit (no plaintext in logs, files, or telemetry; the new DP-affinity key is a salted digest that never leaves process memory, and the new attribution diagnostics emit only bounded labels); the two client-opt-in egress features (web search, fusion) carry over unchanged and remain live-or-latent at deployed config",
     "images/docker.io/nearaidev/vllm/sha256-0956859f52d262fa17084d61320c5b1ea22845825c7aab57d49ed8064cc8a396.md": "QUALIFIED PASS at the deployed flags \u2014 an OLDER build than the audited 5eaa0d46: the same v0.32.0 base and the same three LoRA patches, without the two confidential-computing patches (UVA off, Engram CPU gather), so at its recipe's cpu_offload:true the GPU reads the Engram tables and the per-step input buffers straight out of pinned host memory, the path near.ai's own notes say corrupts decode under TDX plus PPCIe \u2014 a correctness fault with no privacy sink, and no /dev/shm Engram file exists at all; the two base qualifications carry (the engine-crash dump prints every in-flight request's speculative draft token ids; the multimodal model fetches chat image URLs with no allowlist, here from a bridge namespace rather than the host's) plus the stats.vllm.ai phone-home and the latent stdout switches; declared by a superseded revision, not running since 2026-10-31 \u2014 the whole-file re-up of the same recipe at 0200eef6 removed its eight ranks as orphans and no CVM runs this image today",
+    "images/docker.io/nearaidev/vllm/sha256-0e1f95eddd2247bf1c8ab024876319c2f80aead5d0e4a28dfffc9563e370a253.md": "QUALIFIED PASS for an image that is declared, not running \u2014 upstream v0.34.0 plus 17 near.ai patches; the DeepSeek recipe revision d4cbe817 names it for the engines, but by both signed action logs as read on 2026-11-19 that revision created only proxies and nginx, and the running engines are still 2fe23851; under d4cbe817's engine flags and behind proxy e3a4fbca a well-formed request would leave no content in any log, file or non-model destination, and no patch adds a content sink; the qualifications carry from the v0.33.0 build, all on stdout, which the recipe's collector ships to telemetry.infra.near.ai: an engine-step crash prints up to five speculative draft token ids per in-flight request, and a text part without its text field under a non-standard role is printed whole by the chat parser; the fetch-retry warning that prints a media URL is in the image, now also on a broken response body, but unreachable through the proxy; this page would be LEAKS if VLLM_PROXY_INLINE_MEDIA is set to 0 on a proxy or a caller on the CVM host network posts a media URL to the engine port directly, or if the malformed-request and crash triggers are counted as ordinary operation",
     "images/docker.io/nearaidev/vllm/sha256-2fe2385152c450c971ff1ac9262298d9f3ed1a09decd4c65b048a6465c1796ea.md": "QUALIFIED PASS at the deployed flags \u2014 upstream v0.33.0 plus 17 near.ai patches, none of which adds a content sink and two of which (14, 15) close most of the engine's request-driven fetch; well-formed requests leave no content in any log, file or non-model destination, and the proxy in front (e3a4fbca) downloads media itself and refuses anything it could not turn into data URLs; qualifications, all on stdout, which the recipe's collector ships to telemetry.infra.near.ai: an engine-step crash prints up to five speculative draft token ids per in-flight request, and a text part without its text field under a non-standard role is printed whole by the chat parser; the fetch-retry warning that prints a media URL is in the image but unreachable through the proxy; this page would be LEAKS if VLLM_PROXY_INLINE_MEDIA is set to 0 on a proxy or a caller on the CVM host network posts a media URL to the engine port directly, or if the malformed-request and crash triggers are counted as ordinary operation",
     "images/docker.io/nearaidev/vllm/sha256-5eaa0d4637080c10958b6cd8a371ae2ebb749b7a1e19c85bcb1abb89ee2540e4.md": "QUALIFIED PASS at the deployed flags \u2014 no content path to log, disk or telemetry in steady state, and the five near.ai patches add no sink; two qualifications: the engine-crash dump prints the speculative draft token ids of every in-flight request (speculative decoding is deployed here and SchedulerOutput has no redacting repr), and the deployed model class is multimodal, so a chat request's image URL is fetched by the engine with no domain allowlist and redirects on, from the host network namespace; the stats.vllm.ai phone-home (ON, metadata) and the three latent stdout switches of the v0.26 line carry",
     "images/docker.io/nearaidev/vllm/sha256-8353a657f8edbc68637e30371ffacb94713d4e844faf3f73a77d820d5dfdfaae.md": "QUALIFIED PASS at the deployed flags \u2014 the audited 5eaa0d46 build plus one patch (06, Engram fast gather) that adds no log, file, socket or shared-memory sink: it reads one new env var and moves Engram weight rows through in-process pinned host buffers; on this cluster all three near.ai CC patches are live (UVA off, CPU gather, fast gather) so the weights-only Engram table in /dev/shm the base page called dormant is now a real file shared by every ipc-host container; the two base qualifications carry \u2014 the engine-crash dump prints every in-flight request's speculative draft token ids (now up to five per request) and the multimodal model fetches chat image URLs with no allowlist from the host network namespace \u2014 plus the stats.vllm.ai phone-home and the latent stdout switches",
@@ -757,6 +763,7 @@
     "images/docker.io/nearaidev/vllm-proxy-rs/sha256-e4a42b327523e304c0fc389f656ba7a02fd7b3d4a38cdc822f9288fd193a525a.md": "qualified-pass",
     "images/docker.io/nearaidev/vllm-proxy-rs/sha256-e665ebb9998fcf333a1611ecb4c49bd209b90aa9e09547ed792bd0436b132f30.md": "qualified-pass",
     "images/docker.io/nearaidev/vllm/sha256-0956859f52d262fa17084d61320c5b1ea22845825c7aab57d49ed8064cc8a396.md": "qualified-pass",
+    "images/docker.io/nearaidev/vllm/sha256-0e1f95eddd2247bf1c8ab024876319c2f80aead5d0e4a28dfffc9563e370a253.md": "qualified-pass",
     "images/docker.io/nearaidev/vllm/sha256-2fe2385152c450c971ff1ac9262298d9f3ed1a09decd4c65b048a6465c1796ea.md": "qualified-pass",
     "images/docker.io/nearaidev/vllm/sha256-5eaa0d4637080c10958b6cd8a371ae2ebb749b7a1e19c85bcb1abb89ee2540e4.md": "qualified-pass",
     "images/docker.io/nearaidev/vllm/sha256-8353a657f8edbc68637e30371ffacb94713d4e844faf3f73a77d820d5dfdfaae.md": "qualified-pass",
@@ -4597,6 +4604,113 @@
         "qualifier": "deployed: ON",
         "title": "patches 01-03 (LoRA on wo_b), the pip pins and the base engine's remaining INFO items carry unchanged",
         "anchor": "info-deployed-on--patches-01-03-lora-on-wob-the-pip-pins-and-the-base-engines-remaining-info-items-carry-unchanged"
+      }
+    ],
+    "images/docker.io/nearaidev/vllm/sha256-0e1f95eddd2247bf1c8ab024876319c2f80aead5d0e4a28dfffc9563e370a253.md": [
+      {
+        "severity": "medium",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED, fires on an engine-step exception",
+        "title": "engine-crash dump prints every in-flight request's speculative draft token ids to the stdout log, which the collector ships out of the enclave; the prompt and output histories stay redacted",
+        "anchor": "medium-deployed-armed-fires-on-an-engine-step-exception--engine-crash-dump-prints-every-in-flight-requests-speculative-draft-token-ids-to-the-stdout-log-which-the-collector-ships-out-of-the-enclave-the-prompt-and-output-histories-stay-redacted"
+      },
+      {
+        "severity": "medium",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED, fires on a text or refusal content part that lacks its text field, under a non-standard message role",
+        "title": "chat parser WARNING prints the whole content part verbatim to the stdout log, which the collector ships out of the enclave",
+        "anchor": "medium-deployed-armed-fires-on-a-text-or-refusal-content-part-that-lacks-its-text-field-under-a-non-standard-message-role--chat-parser-warning-prints-the-whole-content-part-verbatim-to-the-stdout-log-which-the-collector-ships-out-of-the-enclave"
+      },
+      {
+        "severity": "medium",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, unreachable through the proxy and armed by VLLM_PROXY_INLINE_MEDIA=0 on the proxy or by a caller that reaches the engine port without the proxy",
+        "title": "media-fetch retry warning writes a request's media URL and the fetch error to the stdout log, which the collector ships out of the enclave",
+        "anchor": "medium-deployed-off-unreachable-through-the-proxy-and-armed-by-vllmproxyinlinemedia0-on-the-proxy-or-by-a-caller-that-reaches-the-engine-port-without-the-proxy--media-fetch-retry-warning-writes-a-requests-media-url-and-the-fetch-error-to-the-stdout-log-which-the-collector-ships-out-of-the-enclave"
+      },
+      {
+        "severity": "medium",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, unreachable through the proxy and armed by VLLM_PROXY_INLINE_MEDIA=0 or a caller that bypasses the proxy, then narrowed by patches 13 and 14 to public unicast addresses",
+        "title": "the model class is multimodal: an http(s) image_url handed to the engine is fetched with no domain allowlist, redirects followed and re-validated per hop (egress)",
+        "anchor": "medium-deployed-off-unreachable-through-the-proxy-and-armed-by-vllmproxyinlinemedia0-or-a-caller-that-bypasses-the-proxy-then-narrowed-by-patches-13-and-14-to-public-unicast-addresses--the-model-class-is-multimodal-an-https-imageurl-handed-to-the-engine-is-fetched-with-no-domain-allowlist-redirects-followed-and-re-validated-per-hop-egress"
+      },
+      {
+        "severity": "medium",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, one env var away",
+        "title": "response-body logging middleware writes full API responses to the stdout log, which the collector ships out of the enclave",
+        "anchor": "medium-deployed-off-one-env-var-away--response-body-logging-middleware-writes-full-api-responses-to-the-stdout-log-which-the-collector-ships-out-of-the-enclave"
+      },
+      {
+        "severity": "low",
+        "deployed": "off",
+        "qualifier": "deployed: OFF, activates on VLLM_LOGGING_LEVEL=DEBUG alone with no flag needed",
+        "title": "parser engine logs the first 80 characters of model-generated tool-call arguments, and the multimodal prompt debug and error-response debug lines sit outside the request-logger gate (log)",
+        "anchor": "low-deployed-off-activates-on-vllmloggingleveldebug-alone-with-no-flag-needed--parser-engine-logs-the-first-80-characters-of-model-generated-tool-call-arguments-and-the-multimodal-prompt-debug-and-error-response-debug-lines-sit-outside-the-request-logger-gate-log"
+      },
+      {
+        "severity": "low",
+        "deployed": "armed",
+        "qualifier": "deployed: ARMED, fires on a rejected request",
+        "title": "two engine-core error lines outside any flag print the validation reason and media content hashes of a rejected request (log)",
+        "anchor": "low-deployed-armed-fires-on-a-rejected-request--two-engine-core-error-lines-outside-any-flag-print-the-validation-reason-and-media-content-hashes-of-a-rejected-request-log"
+      },
+      {
+        "severity": "low",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "usage-stats phone-home to stats.vllm.ai (egress; metadata only, no message content; also a local JSON line per report)",
+        "anchor": "low-deployed-on--usage-stats-phone-home-to-statsvllmai-egress-metadata-only-no-message-content-also-a-local-json-line-per-report"
+      },
+      {
+        "severity": "low",
+        "deployed": "off",
+        "qualifier": "deployed: OFF",
+        "title": "request and prompt logging to the stdout log: opt-in, passed off explicitly, no deprecated alias",
+        "anchor": "low-deployed-off--request-and-prompt-logging-to-the-stdout-log-opt-in-passed-off-explicitly-no-deprecated-alias"
+      },
+      {
+        "severity": "low",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "HTTP surface is unauthenticated on the CVM's host network; no runtime switch can turn content logging on; v0.34.0 adds checkpoint control routes, off here",
+        "anchor": "low-deployed-on--http-surface-is-unauthenticated-on-the-cvms-host-network-no-runtime-switch-can-turn-content-logging-on-v0340-adds-checkpoint-control-routes-off-here"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "patch 16 (Engram prestage) would be live: the step's Engram rows are gathered before CUDA-graph replay into the same in-process staging buffers; static and count-only log lines; no file, socket or new shared-memory object",
+        "anchor": "info-deployed-on--patch-16-engram-prestage-would-be-live-the-steps-engram-rows-are-gathered-before-cuda-graph-replay-into-the-same-in-process-staging-buffers-static-and-count-only-log-lines-no-file-socket-or-new-shared-memory-object"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "patch 17 (LoRA decoder replay) would be live: replay rows get their own LoRA token indices; arithmetic only",
+        "anchor": "info-deployed-on--patch-17-lora-decoder-replay-would-be-live-replay-rows-get-their-own-lora-token-indices-arithmetic-only"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "patch 15 (confidential-computing mode) would be live from the env switch alone; the copy machinery itself is now upstream code in the base image",
+        "anchor": "info-deployed-on--patch-15-confidential-computing-mode-would-be-live-from-the-env-switch-alone-the-copy-machinery-itself-is-now-upstream-code-in-the-base-image"
+      },
+      {
+        "severity": "info",
+        "deployed": "on",
+        "qualifier": "deployed: ON",
+        "title": "patches 04-06 would be live as on the running build: a weights-only Engram table in /dev/shm shared by every ipc-host container; peer reads off; the ported request-bound patches add no sink",
+        "anchor": "info-deployed-on--patches-04-06-would-be-live-as-on-the-running-build-a-weights-only-engram-table-in-devshm-shared-by-every-ipc-host-container-peer-reads-off-the-ported-request-bound-patches-add-no-sink"
+      },
+      {
+        "severity": "info",
+        "deployed": "off",
+        "qualifier": "deployed: OFF",
+        "title": "OTLP tracing off; metrics content-free; no CPU or disk KV tier declared",
+        "anchor": "info-deployed-off--otlp-tracing-off-metrics-content-free-no-cpu-or-disk-kv-tier-declared"
       }
     ],
     "images/docker.io/nearaidev/vllm/sha256-2fe2385152c450c971ff1ac9262298d9f3ed1a09decd4c65b048a6465c1796ea.md": [
@@ -21531,6 +21645,7 @@
     "images/docker.io/nearaidev/vllm-proxy-rs/sha256-e4a42b327523e304c0fc389f656ba7a02fd7b3d4a38cdc822f9288fd193a525a.md": "2026-10-22",
     "images/docker.io/nearaidev/vllm-proxy-rs/sha256-e665ebb9998fcf333a1611ecb4c49bd209b90aa9e09547ed792bd0436b132f30.md": "2026-09-02",
     "images/docker.io/nearaidev/vllm/sha256-0956859f52d262fa17084d61320c5b1ea22845825c7aab57d49ed8064cc8a396.md": "2026-11-06",
+    "images/docker.io/nearaidev/vllm/sha256-0e1f95eddd2247bf1c8ab024876319c2f80aead5d0e4a28dfffc9563e370a253.md": "2026-11-19",
     "images/docker.io/nearaidev/vllm/sha256-2fe2385152c450c971ff1ac9262298d9f3ed1a09decd4c65b048a6465c1796ea.md": "2026-11-19",
     "images/docker.io/nearaidev/vllm/sha256-5eaa0d4637080c10958b6cd8a371ae2ebb749b7a1e19c85bcb1abb89ee2540e4.md": "2026-10-30",
     "images/docker.io/nearaidev/vllm/sha256-8353a657f8edbc68637e30371ffacb94713d4e844faf3f73a77d820d5dfdfaae.md": "2026-11-06",
