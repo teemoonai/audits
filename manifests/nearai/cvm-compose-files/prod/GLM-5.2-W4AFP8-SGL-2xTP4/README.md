@@ -16,6 +16,7 @@ verdict column is each page's own `## verdict:` line, truncated.
 |---|---|---|
 | [`f408de5c89d7…`](sha256-f408de5c89d7e7f8b4715b1f62409f67cadf52e232cfdce663f94482a134bba2.md) | qualified PASS on what it configures | 2026-08-03 |
 | [`5b8fd687ad6f…`](sha256-5b8fd687ad6fa58747fcb5731fc28b2d1e91dac121c7843df525f6a93252fa34.md) | QUALIFIED PASS — carried unchanged from f408de5c | 2026-08-21 |
+| [`71d005a45c5b…`](sha256-71d005a45c5be89ab60b1b8f6142903b9a504e3ad67e80db3db8b737db7c9651.md) | QUALIFIED PASS — carried from the 5b8fd687 page for the document, whose three-commit delta (a certificate-reload loop in the nginx command, nine Datadog OpenMetrics labels removed, /metrics and /v1/metrics answered 404 on the TLS listener) adds no sink and no destination, and every image a possibly-surviving service runs has a … | 2026-11-20 |
 
 A revision not listed here has not been audited — the teemoon app shows no audit
 link for it (fail-closed by design). `python3 tools/fleet_drift.py` reports which
