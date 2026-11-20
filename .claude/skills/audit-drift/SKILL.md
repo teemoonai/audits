@@ -34,6 +34,15 @@ Its stdout is the triage. Act on it, not on the issue body:
 - **"THE FLEET MOVED"** — the issue is stale. The target list is the script's.
   A reviewer pointed at a superseded hash is the most expensive mistake available.
 - **DELTA / SIBLING / NEW** on each target decides the brief (step 3).
+- **`(leftover: liveness undecidable)`** on a recipe target: a revision the signed
+  log still attributes a container to, with no page. It counts as drift since
+  2026-11-20 because the client app counts every revision the log leaves running
+  on an enclave that holds the model key. Its page says which services it last
+  created and what the log proves about them; "superseded" is a valid result.
+- The sweep also reads **every enclave the gateway lists for each model**
+  (`?model=`), not only the CVM that answers the model's host name: the listed
+  enclaves share the model key. A gateway that does not answer is a WARN line,
+  not drift.
 
 Do not re-derive by hand anything a brief file states. Do spot-check one hash
 and one line of each patch before you send it — the script is evidence handed

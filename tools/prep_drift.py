@@ -44,6 +44,7 @@ Usage:
 Stdlib only, plus `git` (for the compose-repo clone) and optionally `gh`.
 """
 
+import urllib.parse
 import argparse
 import difflib
 import hashlib
@@ -126,12 +127,31 @@ def fetch_report(domain):
         return None
 
 
-def capture_cvms(domains, samples):
-    """Sample every affected host `samples` times and collapse to distinct CVMs.
-    Identity of a CVM here = (measured compose hash, action-log hash)."""
+def fetch_listed(job):
+    """Every enclave the gateway lists for one model, as (domain, report) pairs:
+    the same sweep fleet_drift.sample_gateway makes, kept whole for the briefs."""
+    domain, model = job
+    nonce = hashlib.sha256(os.urandom(32)).hexdigest()
+    st, body = fd.get(f"{fd.GATEWAY}?model={urllib.parse.quote(model, safe='/')}&nonce={nonce}&signing_algo=ecdsa")
+    if st != 200:
+        return []
+    try:
+        return [(domain, e) for e in (json.loads(body).get("model_attestations") or []) if isinstance(e, dict)]
+    except Exception:
+        return []
+
+
+def capture_cvms(domains, samples, models=None):
+    """Sample every affected host `samples` times, add every enclave the gateway
+    lists for those hosts' models (`models`: {domain: [model ids]}), and collapse
+    to distinct CVMs. Identity of a CVM here = (measured compose hash, action-log hash)."""
     jobs = [d for d in domains for _ in range(samples)]
     with ThreadPoolExecutor(max_workers=12) as ex:
         reports = list(ex.map(fetch_report, jobs))
+        for listed in ex.map(fetch_listed, [(d, m) for d in domains for m in (models or {}).get(d, [])]):
+            for d, rep in listed:
+                jobs.append(d)
+                reports.append(rep)
     cvms = {}
     for d, rep in zip(jobs, reports):
         if not rep:
@@ -567,7 +587,8 @@ def main():
     eps = eps["endpoints"] if isinstance(eps, dict) else eps
     dom = {e["domain"].split(".")[0]: e["domain"] for e in eps}
     hosts = sorted({h for t in targets for h in t["hosts"]})
-    cvms = capture_cvms([dom[h] for h in hosts if h in dom], args.samples)
+    cvms = capture_cvms([dom[h] for h in hosts if h in dom], args.samples,
+                        models={e["domain"]: e.get("models") or [] for e in eps})
     clone = ensure_clone(args.cache)
     idx = fd.load_index()
     # The sweep takes 3 samples a host; this capture takes more. Anything the

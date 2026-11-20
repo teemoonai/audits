@@ -71,11 +71,13 @@ import re
 import sys
 import threading
 import urllib.error
+import urllib.parse
 import urllib.request
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
 ENDPOINTS = "https://completions.near.ai/endpoints"
+GATEWAY = "https://cloud-api.near.ai/v1/attestation/report"   # ?model=<id>: every enclave listed for the model
 COMPOSE_REPO = "nearai/cvm-compose-files"
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -536,7 +538,38 @@ def sample_host(domain):
         rep = json.loads(body)
     except Exception as e:
         return {"host": domain, "error": f"undecodable report: {e}"}
+    return analyze_report(domain, rep)
 
+
+def sample_gateway(job):
+    """Every enclave the GATEWAY lists for one model (LISTED, NOT ANSWERING).
+
+    A host name answers from whichever CVM its load balancer picks, but the
+    model's sealed-request key is held by every enclave the gateway lists for
+    the model, and the client app checks each of those. On 2026-11-19/20 the
+    gateway listed three, then four, enclaves for z-ai/glm-5.3-flash under one
+    key while the model's own host name answered from one of them in 24 of 24
+    samples; the others ran revisions and images this sweep never saw. Each
+    listed entry has the shape of a direct report, so it goes through the same
+    analysis. A gateway that does not answer is a coverage warning, not drift:
+    the direct samples still stand.
+    -> [result dict per listed enclave] or [{"host", "gateway_note"}]"""
+    domain, model = job
+    nonce = hashlib.sha256(os.urandom(32)).hexdigest()
+    st, body = get(f"{GATEWAY}?model={urllib.parse.quote(model, safe='/')}&nonce={nonce}&signing_algo=ecdsa")
+    if st != 200:
+        return [{"host": domain, "gateway_note": f"gateway list for {model}: HTTP {st} — listed enclaves UNCHECKED"}]
+    try:
+        entries = json.loads(body).get("model_attestations") or []
+    except Exception as e:
+        return [{"host": domain, "gateway_note": f"gateway list for {model}: undecodable ({e}) — listed enclaves UNCHECKED"}]
+    if not entries:
+        return [{"host": domain, "gateway_note": f"gateway list for {model}: empty — listed enclaves UNCHECKED"}]
+    return [dict(analyze_report(domain, e), via="gateway") for e in entries if isinstance(e, dict)]
+
+
+def analyze_report(domain, rep):
+    """One attestation report (a host's own, or one entry of the gateway's list) -> result dict."""
     info = rep.get("info") or {}
     tcb = info.get("tcb_info") or {}
     out = {"host": domain, "model": rep.get("model_name"), "images": {},
@@ -640,6 +673,8 @@ def main():
     ap.add_argument("--samples", type=int, default=3,
                     help="requests per host; load-balanced hosts serve different CVMs (default 3)")
     ap.add_argument("--json", metavar="PATH", help="also write a machine-readable report")
+    ap.add_argument("--no-gateway", action="store_true",
+                    help="skip the gateway's per-model enclave lists (direct host samples only)")
     ap.add_argument("--strict-unreachable", action="store_true",
                     help="exit 2 when ANY advertised host is unreachable, not only when all are")
     args = ap.parse_args()
@@ -656,10 +691,18 @@ def main():
     jobs = [d for d in domains for _ in range(args.samples)]
     with ThreadPoolExecutor(max_workers=10) as ex:
         results = list(ex.map(sample_host, jobs))
+        # ...and every enclave the gateway lists for each advertised model (see sample_gateway)
+        gw_jobs = [] if args.no_gateway else [(e["domain"], m) for e in eps for m in (e.get("models") or [])]
+        gw_notes = []
+        for listed in ex.map(sample_gateway, gw_jobs):
+            for r in listed:
+                (gw_notes if r.get("gateway_note") else results).append(r)
 
     live_images, live_measured, live_os, live_recipes = defaultdict(set), defaultdict(set), defaultdict(set), defaultdict(set)
     unreachable, integrity, warnings, swaps = defaultdict(set), [], [], {}
     leftover_recipes, leftover_images = defaultdict(set), defaultdict(set)
+    for r in gw_notes:
+        warnings.append((r["host"].split(".")[0], r["gateway_note"]))
     for r in results:
         host = r["host"].split(".")[0]
         if r.get("error"):
@@ -705,6 +748,16 @@ def main():
         if sha not in (idx.get("manifests") or {}).get(key, []):
             (known if f"{path} {sha}" in ack else unaudited).append(
                 {"kind": "recipe", "id": f"{path} {sha}", "role": "model-layer recipe", "hosts": sorted(hosts)})
+    # A LEFTOVER revision (attributed by the log, liveness undecidable) with no page is drift too:
+    # the client app counts every revision the log leaves running on an enclave that holds the
+    # model key (2026-11-20), so "no page" there reads "not everything here has been reviewed".
+    # Acknowledged ones stay KNOWN OPEN; leftover IMAGES stay a report, not drift (below).
+    have = {u["id"] for u in unaudited}
+    for (path, sha), hosts in sorted(leftover_recipes.items()):
+        ident = f"{path} {sha}"
+        if sha not in (idx.get("manifests") or {}).get(f"{COMPOSE_REPO}/{path}", []) and ident not in ack and ident not in have:
+            unaudited.append({"kind": "recipe", "id": ident, "hosts": sorted(hosts),
+                              "role": "model-layer recipe (leftover: liveness undecidable)"})
 
     live_img_ids = {i for i, _ in live_images}
     for ref, digests in (idx.get("images") or {}).items():
@@ -764,6 +817,7 @@ def main():
     for (kind, ident, role), hosts in [(x, h) for x, h in lo if x[1] in ack]:
         known.append({"kind": kind, "id": ident, "role": role, "hosts": sorted(hosts), "liveness": "undecidable"})
     lo = [(x, h) for x, h in lo if x[1] not in ack]
+    lo = [(x, h) for x, h in lo if x[1] not in {u["id"] for u in unaudited}]   # leftover recipes are listed as UNAUDITED
     if lo:
         print(f"\nLEFTOVER — attributed by the log, no page, liveness UNDECIDABLE  ({len(lo)})")
         print("  (a later up of ANOTHER file does not define the name; the per-deploy compose project is")
