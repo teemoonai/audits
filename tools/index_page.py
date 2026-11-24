@@ -202,7 +202,23 @@ def classify(verdict):
 #
 # copied to `exposure[page].services`, with `scope_kind: "recipe"`. An image
 # page's scope is the image itself (`scope_kind: "image"`, no services): its
-# leak is on the path when a path service runs that image. The client computes
+# leak is on the path when a path service runs that image.
+#
+# An image page may opt in to recipe scoping when its leak lives in one program
+# of the image that only some services run (sglang 2321e3c2, 2026-11-22: the
+# diffusion server keeps FLUX images on disk; the Qwen engines run the same
+# digest and the same `sglang serve` command, which picks the program from the
+# model, so the compose text cannot tell them apart):
+#
+#     ## exposure-scope: recipe
+#
+# copied as `exposure[page].scoped_by = "recipe"`. Client rule for such an
+# image exposure and a path service S that runs the image: count it only when
+# the gated page of the recipe revision that created S is LEAKS and names S in
+# its `services`; when no gated page exists for that revision, count it (fail
+# toward warning). A recipe reviewer who runs such an image therefore decides,
+# on the recipe page, which services carry the leak; a gated LEAKS recipe page
+# already must name them (below). The client computes
 # the path from the ingress config, the proxy's backend list and the running
 # table (README, "exposure"); a gated LEAKS recipe page without a readable
 # services line fails --validate.
@@ -224,6 +240,12 @@ def exposure_of(path):
     entry["scope"] = sm.group(1).lower()
     entry["summary"] = plain(sm.group(2))
     entry["scope_kind"] = "recipe" if path.startswith("manifests/") else "image"
+    if entry["scope_kind"] == "image":
+        sc = re.search(r"^## exposure-scope:\s*(.+)$", text, re.M)
+        if sc:
+            if sc.group(1).strip().lower() != "recipe":
+                return None, f"exposure-scope line must read 'recipe': {sc.group(1)[:40]}"
+            entry["scoped_by"] = "recipe"
     if entry["scope_kind"] == "recipe":
         sv = re.search(r"^## exposure-services:\s*(.+)$", text, re.M)
         if sv:
