@@ -152,6 +152,21 @@ keys its LEAKS copy on `scope` and shows `summary`; a LEAKS page without a
 readable line is omitted and the client falls back to neutral copy, never to
 the worst case.
 
+**`incidents` (additive, 2026-11-25): a provider's security incident.** A review
+reads code; it cannot see that someone broke into the running service. A page under
+`incidents/` records such an event from its public sources, and makes no verdict.
+Its machine-read lines sit directly under the title:
+`## incident: <open|closed> — <sentence>`, `## incident-scope: provider:<id>[,
+image:<repo>@sha256:<digest>][, model:<model id>]`, `## incident-window: <from>
+[<to>]` and `## incident-sources: <url>[, <url>]`. The indexer copies them to
+`incidents[page]` as `{status, summary, scope: [{kind, id}], window: {from, to},
+sources}`; `--validate` fails a page it cannot read. `status` is `open` while the
+provider has not said the cause is fixed and closed, `closed` after. `scope` always
+names the provider and may narrow to image digests or model ids when the sources do;
+a client matches an incident to a chat by the narrowest scope given (an image on the
+chat's path, else the model, else every chat with that provider). `summary` is
+shipped verbatim.
+
 **`exposure[page].services` and `scope_kind` (additive, 2026-11-06): which
 chat a LEAKS verdict is about.** A recipe file runs many services, and a leak
 in one of them (the FLUX engine in `small-models`) is not a leak of a chat

@@ -304,6 +304,58 @@ def findings_of(path):
     return out
 
 
+# Incident records (additive, 2026-11-25, for the 1.1.2 everyday warning). A page
+# under incidents/ records a provider's security incident from its sources; it is
+# not a review and makes no verdict. Its machine-read lines, directly under the title:
+#     ## incident: <open|closed> — <one plain-text sentence: what happened, what it exposed>
+#     ## incident-scope: provider:<id>[, image:<repo>@sha256:<64 hex>][, model:<model id>]
+#     ## incident-window: <YYYY-MM-DD> [<YYYY-MM-DD>]
+#     ## incident-sources: <url>[, <url>]
+# copied to `incidents[page]` as {status, summary, scope: [{kind, id}], window:
+# {from, to}, sources}. A page the rules can't read is omitted and fails --validate.
+INCIDENT_KINDS = ("provider", "image", "model")
+
+
+def incident_of(path):
+    text = strip_fences(open(os.path.join(REPO_ROOT, path), encoding="utf-8").read())
+    m = re.search(r"^## incident:\s*(open|closed)\s+[—-]+\s+(.+)$", text, re.M | re.I)
+    if not m:
+        return None, "no readable '## incident: <open|closed> — <sentence>' line"
+    entry = {"status": m.group(1).lower(), "summary": plain(m.group(2).strip())}
+    sc = re.search(r"^## incident-scope:\s*(.+)$", text, re.M)
+    if not sc:
+        return None, "no '## incident-scope:' line"
+    scope = []
+    for part in [x.strip() for x in sc.group(1).split(",") if x.strip()]:
+        kind, _, ident = part.partition(":")
+        kind, ident = kind.strip().lower(), ident.strip()
+        if kind not in INCIDENT_KINDS or not ident:
+            return None, f"incident-scope entry must be provider:/image:/model:<id>: {part[:60]}"
+        if kind == "image" and not re.fullmatch(r"[^@\s]+@sha256:[0-9a-f]{64}", ident):
+            return None, f"image scope must be <repo>@sha256:<64 hex>: {ident[:60]}"
+        scope.append({"kind": kind, "id": ident})
+    if not any(s["kind"] == "provider" for s in scope):
+        return None, "incident-scope must name the provider (provider:<id>)"
+    entry["scope"] = scope
+    w = re.search(r"^## incident-window:\s*(\d{4}-\d{2}-\d{2})(?:\s+(\d{4}-\d{2}-\d{2}))?\s*$", text, re.M)
+    if not w:
+        return None, "no readable '## incident-window: <from> [<to>]' line"
+    if entry["status"] == "closed" and not w.group(2):
+        return None, "a closed incident's window needs an end date"
+    entry["window"] = {"from": w.group(1), "to": w.group(2)}
+    src = re.search(r"^## incident-sources:\s*(.+)$", text, re.M)
+    urls = [u.strip() for u in (src.group(1).split(",") if src else []) if u.strip()]
+    if not urls or not all(re.fullmatch(r"https://\S+", u) for u in urls):
+        return None, "incident-sources must list at least one https URL"
+    entry["sources"] = urls
+    return entry, None
+
+
+def incident_pages():
+    return sorted(os.path.relpath(f, REPO_ROOT) for f in glob.glob(os.path.join(REPO_ROOT, "incidents", "*.md"))
+                  if os.path.basename(f) != "README.md")
+
+
 def refresh_verdicts(idx):
     """Every page's own verdict line, verbatim — plus the machine-readable
     layer (`verdictClass`, `findings`) mechanically derived from the page's
@@ -339,6 +391,15 @@ def refresh_verdicts(idx):
     idx["verdictClass"] = classes
     idx["exposure"] = exposure
     idx["findings"] = findings
+    incidents = collections.OrderedDict()
+    for rel in incident_pages():
+        entry, why = incident_of(rel)
+        if entry:
+            incidents[rel] = entry
+        else:
+            print(f"  WARN incident page unreadable (omitted from incidents) — {why}: {rel}")
+    if incidents or "incidents" in idx:
+        idx["incidents"] = incidents
     checked = collections.OrderedDict()
     for rel in v:
         d = checked_of(rel)
@@ -456,6 +517,15 @@ def validate(idx):
               "  <-- ungated: intentional? if not, gate it"
         problems.append(f"page on disk, not gated: {extra}{why}") if "INCONCLUSIVE" not in note.upper() \
             else print(f"  note: {extra}{why}")
+    for rel in incident_pages():
+        entry, why = incident_of(rel)
+        if not entry:
+            problems.append(f"incident page unreadable — {why}: {rel}")
+        elif (idx.get("incidents") or {}).get(rel) != entry:
+            problems.append(f"index.json incidents entry is stale against the page — run the indexer: {rel}")
+    for rel in (idx.get("incidents") or {}):
+        if not os.path.exists(os.path.join(REPO_ROOT, rel)):
+            problems.append(f"incidents entry has no page on disk: {rel}")
     return problems, len(built)
 
 
