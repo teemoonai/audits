@@ -165,7 +165,9 @@ provider has not said the cause is fixed and closed, `closed` after. `scope` alw
 names the provider and may narrow to image digests or model ids when the sources do;
 a client matches an incident to a chat by the narrowest scope given (an image on the
 chat's path, else the model, else every chat with that provider). `summary` is
-shipped verbatim.
+shipped verbatim. Warning rule (the maintainer, 2026-11-25): a matching incident sets the
+everyday warning while `open`, and while `closed` until 30 days after `window.to`;
+after that it shows in the expert view only.
 
 **`exposure[page].services` and `scope_kind` (additive, 2026-11-06): which
 chat a LEAKS verdict is about.** A recipe file runs many services, and a leak
