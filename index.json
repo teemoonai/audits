@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-11-24",
+  "updated": "2026-11-25",
   "images": {
     "docker.io/nearaidev/vllm-proxy-rs": [
       "b183677a5d32267539b9b21ec45327a4f3be0a013afeb608c68c4d76e9472e36",
@@ -26414,7 +26414,7 @@
     "images/docker.io/nearaidev/sglang/sha256-050b1adf961c8621264d14696d24645f70d1a675509ad400a72ccfb1a3fddcb2.md": "2026-11-20",
     "images/docker.io/nearaidev/sglang/sha256-0ca61f6ab34faafa41c220ff5eb64c7026b3ada16a87147a0d75680f91a14b50.md": "2026-11-20",
     "images/docker.io/nearaidev/sglang/sha256-1e335c485bfe064e1b9cdfdcb2765e327235a59fbb65df91be9b429d23e1db08.md": "2026-08-04",
-    "images/docker.io/nearaidev/sglang/sha256-2321e3c217f0757fe285187d28553183f051b8d1ceccb0deb6a7459c43ed3a45.md": "2026-11-24",
+    "images/docker.io/nearaidev/sglang/sha256-2321e3c217f0757fe285187d28553183f051b8d1ceccb0deb6a7459c43ed3a45.md": "2026-11-25",
     "images/docker.io/nearaidev/sglang/sha256-3eccc30709f5719c81084d1264f03ca5354b3059ec4cff62f0c5ff88c309680c.md": "2026-11-06",
     "images/docker.io/nearaidev/sglang/sha256-47aff791090003a37f893e998c44794c410d3f7bdfc7fdd2dfab5eb5592b30bb.md": "2026-10-12",
     "images/docker.io/nearaidev/sglang/sha256-59700363c0b6885301ea1f344fe3d45c8335597fdef4ffd49def79dca347f91d.md": "2026-10-12",
