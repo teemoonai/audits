@@ -1,6 +1,6 @@
 # near.ai: code execution on an inference server through SGLang, 2026-11-06 to 2026-11-08
 
-## incident: closed — An attacker ran their own code on one near.ai inference server through a flaw in the SGLang engine and could have seen the requests that server was processing on 8 November 2026, confidential ones included; near.ai says the access is closed and the flaw is fixed.
+## incident: closed — Between 6 and 8 November 2026, an attacker ran code inside one near.ai server through a flaw in its SGLang engine and could see requests in progress there, encrypted ones included; near.ai says it is fixed.
 ## incident-scope: provider:nearai
 ## incident-window: 2026-11-06 2026-11-08
 ## incident-sources: https://near.ai/blog/security-incident-report-sglang-vulnerability, https://github.com/nearai/cvm-compose-files/commit/ab7eeee2e3b480d4f5644d7988586e8f5765a969, https://github.com/nearai/cvm-compose-files/commit/3ea271967dc297e0a2b7a3c37a00c55f8bab55b6, https://github.com/nearai/cvm-compose-files/commit/dc31c385e99d5caaa04acfd8b426bf4943ef46b5, https://github.com/nearai/cvm-compose-files/commit/48310b813d207170247786a50265485967e76b14, https://github.com/nearai/cvm-compose-files/commit/aeef5070890ff8447c98db0afbce997edc529019, https://labs.cloudsecurityalliance.org/research/csa-research-note-near-ai-sglang-confidential-inference-brea/
